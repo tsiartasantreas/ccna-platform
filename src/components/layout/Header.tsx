@@ -35,6 +35,7 @@ export default function Header({ locale, translations }: HeaderProps) {
   const [isHidden, setIsHidden] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [userAvatar, setUserAvatar] = useState('');
 
   useEffect(() => {
     const theme = localStorage.getItem('theme') || 'dark';
@@ -67,6 +68,9 @@ export default function Header({ locale, translations }: HeaderProps) {
         // Get display name from metadata or email
         const name = session.user.user_metadata?.display_name || session.user.email?.split('@')[0] || 'User';
         setUserName(name);
+        // Get avatar from localStorage or profile
+        const savedAvatar = localStorage.getItem('userAvatar');
+        if (savedAvatar) setUserAvatar(savedAvatar);
       } else {
         setIsLoggedIn(false);
         setIsAdmin(false);
@@ -218,8 +222,12 @@ export default function Header({ locale, translations }: HeaderProps) {
                   onClick={() => setShowUserMenu(!showUserMenu)}
                   className="flex items-center gap-2 px-3 py-2 rounded-lg bg-surface-light hover:bg-surface transition-all"
                 >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white text-sm font-bold">
-                    {userName.charAt(0).toUpperCase()}
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white text-sm font-bold overflow-hidden">
+                    {userAvatar ? (
+                      <img src={userAvatar} alt={userName} className="w-full h-full object-cover" />
+                    ) : (
+                      userName.charAt(0).toUpperCase()
+                    )}
                   </div>
                   <span className="text-sm font-medium text-text hidden sm:block">{userName}</span>
                   <svg className="w-4 h-4 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">

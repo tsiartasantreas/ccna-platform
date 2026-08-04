@@ -22,6 +22,26 @@ const t = el;
             <label for="display-name" class="block text-sm font-medium text-text mb-2">{t.profile.display_name}</label>
             <input type="text" id="display-name" name="display-name" class="w-full px-4 py-3 bg-surface border border-primary/10 rounded-xl text-text placeholder-text-muted focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="Το όνομά σας" />
           </div>
+          {/* Profile Picture */}
+          <div class="flex items-center gap-6">
+            <div class="relative">
+              <div id="avatar-preview" class="w-24 h-24 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-3xl overflow-hidden">
+                <span id="avatar-letter">U</span>
+                <img id="avatar-img" src="" alt="Profile" class="w-full h-full object-cover hidden" />
+              </div>
+              <label for="avatar-upload" class="absolute bottom-0 right-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center cursor-pointer hover:bg-primary-dark transition-colors shadow-lg">
+                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+              </label>
+              <input type="file" id="avatar-upload" accept="image/*" class="hidden" />
+            </div>
+            <div>
+              <h3 class="font-medium text-text">Φωτογραφία Προφίλ</h3>
+              <p class="text-sm text-text-muted">Μεταφορτώστε μια φωτογραφία</p>
+              <p class="text-xs text-text-muted mt-1">JPG, PNG ή WebP. Max 2MB.</p>
+              <button type="button" id="remove-avatar" class="hidden text-xs text-error mt-2 hover:underline">Αφαίρεση φωτογραφίας</button>
+            </div>
+          </div>
+
           <div>
             <label for="email" class="block text-sm font-medium text-text mb-2">{t.auth.email}</label>
             <input type="email" id="email" name="email" disabled class="w-full px-4 py-3 bg-surface-light border border-primary/10 rounded-xl text-text-muted cursor-not-allowed" />
@@ -122,6 +142,19 @@ const t = el;
       if (nameInput) nameInput.value = profile?.display_name || session.user.user_metadata?.display_name || '';
       if (emailInput) emailInput.value = session.user.email || '';
 
+      // Avatar
+      const avatarLetter = document.getElementById('avatar-letter');
+      const avatarImg = document.getElementById('avatar-img') as HTMLImageElement;
+      const removeBtn = document.getElementById('remove-avatar');
+      const displayName = profile?.display_name || session.user.user_metadata?.display_name || session.user.email?.split('@')[0] || 'U';
+      if (avatarLetter) avatarLetter.textContent = displayName.charAt(0).toUpperCase();
+      if (profile?.avatar_url && avatarImg) {
+        avatarImg.src = profile.avatar_url;
+        avatarImg.classList.remove('hidden');
+        if (avatarLetter) avatarLetter.style.display = 'none';
+        if (removeBtn) removeBtn.classList.remove('hidden');
+      }
+
       if (profile?.plan === 'pro') {
         const planIcon = document.getElementById('plan-icon');
         const planName = document.getElementById('plan-name');
@@ -134,6 +167,46 @@ const t = el;
       }
     }
     loadProfile();
+
+    // Avatar upload
+    document.getElementById('avatar-upload')?.addEventListener('change', async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+      if (file.size > 2 * 1024 * 1024) { alert('Το αρχείο είναι πολύ μεγάλο. Μέγιστο 2MB.'); return; }
+      if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) { alert('Μη έγκυρος τύπος αρχείου.'); return; }
+
+      const reader = new FileReader();
+      reader.onload = async function() {
+        const base64 = reader.result as string;
+        const avatarImg = document.getElementById('avatar-img') as HTMLImageElement;
+        const avatarLetter = document.getElementById('avatar-letter');
+        const removeBtn = document.getElementById('remove-avatar');
+        if (avatarImg) { avatarImg.src = base64; avatarImg.classList.remove('hidden'); }
+        if (avatarLetter) avatarLetter.style.display = 'none';
+        if (removeBtn) removeBtn.classList.remove('hidden');
+        localStorage.setItem('userAvatar', base64);
+
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          await supabase.from('profiles').update({ avatar_url: base64 }).eq('id', session.user.id);
+          alert('Η φωτογραφία ενημερώθηκε!');
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+
+    document.getElementById('remove-avatar')?.addEventListener('click', async () => {
+      const avatarImg = document.getElementById('avatar-img') as HTMLImageElement;
+      const avatarLetter = document.getElementById('avatar-letter');
+      const removeBtn = document.getElementById('remove-avatar');
+      if (avatarImg) { avatarImg.src = ''; avatarImg.classList.add('hidden'); }
+      if (avatarLetter) avatarLetter.style.display = 'flex';
+      if (removeBtn) removeBtn.classList.add('hidden');
+      localStorage.removeItem('userAvatar');
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) await supabase.from('profiles').update({ avatar_url: null }).eq('id', session.user.id);
+      alert('Η φωτογραφία αφαιρέθηκε.');
+    });
 
     // Password reset
     document.getElementById('reset-password-btn')?.addEventListener('click', async () => {
