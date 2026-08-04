@@ -54,23 +54,19 @@ const t = en;
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
             <div class="text-sm text-text-muted mb-1">Total Users</div>
-            <div class="text-3xl font-bold text-primary" id="stat-total-users">156</div>
-            <div class="text-xs text-success mt-1">+5 today</div>
-          </div>
-          <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
-            <div class="text-sm text-text-muted mb-1">Active Users</div>
-            <div class="text-3xl font-bold text-success" id="stat-active-users">89</div>
-            <div class="text-xs text-text-muted mt-1">57% of total</div>
+            <div class="text-3xl font-bold text-primary" id="stat-total-users">0</div>
           </div>
           <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
             <div class="text-sm text-text-muted mb-1">Pro Users</div>
-            <div class="text-3xl font-bold text-accent" id="stat-pro-users">23</div>
-            <div class="text-xs text-text-muted mt-1">15% conversion</div>
+            <div class="text-3xl font-bold text-accent" id="stat-pro-users">0</div>
           </div>
           <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
             <div class="text-sm text-text-muted mb-1">Revenue (Month)</div>
-            <div class="text-3xl font-bold text-warning" id="stat-revenue">€229.77</div>
-            <div class="text-xs text-success mt-1">+12% vs last month</div>
+            <div class="text-3xl font-bold text-warning" id="stat-revenue">€0.00</div>
+          </div>
+          <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
+            <div class="text-sm text-text-muted mb-1">Free Users</div>
+            <div class="text-3xl font-bold text-text" id="stat-free-users">0</div>
           </div>
         </div>
 
@@ -452,8 +448,10 @@ const t = en;
           : 0;
 
         // Update stats
+        const freeUsers = totalUsers - proUsers;
         document.getElementById('stat-total-users')!.textContent = String(totalUsers);
         document.getElementById('stat-pro-users')!.textContent = String(proUsers);
+        document.getElementById('stat-free-users')!.textContent = String(freeUsers);
         document.getElementById('stat-revenue')!.textContent = `€${revenue.toFixed(2)}`;
         document.getElementById('stat-new-week')!.textContent = String(newThisWeek);
         document.getElementById('stat-avg-score')!.textContent = `${avgScore}%`;
