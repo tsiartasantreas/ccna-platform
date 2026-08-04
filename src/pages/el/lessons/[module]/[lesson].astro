@@ -1,0 +1,203 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import Header from '../../../../components/layout/Header.tsx';
+import Footer from '../../../../components/layout/Footer.tsx';
+import el from '../../../../i18n/el.json';
+
+const locale = 'el' as const;
+const t = el;
+
+// Import Greek lesson content
+import { module1LessonsEl } from '../../../../lib/lessons/module1-el';
+import { module2LessonsEl } from '../../../../lib/lessons/module2-el';
+import { module3LessonsEl } from '../../../../lib/lessons/module3-el';
+import { module4LessonsEl } from '../../../../lib/lessons/module4-el';
+import { module5LessonsEl } from '../../../../lib/lessons/module5-el';
+import { module6LessonsEl } from '../../../../lib/lessons/module6-el';
+
+const allModuleLessons: Record<number, Record<number, { objectives: string[]; keyTerms: { term: string; definition: string }[]; content: string }>> = {
+  1: module1LessonsEl,
+  2: module2LessonsEl,
+  3: module3LessonsEl,
+  4: module4LessonsEl,
+  5: module5LessonsEl,
+  6: module6LessonsEl,
+};
+
+const moduleNames: Record<number, string> = {
+  1: 'Θεμέλια Δικτύων',
+  2: 'Πρόσβαση Δικτύου',
+  3: 'Συνδεσιμότητα IP',
+  4: 'Υπηρεσίες IP',
+  5: 'Θεμέλια Ασφάλειας',
+  6: 'Αυτοματοποίηση & Προγραμματισμός',
+};
+
+const moduleLessonTitles: Record<number, string[]> = {
+  1: ['Μοντέλο OSI & TCP/IP', 'Τοπολογίες & Τύποι Δικτύων', 'Καλωδίωση & Υποδομή', 'Διευθυνσιοδότηση IPv4', 'Υποδίκτυα IPv4 & VLSM', 'Διευθυνσιοδότηση IPv6', 'TCP, UDP, ARP, DNS, ICMP', 'Βασικά Cisco CLI'],
+  2: ['Ethernet & Διευθύνσεις MAC', 'Λειτουργία Switch', 'VLANs & Trunking (802.1Q)', 'EtherChannel', 'Spanning Tree Protocol (STP)', 'Ασύρματα Θεμέλια', 'PoE & Ασφάλεια Ασύρματων'],
+  3: ['Πίνακας Δρομολόγησης & Επιλογή Διαδρομής', 'Στατικές Διαδρομές', 'Δρομολόγηση Inter-VLAN', 'OSPF Μονής Περιοχής', 'OSPF Πολλαπλών Περιοχών', 'Πρωτόκολλα Πλεονασμού (HSRP/VRRP)'],
+  4: ['DHCP', 'NAT & PAT', 'NTP & Syslog', 'SNMP & QoS', 'SSH & Απομακρυσμένη Πρόσβαση'],
+  5: ['Επισκόπηση Απειλών Ασφάλειας', 'Λίστες Ελέγχου Πρόσβασης (ACLs)', 'Ασφάλεια Θυρών & DHCP Snooping', 'AAA & 802.1X', 'VPN & Firewalls'],
+  6: ['Έννοιες SDN', 'REST APIs & Μορφές Δεδομένων', 'Διαχείριση Ρυθμίσεων', 'Cisco DNA Center & Προγραμματισμός'],
+};
+
+export function getStaticPaths() {
+  const paths: { params: { module: string; lesson: string } }[] = [];
+  for (let m = 1; m <= 6; m++) {
+    const lessonCount = [8, 7, 6, 5, 5, 4][m - 1];
+    for (let l = 1; l <= lessonCount; l++) {
+      paths.push({ params: { module: String(m), lesson: String(l) } });
+    }
+  }
+  return paths;
+}
+
+const { module: moduleParam, lesson: lessonParam } = Astro.params;
+const moduleNum = parseInt(moduleParam || '1');
+const lessonNum = parseInt(lessonParam || '1');
+
+const moduleName = moduleNames[moduleNum] || 'Θεμέλια Δικτύων';
+const lessonTitle = moduleLessonTitles[moduleNum]?.[lessonNum - 1] || 'Μάθημα';
+const content = allModuleLessons[moduleNum]?.[lessonNum] || null;
+
+const lessonCount = moduleLessonTitles[moduleNum]?.length || 1;
+const prevLesson = lessonNum > 1
+  ? { module: moduleNum, lesson: lessonNum - 1 }
+  : moduleNum > 1
+    ? { module: moduleNum - 1, lesson: moduleLessonTitles[moduleNum - 1]?.length || 1 }
+    : null;
+const nextLesson = lessonNum < lessonCount
+  ? { module: moduleNum, lesson: lessonNum + 1 }
+  : moduleNum < 6
+    ? { module: moduleNum + 1, lesson: 1 }
+    : null;
+
+function mdToHtml(md: string): string {
+  let html = md
+    .replace(/^### (.+)$/gm, '<h3 class="text-xl font-bold text-text mt-8 mb-3">$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2 class="text-2xl font-bold text-text mt-10 mb-4 pb-2 border-b border-primary/10">$1</h2>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong class="text-text font-semibold">$1</strong>')
+    .replace(/`([^`]+)`/g, '<code class="px-1.5 py-0.5 bg-surface-light rounded text-primary text-sm font-mono">$1</code>')
+    .replace(/```(\w*)\n([\s\S]*?)```/g, '<pre class="bg-surface-light rounded-xl p-4 overflow-x-auto my-4 border border-primary/10"><code class="text-sm font-mono text-text-muted">$2</code></pre>')
+    .replace(/\|(.+)\|/g, (match) => {
+      const cells = match.split('|').filter(c => c.trim());
+      if (cells.some(c => c.trim().match(/^[-:]+$/))) return '';
+      const isHeader = !match.includes('---');
+      return '<tr>' + cells.map(c => {
+        const cell = c.trim();
+        return isHeader
+          ? `<th class="px-4 py-2 bg-surface-light text-left text-sm font-semibold text-text border border-primary/10">${cell}</th>`
+          : `<td class="px-4 py-2 text-sm text-text-muted border border-primary/10">${cell}</td>`;
+      }).join('') + '</tr>';
+    })
+    .replace(/^> (.+)$/gm, '<blockquote class="pl-4 border-l-4 border-primary/30 text-text-muted italic my-4">$1</blockquote>')
+    .replace(/^- (.+)$/gm, '<li class="flex items-start gap-2 text-text-muted"><span class="text-primary mt-1.5">•</span><span>$1</span></li>')
+    .replace(/^(?!<|$|\s*$)(.+)$/gm, '<p class="text-text-muted leading-relaxed mb-4">$1</p>')
+    .replace(/<p class="[^"]*"><\/p>/g, '')
+    .replace(/(<tr>[\s\S]*?<\/tr>\s*)+/g, (match) => `<div class="overflow-x-auto my-4"><table class="w-full border-collapse">${match}</table></div>`);
+  return html;
+}
+---
+
+<BaseLayout title={`${lessonTitle} - ${t.modules.module} ${moduleNum}`} lang={locale}>
+  <Header locale={locale} translations={t} client:load />
+
+  <main class="pt-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex gap-8">
+      <aside class="hidden lg:block w-64 flex-shrink-0">
+        <div class="sticky top-24 space-y-4">
+          <div class="bg-surface-card rounded-xl border border-primary/10 p-4">
+            <h3 class="text-sm font-bold text-primary mb-3">
+              {t.modules.module} {moduleNum}: {moduleName}
+            </h3>
+            <ul class="space-y-1">
+              {(moduleLessonTitles[moduleNum] || []).map((lesson, idx) => (
+                <li>
+                  <a href={`/${locale}/lessons/${moduleNum}/${idx + 1}`} class={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${idx + 1 === lessonNum ? 'bg-primary/10 text-primary font-medium' : 'text-text-muted hover:text-primary hover:bg-surface-light'}`}>
+                    <span class={`w-6 h-6 rounded flex items-center justify-center text-xs ${idx + 1 === lessonNum ? 'bg-primary/20 text-primary' : 'bg-surface text-text-muted'}`}>{idx + 1}</span>
+                    <span class="truncate">{lesson}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <a href={`/${locale}/lessons/${moduleNum}/quiz`} class="block bg-gradient-to-r from-primary/10 to-accent/10 rounded-xl border border-primary/20 p-4 hover:border-primary/40 transition-colors">
+            <div class="text-sm font-bold text-primary mb-1">🎯 {t.quiz.title}</div>
+            <div class="text-xs text-text-muted">Δοκιμάστε τις γνώσεις σας</div>
+          </a>
+        </div>
+      </aside>
+
+      <article class="flex-grow max-w-4xl pb-16">
+        <nav class="flex items-center gap-2 text-sm text-text-muted mb-8">
+          <a href={`/${locale}/curriculum`} class="hover:text-primary">{t.nav.curriculum}</a>
+          <span>/</span>
+          <a href={`/${locale}/curriculum`} class="hover:text-primary">{t.modules.module} {moduleNum}</a>
+          <span>/</span>
+          <span class="text-primary">{lessonTitle}</span>
+        </nav>
+
+        <div class="mb-8">
+          <div class="flex items-center gap-3 mb-2">
+            <span class="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">{t.modules.module} {moduleNum}</span>
+            <span class="px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-medium">Μάθημα {lessonNum} από {lessonCount}</span>
+          </div>
+          <h1 class="text-3xl sm:text-4xl font-bold text-text">{lessonTitle}</h1>
+        </div>
+
+        {content ? (
+          <>
+            <div class="bg-primary/5 rounded-xl border border-primary/10 p-6 mb-8">
+              <h2 class="text-lg font-bold text-primary mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                {t.lesson.objectives}
+              </h2>
+              <ul class="space-y-2">
+                {content.objectives.map((obj) => (
+                  <li class="flex items-start gap-2 text-text-muted"><span class="text-primary mt-1">•</span>{obj}</li>
+                ))}
+              </ul>
+            </div>
+
+            <div class="prose max-w-none" set:html={mdToHtml(content.content)} />
+
+            <div class="mt-12 bg-surface-card rounded-xl border border-primary/10 p-6">
+              <h2 class="text-lg font-bold text-text mb-4 flex items-center gap-2">📖 {t.lesson.key_terms}</h2>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {content.keyTerms.map((kt) => (
+                  <div class="p-4 bg-surface-light rounded-lg">
+                    <div class="font-bold text-primary text-sm mb-1">{kt.term}</div>
+                    <div class="text-text-muted text-sm">{kt.definition}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div class="mt-12 bg-gradient-to-r from-primary/5 to-accent/5 rounded-xl border border-primary/10 p-6">
+              <h2 class="text-lg font-bold text-text mb-4 flex items-center gap-2">🧠 {t.lesson.test_knowledge}</h2>
+              <p class="text-text-muted mb-4">Έτοιμοι να δοκιμάσετε τις γνώσεις σας;</p>
+              <a href={`/${locale}/lessons/${moduleNum}/quiz`} class="inline-flex px-6 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity">
+                Τεστ Ενότητας {moduleNum} →
+              </a>
+            </div>
+          </>
+        ) : (
+          <div class="bg-surface-card rounded-xl border border-primary/10 p-12 text-center">
+            <div class="text-6xl mb-4">📚</div>
+            <h2 class="text-2xl font-bold text-text mb-2">{lessonTitle}</h2>
+            <p class="text-text-muted mb-6">Το περιεχόμενο προετοιμάζεται.</p>
+            <a href={`/${locale}/curriculum`} class="inline-flex px-6 py-3 bg-primary/10 text-primary rounded-xl font-medium hover:bg-primary/20 transition-colors">{t.lesson.back_to_curriculum}</a>
+          </div>
+        )}
+
+        <div class="mt-12 flex items-center justify-between">
+          {prevLesson ? <a href={`/${locale}/lessons/${prevLesson.module}/${prevLesson.lesson}`} class="flex items-center gap-2 px-4 py-2 text-text-muted hover:text-primary transition-colors">← {t.lesson.prev_lesson}</a> : <div />}
+          {nextLesson ? <a href={`/${locale}/lessons/${nextLesson.module}/${nextLesson.lesson}`} class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity">{t.lesson.next_lesson} →</a> : <div />}
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <Footer locale={locale} translations={t} />
+</BaseLayout>
