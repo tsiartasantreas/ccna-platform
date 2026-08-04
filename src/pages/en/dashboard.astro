@@ -22,17 +22,12 @@ const modules = [
 
   <main class="pt-24 pb-16 min-h-screen">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      {/* Welcome header */}
       <div class="mb-8">
-        <h1 class="text-3xl sm:text-4xl font-bold mb-2">
-          {t.dashboard.welcome} 👋
-        </h1>
-        <p class="text-text-muted">
-          {t.dashboard.your_progress}
-        </p>
+        <h1 class="text-3xl sm:text-4xl font-bold mb-2">{t.dashboard.welcome} 👋</h1>
+        <p class="text-text-muted" id="user-greeting">{t.dashboard.your_progress}</p>
       </div>
 
-      {/* Stats cards */}
+      {/* Stats Cards */}
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
           <div class="flex items-center gap-3 mb-2">
@@ -41,7 +36,6 @@ const modules = [
           </div>
           <div class="text-3xl font-bold text-primary" id="total-points">0</div>
         </div>
-
         <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
           <div class="flex items-center gap-3 mb-2">
             <div class="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center text-xl">🔥</div>
@@ -49,7 +43,6 @@ const modules = [
           </div>
           <div class="text-3xl font-bold text-accent" id="current-streak">0 days</div>
         </div>
-
         <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
           <div class="flex items-center gap-3 mb-2">
             <div class="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center text-xl">📚</div>
@@ -57,7 +50,6 @@ const modules = [
           </div>
           <div class="text-3xl font-bold text-success" id="modules-completed">0/6</div>
         </div>
-
         <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
           <div class="flex items-center gap-3 mb-2">
             <div class="w-10 h-10 rounded-lg bg-warning/10 flex items-center justify-center text-xl">📝</div>
@@ -67,7 +59,23 @@ const modules = [
         </div>
       </div>
 
-      {/* Module progress */}
+      {/* Plan Status */}
+      <div class="bg-surface-card rounded-xl border border-primary/10 p-6 mb-8">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-lg" id="plan-icon">F</div>
+            <div>
+              <div class="font-bold text-text" id="plan-name">Free Plan</div>
+              <div class="text-sm text-text-muted" id="plan-desc">Basic access to all lessons</div>
+            </div>
+          </div>
+          <a href={`/${locale}/pricing`} class="px-4 py-2 bg-primary/10 text-primary rounded-lg text-sm font-medium hover:bg-primary/20 transition-colors" id="plan-action">
+            Upgrade to Pro
+          </a>
+        </div>
+      </div>
+
+      {/* Module Progress */}
       <div class="mb-8">
         <h2 class="text-2xl font-bold mb-6">{t.dashboard.your_progress}</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -83,7 +91,6 @@ const modules = [
                 </div>
               </div>
 
-              {/* Progress bar */}
               <div class="mb-3">
                 <div class="flex items-center justify-between text-sm mb-1">
                   <span class="text-text-muted">Progress</span>
@@ -109,21 +116,14 @@ const modules = [
         </div>
       </div>
 
-      {/* Quick actions */}
+      {/* Quick Actions */}
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <a
-          href={`/${locale}/curriculum`}
-          class="bg-gradient-to-r from-primary/10 to-accent/10 rounded-xl border border-primary/20 p-6 hover:border-primary/40 transition-colors"
-        >
+        <a href={`/${locale}/curriculum`} class="bg-gradient-to-r from-primary/10 to-accent/10 rounded-xl border border-primary/20 p-6 hover:border-primary/40 transition-colors">
           <div class="text-2xl mb-2">📖</div>
           <h3 class="font-bold text-text mb-1">Browse Curriculum</h3>
           <p class="text-sm text-text-muted">View all 35 lessons across 6 modules</p>
         </a>
-
-        <a
-          href={`/${locale}/pricing`}
-          class="bg-gradient-to-r from-accent/10 to-primary/10 rounded-xl border border-accent/20 p-6 hover:border-accent/40 transition-colors"
-        >
+        <a href={`/${locale}/pricing`} class="bg-gradient-to-r from-accent/10 to-primary/10 rounded-xl border border-accent/20 p-6 hover:border-accent/40 transition-colors">
           <div class="text-2xl mb-2">⭐</div>
           <h3 class="font-bold text-text mb-1">Upgrade to Pro</h3>
           <p class="text-sm text-text-muted">Unlock gamified quizzes and certificates</p>
@@ -135,25 +135,84 @@ const modules = [
   <Footer locale={locale} translations={t} />
 
   <script>
-    // Dashboard data loading
-    // In production, this would fetch from Supabase
-    document.addEventListener('DOMContentLoaded', () => {
-      // Check if user is authenticated
-      const userData = localStorage.getItem('user');
-      if (!userData) {
-        // Redirect to login if not authenticated
-        // window.location.href = '/en/login';
+    import { createClient } from '@supabase/supabase-js';
+
+    const supabase = createClient(
+      'https://jhesstimsojwmkdysmpy.supabase.co',
+      'sb_publishable_bKD9biIulcfC5iNipD-8IA_3Zu4bmWD'
+    );
+
+    async function loadDashboard() {
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session?.user) {
+        window.location.href = '/en/login';
+        return;
       }
 
-      // Load progress from localStorage (demo mode)
-      const progress = JSON.parse(localStorage.getItem('lessonProgress') || '{}');
-      let totalLessons = 0;
-      let completedModules = 0;
+      const user = session.user;
+      const userName = user.user_metadata?.display_name || user.email?.split('@')[0] || 'User';
+
+      // Update greeting
+      const greeting = document.getElementById('user-greeting');
+      if (greeting) greeting.textContent = `Welcome back, ${userName}! Here's your learning progress.`;
+
+      // Fetch user profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      // Update plan status
+      const planIcon = document.getElementById('plan-icon');
+      const planName = document.getElementById('plan-name');
+      const planDesc = document.getElementById('plan-desc');
+      const planAction = document.getElementById('plan-action');
+
+      if (profile?.plan === 'pro') {
+        if (planIcon) { planIcon.textContent = 'P'; planIcon.className = 'w-12 h-12 rounded-xl bg-gradient-to-br from-accent to-primary flex items-center justify-center text-white font-bold text-lg'; }
+        if (planName) planName.textContent = 'Pro Plan';
+        if (planDesc) planDesc.textContent = 'Full access to quizzes, certificates, and more';
+        if (planAction) { planAction.textContent = 'Active'; planAction.className = 'px-4 py-2 bg-success/10 text-success rounded-lg text-sm font-medium cursor-default'; }
+      }
+
+      // Fetch lesson progress
+      const { data: progress } = await supabase
+        .from('lesson_progress')
+        .select('*')
+        .eq('user_id', user.id);
+
+      // Fetch quiz scores
+      const { data: scores } = await supabase
+        .from('quiz_scores')
+        .select('*')
+        .eq('user_id', user.id);
+
+      // Fetch user points
+      const { data: points } = await supabase
+        .from('user_points')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      // Update points
+      const totalPoints = document.getElementById('total-points');
+      if (totalPoints && points) totalPoints.textContent = String(points.total_points || 0);
+
+      // Update streak
+      const streak = document.getElementById('current-streak');
+      if (streak && points) streak.textContent = `${points.current_streak || 0} days`;
+
+      // Calculate module progress
+      const moduleLessons = [8, 7, 6, 5, 5, 4];
+      let totalCompleted = 0;
+      let modulesCompleted = 0;
 
       for (let m = 1; m <= 6; m++) {
-        const moduleProgress = progress[m] || {};
-        const completed = Object.values(moduleProgress).filter((s: any) => s === 'completed').length;
-        const total = [8, 7, 6, 5, 5, 4][m - 1];
+        const moduleProgress = progress?.filter(p => p.module_number === m) || [];
+        const completed = moduleProgress.filter(p => p.status === 'completed').length;
+        const total = moduleLessons[m - 1];
         const percent = Math.round((completed / total) * 100);
 
         const bar = document.querySelector(`[data-module-bar="${m}"]`) as HTMLElement;
@@ -161,19 +220,17 @@ const modules = [
         if (bar) bar.style.width = `${percent}%`;
         if (label) label.textContent = `${percent}%`;
 
-        totalLessons += completed;
-        if (percent === 100) completedModules++;
+        totalCompleted += completed;
+        if (percent === 100) modulesCompleted++;
       }
 
+      // Update totals
       const lessonsEl = document.getElementById('lessons-completed');
       const modulesEl = document.getElementById('modules-completed');
-      if (lessonsEl) lessonsEl.textContent = `${totalLessons}/35`;
-      if (modulesEl) modulesEl.textContent = `${completedModules}/6`;
+      if (lessonsEl) lessonsEl.textContent = `${totalCompleted}/35`;
+      if (modulesEl) modulesEl.textContent = `${modulesCompleted}/6`;
+    }
 
-      // Points from localStorage
-      const points = localStorage.getItem('userPoints') || '0';
-      const pointsEl = document.getElementById('total-points');
-      if (pointsEl) pointsEl.textContent = points;
-    });
+    loadDashboard();
   </script>
 </BaseLayout>

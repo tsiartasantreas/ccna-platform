@@ -442,13 +442,61 @@ const t = en;
     const adminContent = document.getElementById('admin-content');
 
     if (!session?.user || session.user.email !== ADMIN_EMAIL) {
-      // Not logged in or not admin - show access denied
       if (accessDenied) accessDenied.classList.remove('hidden');
       if (adminContent) adminContent.classList.add('hidden');
     } else {
-      // Admin authenticated - show content
       if (accessDenied) accessDenied.classList.add('hidden');
       if (adminContent) adminContent.classList.remove('hidden');
+
+      // Load real data from Supabase
+      async function loadAdminData() {
+        // Fetch all profiles
+        const { data: profiles } = await supabase.from('profiles').select('*');
+        const totalUsers = profiles?.length || 0;
+        const proUsers = profiles?.filter(p => p.plan === 'pro').length || 0;
+        const freeUsers = totalUsers - proUsers;
+
+        // Update stats
+        const totalEl = document.getElementById('stat-total-users');
+        const proEl = document.getElementById('stat-pro-users');
+        if (totalEl) totalEl.textContent = String(totalUsers);
+        if (proEl) proEl.textContent = String(proUsers);
+
+        // Fetch all lesson progress
+        const { data: allProgress } = await supabase.from('lesson_progress').select('*');
+        const totalLessons = allProgress?.filter(p => p.status === 'completed').length || 0;
+
+        // Fetch all quiz scores
+        const { data: allScores } = await supabase.from('quiz_scores').select('*');
+        const totalQuizzes = allScores?.length || 0;
+        const avgScore = allScores?.length
+          ? Math.round(allScores.reduce((sum, s) => sum + Number(s.score), 0) / allScores.length)
+          : 0;
+
+        // Update users table
+        const tableBody = document.getElementById('users-table-body');
+        if (tableBody && profiles) {
+          tableBody.innerHTML = profiles.map(p => {
+            const userProgress = allProgress?.filter(lp => lp.user_id === p.id) || [];
+            const userScores = allScores?.filter(qs => qs.user_id === p.id) || [];
+            const lessonsCompleted = userProgress.filter(lp => lp.status === 'completed').length;
+            const avgUserScore = userScores.length
+              ? Math.round(userScores.reduce((sum, s) => sum + Number(s.score), 0) / userScores.length)
+              : 0;
+
+            return `<tr class="border-b border-primary/5 hover:bg-surface-light">
+              <td class="px-4 py-3 text-sm text-text font-medium">${p.display_name || 'User'}</td>
+              <td class="px-4 py-3 text-sm text-text-muted">${p.id.substring(0, 8)}...</td>
+              <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full ${p.plan === 'pro' ? 'bg-accent/10 text-accent' : 'bg-surface-light text-text-muted'} text-xs font-medium">${p.plan === 'pro' ? 'Pro' : 'Free'}</span></td>
+              <td class="px-4 py-3 text-sm text-text">${lessonsCompleted}/35</td>
+              <td class="px-4 py-3 text-sm ${avgUserScore >= 80 ? 'text-success' : avgUserScore > 0 ? 'text-warning' : 'text-text-muted'}">${avgUserScore > 0 ? avgUserScore + '%' : '—'}</td>
+              <td class="px-4 py-3 text-sm text-text-muted">${new Date(p.updated_at).toLocaleDateString()}</td>
+              <td class="px-4 py-3"><button class="text-xs text-primary hover:underline">Reset Password</button></td>
+            </tr>`;
+          }).join('');
+        }
+      }
+      loadAdminData();
     }
 
     // Tab switching

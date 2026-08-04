@@ -103,29 +103,57 @@ const modules = [
   <Footer locale={locale} translations={t} />
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const progress = JSON.parse(localStorage.getItem('lessonProgress') || '{}');
-      let totalLessons = 0;
-      let completedModules = 0;
+    import { createClient } from '@supabase/supabase-js';
+
+    const supabase = createClient(
+      'https://jhesstimsojwmkdysmpy.supabase.co',
+      'sb_publishable_bKD9biIulcfC5iNipD-8IA_3Zu4bmWD'
+    );
+
+    async function loadDashboard() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) { window.location.href = '/el/login'; return; }
+
+      const user = session.user;
+
+      // Fetch profile
+      const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+
+      // Fetch progress
+      const { data: progress } = await supabase.from('lesson_progress').select('*').eq('user_id', user.id);
+      const { data: points } = await supabase.from('user_points').select('*').eq('user_id', user.id).single();
+
+      // Update points
+      const totalPoints = document.getElementById('total-points');
+      if (totalPoints && points) totalPoints.textContent = String(points.total_points || 0);
+
+      const streak = document.getElementById('current-streak');
+      if (streak && points) streak.textContent = `${points.current_streak || 0}`;
+
+      // Calculate module progress
+      const moduleLessons = [8, 7, 6, 5, 5, 4];
+      let totalCompleted = 0;
+      let modulesCompleted = 0;
+
       for (let m = 1; m <= 6; m++) {
-        const moduleProgress = progress[m] || {};
-        const completed = Object.values(moduleProgress).filter((s) => s === 'completed').length;
-        const total = [8, 7, 6, 5, 5, 4][m - 1];
+        const moduleProgress = progress?.filter(p => p.module_number === m) || [];
+        const completed = moduleProgress.filter(p => p.status === 'completed').length;
+        const total = moduleLessons[m - 1];
         const percent = Math.round((completed / total) * 100);
         const bar = document.querySelector(`[data-module-bar="${m}"]`);
         const label = document.querySelector(`[data-module-progress="${m}"]`);
         if (bar) bar.style.width = `${percent}%`;
         if (label) label.textContent = `${percent}%`;
-        totalLessons += completed;
-        if (percent === 100) completedModules++;
+        totalCompleted += completed;
+        if (percent === 100) modulesCompleted++;
       }
+
       const lessonsEl = document.getElementById('lessons-completed');
       const modulesEl = document.getElementById('modules-completed');
-      if (lessonsEl) lessonsEl.textContent = `${totalLessons}/35`;
-      if (modulesEl) modulesEl.textContent = `${completedModules}/6`;
-      const points = localStorage.getItem('userPoints') || '0';
-      const pointsEl = document.getElementById('total-points');
-      if (pointsEl) pointsEl.textContent = points;
-    });
+      if (lessonsEl) lessonsEl.textContent = `${totalCompleted}/35`;
+      if (modulesEl) modulesEl.textContent = `${modulesCompleted}/6`;
+    }
+
+    loadDashboard();
   </script>
 </BaseLayout>
