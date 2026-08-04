@@ -58,6 +58,20 @@ const t = el;
         </div>
       </div>
 
+      {/* Security */}
+      <div class="bg-surface-card rounded-2xl border border-primary/10 p-8 mb-8">
+        <h2 class="text-xl font-bold mb-4">🔐 Ασφάλεια</h2>
+        <div class="flex items-center justify-between p-4 bg-surface-light rounded-xl">
+          <div>
+            <div class="font-medium text-text">Κωδικός</div>
+            <div class="text-sm text-text-muted">Επαναφορά κωδικού μέσω email</div>
+          </div>
+          <button id="reset-password-btn" class="px-4 py-2 bg-primary/10 text-primary rounded-lg text-sm font-medium hover:bg-primary/20 transition-colors">
+            Επαναφορά Κωδικού
+          </button>
+        </div>
+      </div>
+
       <div class="bg-surface-card rounded-2xl border border-primary/10 p-8 mb-8">
         <h2 class="text-xl font-bold mb-2">Δεδομένα & Απόρρητο</h2>
         <p class="text-text-muted text-sm mb-6">{t.profile.gdpr_notice}</p>
@@ -120,6 +134,18 @@ const t = el;
       }
     }
     loadProfile();
+
+    // Password reset
+    document.getElementById('reset-password-btn')?.addEventListener('click', async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user?.email) return;
+      if (confirm(`Αποστολή email επαναφοράς κωδικού στο ${session.user.email};`)) {
+        const { error } = await supabase.auth.resetPasswordForEmail(session.user.email, {
+          redirectTo: window.location.origin + '/el/profile',
+        });
+        alert(error ? 'Σφάλμα: ' + error.message : 'Email επαναφοράς κωδικού στάλθηκε!');
+      }
+    });
 
     document.querySelectorAll('.theme-btn').forEach(btn => {
       btn.addEventListener('click', () => {

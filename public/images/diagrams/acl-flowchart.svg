@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 600">
+  <rect width="500" height="600" fill="#0a0f1e"/>
+  <text x="250" y="30" font-family="Arial" font-size="20" fill="#00d4ff" text-anchor="middle" font-weight="bold">ACL Processing Logic</text>
+
+  <!-- Packet In -->
+  <rect x="175" y="50" width="150" height="40" rx="8" fill="#00d4ff" fill-opacity="0.2" stroke="#00d4ff" stroke-width="2"/>
+  <text x="250" y="75" font-family="Arial" font-size="13" fill="#00d4ff" text-anchor="middle" font-weight="bold">Packet Arrives</text>
+
+  <!-- ACE 1 -->
+  <rect x="150" y="120" width="200" height="50" rx="8" fill="#1a2332" stroke="#7c3aed" stroke-width="1"/>
+  <text x="250" y="145" font-family="Arial" font-size="12" fill="#e2e8f0" text-anchor="middle">ACE 1: permit 10.0.0.0/8</text>
+  <text x="250" y="160" font-family="Arial" font-size="10" fill="#94a3b8" text-anchor="middle">Match source IP?</text>
+
+  <!-- Yes/No for ACE 1 -->
+  <line x1="250" y1="170" x2="250" y2="200" stroke="#10b981" stroke-width="2"/>
+  <text x="265" y="190" font-family="Arial" font-size="10" fill="#10b981">Yes</text>
+  <line x1="350" y1="145" x2="420" y2="145" stroke="#ef4444" stroke-width="2"/>
+  <text x="380" y="138" font-family="Arial" font-size="10" fill="#ef4444">No</text>
+
+  <!-- ACE 2 -->
+  <rect x="150" y="200" width="200" height="50" rx="8" fill="#1a2332" stroke="#7c3aed" stroke-width="1"/>
+  <text x="250" y="225" font-family="Arial" font-size="12" fill="#e2e8f0" text-anchor="middle">ACE 2: deny 192.168.1.0/24</text>
+  <text x="250" y="240" font-family="Arial" font-size="10" fill="#94a3b8" text-anchor="middle">Match source IP?</text>
+
+  <!-- Yes/No for ACE 2 -->
+  <line x1="250" y1="250" x2="250" y2="280" stroke="#10b981" stroke-width="2"/>
+  <text x="265" y="270" font-family="Arial" font-size="10" fill="#10b981">Yes</text>
+  <line x1="350" y1="225" x2="420" y2="225" stroke="#ef4444" stroke-width="2"/>
+  <text x="380" y="218" font-family="Arial" font-size="10" fill="#ef4444">No</text>
+
+  <!-- ACE 3 -->
+  <rect x="150" y="280" width="200" height="50" rx="8" fill="#1a2332" stroke="#7c3aed" stroke-width="1"/>
+  <text x="250" y="305" font-family="Arial" font-size="12" fill="#e2e8f0" text-anchor="middle">ACE 3: permit any</text>
+  <text x="250" y="320" font-family="Arial" font-size="10" fill="#94a3b8" text-anchor="middle">Match all?</text>
+
+  <!-- Results -->
+  <!-- Permit -->
+  <rect x="30" y="380" width="120" height="40" rx="8" fill="#10b981" fill-opacity="0.3" stroke="#10b981" stroke-width="2"/>
+  <text x="90" y="405" font-family="Arial" font-size="14" fill="#10b981" text-anchor="middle" font-weight="bold">PERMIT</text>
+  <text x="90" y="435" font-family="Arial" font-size="10" fill="#94a3b8" text-anchor="middle">Packet forwarded</text>
+
+  <!-- Deny -->
+  <rect x="190" y="380" width="120" height="40" rx="8" fill="#ef4444" fill-opacity="0.3" stroke="#ef4444" stroke-width="2"/>
+  <text x="250" y="405" font-family="Arial" font-size="14" fill="#ef4444" text-anchor="middle" font-weight="bold">DENY</text>
+  <text x="250" y="435" font-family="Arial" font-size="10" fill="#94a3b8" text-anchor="middle">Packet dropped</text>
+
+  <!-- Implicit Deny -->
+  <rect x="350" y="380" width="120" height="40" rx="8" fill="#ef4444" fill-opacity="0.3" stroke="#ef4444" stroke-width="2"/>
+  <text x="410" y="405" font-family="Arial" font-size="12" fill="#ef4444" text-anchor="middle" font-weight="bold">Implicit Deny</text>
+  <text x="410" y="435" font-family="Arial" font-size="10" fill="#94a3b8" text-anchor="middle">deny any</text>
+
+  <!-- Lines to results -->
+  <line x1="90" y1="380" x2="250" y2="330" stroke="#10b981" stroke-width="1"/>
+  <line x1="250" y1="380" x2="250" y2="330" stroke="#ef4444" stroke-width="1"/>
+  <line x1="410" y1="380" x2="350" y2="225" stroke="#ef4444" stroke-width="1"/>
+
+  <!-- Next ACE arrows -->
+  <line x1="420" y1="145" x2="420" y2="200" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="420" y1="200" x2="350" y2="225" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="420" y1="225" x2="420" y2="280" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="420" y1="280" x2="350" y2="305" stroke="#94a3b8" stroke-width="1"/>
+
+  <!-- Key point -->
+  <rect x="50" y="480" width="400" height="60" rx="8" fill="#f59e0b" fill-opacity="0.1" stroke="#f59e0b" stroke-width="1"/>
+  <text x="250" y="505" font-family="Arial" font-size="12" fill="#f59e0b" text-anchor="middle" font-weight="bold">Key Points:</text>
+  <text x="250" y="525" font-family="Arial" font-size="11" fill="#94a3b8" text-anchor="middle">ACLs are processed top-down • First match wins • Implicit deny at the end</text>
+</svg>

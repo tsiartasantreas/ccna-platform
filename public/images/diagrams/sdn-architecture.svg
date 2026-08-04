@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  <rect width="800" height="500" fill="#0a0f1e"/>
+  <text x="400" y="30" font-family="Arial" font-size="20" fill="#00d4ff" text-anchor="middle" font-weight="bold">Traditional vs SDN Architecture</text>
+
+  <!-- Traditional -->
+  <rect x="30" y="60" width="350" height="400" rx="10" fill="#1a2332" stroke="#ef4444" stroke-width="1"/>
+  <text x="205" y="90" font-family="Arial" font-size="16" fill="#ef4444" text-anchor="middle" font-weight="bold">Traditional Networking</text>
+
+  <!-- Traditional Devices -->
+  <rect x="60" y="120" width="100" height="60" rx="6" fill="#ef4444" fill-opacity="0.2" stroke="#ef4444" stroke-width="1"/>
+  <text x="110" y="145" font-family="Arial" font-size="10" fill="#e2e8f0" text-anchor="middle">Router</text>
+  <text x="110" y="165" font-family="Arial" font-size="9" fill="#94a3b8" text-anchor="middle">Control + Data</text>
+
+  <rect x="180" y="120" width="100" height="60" rx="6" fill="#ef4444" fill-opacity="0.2" stroke="#ef4444" stroke-width="1"/>
+  <text x="230" y="145" font-family="Arial" font-size="10" fill="#e2e8f0" text-anchor="middle">Switch</text>
+  <text x="230" y="165" font-family="Arial" font-size="9" fill="#94a3b8" text-anchor="middle">Control + Data</text>
+
+  <rect x="300" y="120" width="60" height="60" rx="6" fill="#ef4444" fill-opacity="0.2" stroke="#ef4444" stroke-width="1"/>
+  <text x="330" y="155" font-family="Arial" font-size="10" fill="#e2e8f0" text-anchor="middle">FW</text>
+
+  <text x="205" y="220" font-family="Arial" font-size="11" fill="#94a3b8" text-anchor="middle">Each device has its own</text>
+  <text x="205" y="240" font-family="Arial" font-size="11" fill="#94a3b8" text-anchor="middle">control plane & data plane</text>
+
+  <!-- SDN -->
+  <rect x="420" y="60" width="350" height="400" rx="10" fill="#1a2332" stroke="#10b981" stroke-width="1"/>
+  <text x="595" y="90" font-family="Arial" font-size="16" fill="#10b981" text-anchor="middle" font-weight="bold">SDN Architecture</text>
+
+  <!-- SDN Controller -->
+  <rect x="480" y="120" width="230" height="60" rx="8" fill="#10b981" fill-opacity="0.3" stroke="#10b981" stroke-width="2"/>
+  <text x="595" y="145" font-family="Arial" font-size="13" fill="#10b981" text-anchor="middle" font-weight="bold">SDN Controller</text>
+  <text x="595" y="165" font-family="Arial" font-size="10" fill="#94a3b8" text-anchor="middle">Centralized Control Plane</text>
+
+  <!-- SDN Devices -->
+  <rect x="460" y="280" width="80" height="50" rx="6" fill="#00d4ff" fill-opacity="0.2" stroke="#00d4ff" stroke-width="1"/>
+  <text x="500" y="310" font-family="Arial" font-size="10" fill="#e2e8f0" text-anchor="middle">Switch</text>
+
+  <rect x="560" y="280" width="80" height="50" rx="6" fill="#00d4ff" fill-opacity="0.2" stroke="#00d4ff" stroke-width="1"/>
+  <text x="600" y="310" font-family="Arial" font-size="10" fill="#e2e8f0" text-anchor="middle">Switch</text>
+
+  <rect x="660" y="280" width="80" height="50" rx="6" fill="#00d4ff" fill-opacity="0.2" stroke="#00d4ff" stroke-width="1"/>
+  <text x="700" y="310" font-family="Arial" font-size="10" fill="#e2e8f0" text-anchor="middle">Switch</text>
+
+  <!-- Lines -->
+  <line x1="530" y1="180" x2="500" y2="280" stroke="#10b981" stroke-width="1"/>
+  <line x1="595" y1="180" x2="600" y2="280" stroke="#10b981" stroke-width="1"/>
+  <line x1="660" y1="180" x2="700" y2="280" stroke="#10b981" stroke-width="1"/>
+
+  <text x="595" y="220" font-family="Arial" font-size="11" fill="#94a3b8" text-anchor="middle">Devices have data plane only</text>
+  <text x="595" y="240" font-family="Arial" font-size="11" fill="#94a3b8" text-anchor="middle">Controller manages all decisions</text>
+
+  <!-- API Labels -->
+  <text x="450" y="250" font-family="Arial" font-size="9" fill="#f59e0b">Southbound API</text>
+  <text x="450" y="350" font-family="Arial" font-size="9" fill="#7c3aed">OpenFlow</text>
+
+  <!-- Benefits -->
+  <rect x="460" y="370" width="230" height="70" rx="6" fill="#10b981" fill-opacity="0.1" stroke="#10b981" stroke-width="1"/>
+  <text x="575" y="395" font-family="Arial" font-size="11" fill="#10b981" text-anchor="middle" font-weight="bold">SDN Benefits:</text>
+  <text x="575" y="415" font-family="Arial" font-size="10" fill="#94a3b8" text-anchor="middle">• Centralized management</text>
+  <text x="575" y="430" font-family="Arial" font-size="10" fill="#94a3b8" text-anchor="middle">• Programmable network</text>
+</svg>

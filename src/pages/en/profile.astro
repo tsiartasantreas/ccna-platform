@@ -123,6 +123,25 @@ const t = en;
         </div>
       </div>
 
+      {/* Security */}
+      <div class="bg-surface-card rounded-2xl border border-primary/10 p-8 mb-8">
+        <h2 class="text-xl font-bold mb-4">🔐 Security</h2>
+        <div class="space-y-4">
+          <div class="flex items-center justify-between p-4 bg-surface-light rounded-xl">
+            <div>
+              <div class="font-medium text-text">Password</div>
+              <div class="text-sm text-text-muted">Reset your password via email</div>
+            </div>
+            <button
+              id="reset-password-btn"
+              class="px-4 py-2 bg-primary/10 text-primary rounded-lg text-sm font-medium hover:bg-primary/20 transition-colors"
+            >
+              Reset Password
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* GDPR Section */}
       <div class="bg-surface-card rounded-2xl border border-primary/10 p-8 mb-8">
         <h2 class="text-xl font-bold mb-2">Data & Privacy</h2>
@@ -229,6 +248,23 @@ const t = en;
     }
 
     loadProfile();
+
+    // Password reset
+    document.getElementById('reset-password-btn')?.addEventListener('click', async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user?.email) return;
+
+      if (confirm(`Send password reset email to ${session.user.email}?`)) {
+        const { error } = await supabase.auth.resetPasswordForEmail(session.user.email, {
+          redirectTo: window.location.origin + '/en/profile',
+        });
+        if (error) {
+          alert('Error: ' + error.message);
+        } else {
+          alert('Password reset email sent! Check your inbox.');
+        }
+      }
+    });
 
     // Theme toggle
     document.querySelectorAll('.theme-btn').forEach(btn => {
