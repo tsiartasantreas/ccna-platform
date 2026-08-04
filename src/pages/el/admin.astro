@@ -50,20 +50,33 @@ const t = el;
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
             <div class="text-sm text-text-muted mb-1">Σύνολο Χρηστών</div>
-            <div class="text-3xl font-bold text-primary">156</div>
-            <div class="text-xs text-success mt-1">+5 σήμερα</div>
-          </div>
-          <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
-            <div class="text-sm text-text-muted mb-1">Ενεργοί Χρήστες</div>
-            <div class="text-3xl font-bold text-success">89</div>
+            <div class="text-3xl font-bold text-primary" id="stat-total-users-el">0</div>
           </div>
           <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
             <div class="text-sm text-text-muted mb-1">Pro Χρήστες</div>
-            <div class="text-3xl font-bold text-accent">23</div>
+            <div class="text-3xl font-bold text-accent" id="stat-pro-users-el">0</div>
           </div>
           <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
             <div class="text-sm text-text-muted mb-1">Έσοδα (Μήνας)</div>
-            <div class="text-3xl font-bold text-warning">€229.77</div>
+            <div class="text-3xl font-bold text-warning" id="stat-revenue-el">€0.00</div>
+          </div>
+          <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
+            <div class="text-sm text-text-muted mb-1">Νέοι Εβδομάδας</div>
+            <div class="text-3xl font-bold text-success" id="stat-new-week-el">0</div>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+          <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
+            <div class="text-sm text-text-muted mb-1">Μέσος Όρος Τεστ</div>
+            <div class="text-2xl font-bold text-text" id="stat-avg-score-el">0%</div>
+          </div>
+          <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
+            <div class="text-sm text-text-muted mb-1">Μαθήματα Ολοκληρώθηκαν</div>
+            <div class="text-2xl font-bold text-text" id="stat-lessons-el">0</div>
+          </div>
+          <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
+            <div class="text-sm text-text-muted mb-1">Τεστ Εκτελέστηκαν</div>
+            <div class="text-2xl font-bold text-text" id="stat-quizzes-el">0</div>
           </div>
         </div>
       </div>
@@ -192,6 +205,26 @@ const t = el;
         const { data: profiles } = await supabase.from('profiles').select('*');
         const { data: allProgress } = await supabase.from('lesson_progress').select('*');
         const { data: allScores } = await supabase.from('quiz_scores').select('*');
+
+        const totalUsers = profiles?.length || 0;
+        const proUsers = profiles?.filter(p => p.plan === 'pro').length || 0;
+        const revenue = proUsers * 0.99;
+
+        const now = new Date();
+        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        const newThisWeek = profiles?.filter(p => new Date(p.created_at) >= weekAgo).length || 0;
+        const totalLessons = allProgress?.filter(p => p.status === 'completed').length || 0;
+        const totalQuizzes = allScores?.length || 0;
+        const avgScore = allScores?.length ? Math.round(allScores.reduce((s, q) => s + Number(q.score), 0) / allScores.length) : 0;
+
+        // Update stats
+        document.getElementById('stat-total-users-el')!.textContent = String(totalUsers);
+        document.getElementById('stat-pro-users-el')!.textContent = String(proUsers);
+        document.getElementById('stat-revenue-el')!.textContent = `€${revenue.toFixed(2)}`;
+        document.getElementById('stat-new-week-el')!.textContent = String(newThisWeek);
+        document.getElementById('stat-avg-score-el')!.textContent = `${avgScore}%`;
+        document.getElementById('stat-lessons-el')!.textContent = totalLessons.toLocaleString();
+        document.getElementById('stat-quizzes-el')!.textContent = totalQuizzes.toLocaleString();
 
         const tableBody = document.getElementById('users-table-body-el');
         if (tableBody && profiles) {

@@ -77,29 +77,27 @@ const t = en;
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
             <div class="text-sm text-text-muted mb-1">New This Week</div>
-            <div class="text-2xl font-bold text-text">34</div>
+            <div class="text-2xl font-bold text-text" id="stat-new-week">0</div>
           </div>
           <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
             <div class="text-sm text-text-muted mb-1">Avg Quiz Score</div>
-            <div class="text-2xl font-bold text-text">76.5%</div>
+            <div class="text-2xl font-bold text-text" id="stat-avg-score">0%</div>
           </div>
           <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
             <div class="text-sm text-text-muted mb-1">Lessons Completed</div>
-            <div class="text-2xl font-bold text-text">1,247</div>
+            <div class="text-2xl font-bold text-text" id="stat-lessons-completed">0</div>
           </div>
           <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
             <div class="text-sm text-text-muted mb-1">Quizzes Taken</div>
-            <div class="text-2xl font-bold text-text">456</div>
+            <div class="text-2xl font-bold text-text" id="stat-quizzes-taken">0</div>
           </div>
         </div>
 
-        {/* Chart placeholder */}
+        {/* User Growth Chart */}
         <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
           <h3 class="text-lg font-bold text-text mb-4">User Growth (Last 30 Days)</h3>
-          <div class="h-48 flex items-end gap-1">
-            {[12, 18, 15, 22, 28, 25, 30, 35, 32, 38, 42, 40, 45, 48, 50, 52, 55, 58, 60, 62, 65, 68, 70, 72, 75, 78, 80, 82, 85, 89].map((val, i) => (
-              <div class="flex-1 bg-gradient-to-t from-primary to-accent rounded-t" style={`height: ${(val / 89) * 100}%`} title={`Day ${i + 1}: ${val} users`}></div>
-            ))}
+          <div class="h-48 flex items-end gap-1" id="growth-chart">
+            <div class="flex-1 bg-surface-light rounded-t" style="height: 10%"></div>
           </div>
           <div class="flex justify-between text-xs text-text-muted mt-2">
             <span>30 days ago</span>
@@ -442,10 +440,45 @@ const t = en;
         const proUsers = profiles?.filter(p => p.plan === 'pro').length || 0;
         const revenue = proUsers * 0.99;
 
+        // Calculate real statistics
+        const now = new Date();
+        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        const newThisWeek = profiles?.filter(p => new Date(p.created_at) >= weekAgo).length || 0;
+
+        const totalLessonsCompleted = allProgress?.filter(p => p.status === 'completed').length || 0;
+        const totalQuizzesTaken = allScores?.length || 0;
+        const avgScore = allScores?.length
+          ? Math.round(allScores.reduce((sum, s) => sum + Number(s.score), 0) / allScores.length)
+          : 0;
+
         // Update stats
         document.getElementById('stat-total-users')!.textContent = String(totalUsers);
         document.getElementById('stat-pro-users')!.textContent = String(proUsers);
         document.getElementById('stat-revenue')!.textContent = `€${revenue.toFixed(2)}`;
+        document.getElementById('stat-new-week')!.textContent = String(newThisWeek);
+        document.getElementById('stat-avg-score')!.textContent = `${avgScore}%`;
+        document.getElementById('stat-lessons-completed')!.textContent = totalLessonsCompleted.toLocaleString();
+        document.getElementById('stat-quizzes-taken')!.textContent = totalQuizzesTaken.toLocaleString();
+
+        // Build user growth chart (last 30 days)
+        const chartContainer = document.getElementById('growth-chart');
+        if (chartContainer && profiles) {
+          const days: number[] = [];
+          for (let i = 29; i >= 0; i--) {
+            const dayStart = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+            dayStart.setHours(0, 0, 0, 0);
+            const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
+            const count = profiles.filter(p => {
+              const created = new Date(p.created_at);
+              return created >= dayStart && created < dayEnd;
+            }).length;
+            days.push(count);
+          }
+          const maxVal = Math.max(...days, 1);
+          chartContainer.innerHTML = days.map((val, i) =>
+            `<div class="flex-1 bg-gradient-to-t from-primary to-accent rounded-t transition-all" style="height: ${Math.max((val / maxVal) * 100, 5)}%" title="Day ${i + 1}: ${val} users"></div>`
+          ).join('');
+        }
 
         // Update users table with full management
         const tableBody = document.getElementById('users-table-body');
