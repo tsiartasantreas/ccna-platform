@@ -3,7 +3,6 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
 import Header from '../../../../components/layout/Header.tsx';
 import Footer from '../../../../components/layout/Footer.tsx';
 import QuizEngine from '../../../../components/quiz/QuizEngine.tsx';
-import FeedbackForm from '../../../../components/ui/FeedbackForm.tsx';
 import en from '../../../../i18n/en.json';
 
 const locale = 'en' as const;
@@ -130,16 +129,6 @@ const quizQuestions = questions.map((q, i) => ({ id: `m${moduleNum}q${i + 1}`, .
         locale={locale}
         client:load
       />
-
-      {/* Feedback Form - shown after quiz */}
-      <div class="mt-12">
-        <FeedbackForm
-          moduleNumber={moduleNum}
-          moduleName={moduleName}
-          locale={locale}
-          client:load
-        />
-      </div>
     </div>
   </main>
 

@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/layout/Header.tsx';
 import Footer from '../../components/layout/Footer.tsx';
 import NetworkHero from '../../components/3d/NetworkHero.tsx';
+import FeedbackDisplay from '../../components/ui/FeedbackDisplay.tsx';
 import en from '../../i18n/en.json';
 
 const locale = 'en';
@@ -220,6 +221,9 @@ const t = en;
       </div>
     </div>
   </section>
+
+  {/* Student Feedback Section */}
+  <FeedbackDisplay locale={locale} client:load />
 
   <Footer locale={locale} translations={t} />
 </BaseLayout>
