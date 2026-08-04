@@ -28,6 +28,8 @@ export default function Header({ locale, translations }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userName, setUserName] = useState('');
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   useEffect(() => {
     const theme = localStorage.getItem('theme') || 'dark';
@@ -41,14 +43,33 @@ export default function Header({ locale, translations }: HeaderProps) {
         localStorage.setItem('userEmail', session.user.email || '');
         localStorage.setItem('userId', session.user.id);
         setIsAdmin(session.user.email === ADMIN_EMAIL);
+        // Get display name from metadata or email
+        const name = session.user.user_metadata?.display_name || session.user.email?.split('@')[0] || 'User';
+        setUserName(name);
       } else {
         setIsLoggedIn(false);
         setIsAdmin(false);
+        setUserName('');
         localStorage.removeItem('userEmail');
         localStorage.removeItem('userId');
       }
     };
     checkAuth();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setIsLoggedIn(true);
+        setIsAdmin(session.user.email === ADMIN_EMAIL);
+        const name = session.user.user_metadata?.display_name || session.user.email?.split('@')[0] || 'User';
+        setUserName(name);
+      } else {
+        setIsLoggedIn(false);
+        setIsAdmin(false);
+        setUserName('');
+      }
+    });
+    return () => subscription.unsubscribe();
 
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -143,25 +164,63 @@ export default function Header({ locale, translations }: HeaderProps) {
 
             {/* Auth Buttons */}
             {isLoggedIn ? (
-              <>
-                <a
-                  href={`/${locale}/dashboard`}
-                  className="hidden sm:block px-4 py-2 text-sm font-medium text-text-muted hover:text-primary transition-colors"
-                >
-                  {translations.nav.dashboard}
-                </a>
+              <div className="relative">
                 <button
-                  onClick={async () => {
-                    await supabase.auth.signOut();
-                    localStorage.removeItem('userEmail');
-                    localStorage.removeItem('userId');
-                    window.location.href = `/${locale}/`;
-                  }}
-                  className="px-4 py-2 text-sm font-medium bg-surface-light text-text-muted rounded-lg hover:text-primary transition-all"
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-surface-light hover:bg-surface transition-all"
                 >
-                  {translations.nav.logout}
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white text-sm font-bold">
+                    {userName.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="text-sm font-medium text-text hidden sm:block">{userName}</span>
+                  <svg className="w-4 h-4 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
                 </button>
-              </>
+
+                {/* Dropdown Menu */}
+                {showUserMenu && (
+                  <div className="absolute right-0 top-12 w-48 bg-surface-card rounded-xl border border-primary/10 shadow-lg shadow-primary/5 py-2 z-50">
+                    <div className="px-4 py-2 border-b border-primary/10">
+                      <p className="text-sm font-medium text-text">{userName}</p>
+                      <p className="text-xs text-text-muted">{localStorage.getItem('userEmail')}</p>
+                    </div>
+                    <a
+                      href={`/${locale}/dashboard`}
+                      className="block px-4 py-2 text-sm text-text-muted hover:text-primary hover:bg-surface-light transition-colors"
+                    >
+                      📊 {translations.nav.dashboard}
+                    </a>
+                    <a
+                      href={`/${locale}/profile`}
+                      className="block px-4 py-2 text-sm text-text-muted hover:text-primary hover:bg-surface-light transition-colors"
+                    >
+                      👤 {translations.nav.profile}
+                    </a>
+                    {isAdmin && (
+                      <a
+                        href={`/${locale}/admin`}
+                        className="block px-4 py-2 text-sm text-primary hover:bg-surface-light transition-colors"
+                      >
+                        🔧 Admin
+                      </a>
+                    )}
+                    <div className="border-t border-primary/10 mt-1 pt-1">
+                      <button
+                        onClick={async () => {
+                          await supabase.auth.signOut();
+                          localStorage.removeItem('userEmail');
+                          localStorage.removeItem('userId');
+                          window.location.href = `/${locale}/`;
+                        }}
+                        className="block w-full text-left px-4 py-2 text-sm text-error hover:bg-surface-light transition-colors"
+                      >
+                        🚪 {translations.nav.logout}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             ) : (
               <>
                 <a
