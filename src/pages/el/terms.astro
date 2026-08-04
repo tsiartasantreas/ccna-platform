@@ -1,0 +1,78 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/layout/Header.tsx';
+import Footer from '../../components/layout/Footer.tsx';
+import el from '../../i18n/el.json';
+
+const locale = 'el' as const;
+const t = el;
+---
+
+<BaseLayout title="Όροι Χρήσης" description="Όροι Χρήσης NetAcad" lang={locale}>
+  <Header locale={locale} translations={t} client:load />
+
+  <main class="pt-24 pb-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl font-bold text-text mb-4">Όροι Χρήσης</h1>
+      <p class="text-text-muted mb-8">Τελευταία ενημέρωση: 4 Αυγούστου 2026</p>
+
+      <div class="prose max-w-none space-y-8">
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">1. Αποδοχή Όρων</h2>
+          <p class="text-text-muted leading-relaxed">
+            Χρησιμοποιώντας το NetAcad, συμφωνείτε με αυτούς τους Όρους Χρήσης. Αν δεν συμφωνείτε, παρακαλώ μην χρησιμοποιήσετε την πλατφόρμα.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">2. Περιγραφή Υπηρεσίας</h2>
+          <p class="text-text-muted leading-relaxed">
+            Το NetAcad είναι μια διαδικτυακή εκπαιδευτική πλατφόρμα που παρέχει υλικό εκπαίδευσης CCNA, συμπεριλαμβανομένου 35 μαθημάτων, 3D διαγραμμάτων, τεστ και πιστοποιητικών.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">3. Λογαριασμοί</h2>
+          <p class="text-text-muted leading-relaxed">
+            Για πρόσβαση σε ορισμένες λειτουργίες, πρέπει να δημιουργήσετε λογαριασμό. Συμφωνείτε να παρέχετε ακριβείς πληροφορίες και να διατηρείτε την ασφάλεια του κωδικού σας.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">4. Συνδρομές</h2>
+          <h3 class="text-xl font-semibold text-text mb-2">4.1 Δωρεάν Πλάνο</h3>
+          <p class="text-text-muted leading-relaxed">Πρόσβαση σε όλα τα μαθήματα και βασική παρακολούθηση προόδου.</p>
+          <h3 class="text-xl font-semibold text-text mb-2 mt-4">4.2 Pro Πλάνο</h3>
+          <p class="text-text-muted leading-relaxed">€9.99/μήνα ή €79.99/έτος. Περιλαμβάνει gamified τεστ, πόντους και πιστοποιητικό.</p>
+          <h3 class="text-xl font-semibold text-text mb-2 mt-4">4.3 Ακύρωση</h3>
+          <p class="text-text-muted leading-relaxed">Μπορείτε να ακυρώσετε οποιαδήποτε στιγμή. Η πρόσβαση Pro παραμένει μέχρι το τέλος της περιόδου χρέωσης.</p>
+          <h3 class="text-xl font-semibold text-text mb-2 mt-4">4.4 Επιστροφές</h3>
+          <p class="text-text-muted leading-relaxed">Εγγύηση επιστροφής χρημάτων 14 ημερών.</p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">5. Πνευματική Ιδιοκτησία</h2>
+          <p class="text-text-muted leading-relaxed">
+            Όλο το περιεχόμενο της πλατφόρμας προστατεύεται από δικαιώματα πνευματικής ιδιοκτησίας.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">6. Cisco Disclaimer</h2>
+          <p class="text-text-muted leading-relaxed">
+            Το CCNA® είναι σήμα κατατεθέν της Cisco Systems, Inc. Το NetAcad είναι ανεξάρτητη εκπαιδευτική πλατφόρμα.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">7. Επικοινωνία</h2>
+          <p class="text-text-muted leading-relaxed">
+            <strong>Email:</strong> tsiartasantreas@gmail.com
+          </p>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <Footer locale={locale} translations={t} />
+</BaseLayout>

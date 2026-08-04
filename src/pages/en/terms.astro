@@ -1,0 +1,157 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/layout/Header.tsx';
+import Footer from '../../components/layout/Footer.tsx';
+import en from '../../i18n/en.json';
+
+const locale = 'en' as const;
+const t = en;
+---
+
+<BaseLayout title="Terms of Service" description="NetAcad Terms of Service - Rules governing your use of our platform" lang={locale}>
+  <Header locale={locale} translations={t} client:load />
+
+  <main class="pt-24 pb-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl font-bold text-text mb-4">Terms of Service</h1>
+      <p class="text-text-muted mb-8">Last updated: August 4, 2026</p>
+
+      <div class="prose max-w-none space-y-8">
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">1. Acceptance of Terms</h2>
+          <p class="text-text-muted leading-relaxed">
+            By accessing or using NetAcad ("the Platform"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Platform.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">2. Description of Service</h2>
+          <p class="text-text-muted leading-relaxed">
+            NetAcad is an online educational platform providing CCNA (Cisco Certified Network Associate) training materials, including:
+          </p>
+          <ul class="list-disc list-inside text-text-muted space-y-2 ml-4 mt-3">
+            <li>35 structured lessons across 6 modules</li>
+            <li>Interactive 3D diagrams and visualizations</li>
+            <li>Quizzes and knowledge assessments</li>
+            <li>Progress tracking and gamification</li>
+            <li>Completion certificates (Pro plan)</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">3. User Accounts</h2>
+          <p class="text-text-muted leading-relaxed">
+            To access certain features, you must create an account. You agree to:
+          </p>
+          <ul class="list-disc list-inside text-text-muted space-y-2 ml-4 mt-3">
+            <li>Provide accurate and complete information</li>
+            <li>Maintain the security of your password</li>
+            <li>Not share your account credentials with others</li>
+            <li>Notify us immediately of any unauthorized use</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">4. Subscription Plans</h2>
+          <h3 class="text-xl font-semibold text-text mb-2">4.1 Free Plan</h3>
+          <p class="text-text-muted leading-relaxed">
+            The Free plan provides access to all lesson content, 3D diagrams, and basic progress tracking.
+          </p>
+          <h3 class="text-xl font-semibold text-text mb-2 mt-4">4.2 Pro Plan</h3>
+          <p class="text-text-muted leading-relaxed">
+            The Pro plan (€9.99/month or €79.99/year) includes everything in Free, plus gamified quizzes, points system, streaks, achievements, and a completion certificate.
+          </p>
+          <h3 class="text-xl font-semibold text-text mb-2 mt-4">4.3 Payment</h3>
+          <p class="text-text-muted leading-relaxed">
+            Payments are processed through Revolut. By subscribing, you authorize us to charge your selected payment method. Subscriptions automatically renew unless cancelled.
+          </p>
+          <h3 class="text-xl font-semibold text-text mb-2 mt-4">4.4 Cancellation</h3>
+          <p class="text-text-muted leading-relaxed">
+            You may cancel your subscription at any time. Upon cancellation, you will retain Pro access until the end of your current billing period.
+          </p>
+          <h3 class="text-xl font-semibold text-text mb-2 mt-4">4.5 Refunds</h3>
+          <p class="text-text-muted leading-relaxed">
+            We offer a 14-day money-back guarantee. If you are not satisfied with the Pro plan within 14 days of purchase, contact us for a full refund.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">5. Intellectual Property</h2>
+          <p class="text-text-muted leading-relaxed">
+            All content on the Platform, including text, graphics, logos, 3D models, and software, is the property of NetAcad and is protected by copyright laws. You may not reproduce, distribute, or create derivative works without our written permission.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">6. Acceptable Use</h2>
+          <p class="text-text-muted leading-relaxed">You agree not to:</p>
+          <ul class="list-disc list-inside text-text-muted space-y-2 ml-4 mt-3">
+            <li>Use the Platform for any illegal purpose</li>
+            <li>Attempt to gain unauthorized access to any part of the Platform</li>
+            <li>Use automated systems to access the Platform</li>
+            <li>Share your account or quiz answers with others</li>
+            <li>Reverse engineer or decompile any part of the Platform</li>
+            <li>Upload malicious code or content</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">7. Disclaimer of Warranties</h2>
+          <p class="text-text-muted leading-relaxed">
+            The Platform is provided "as is" without warranties of any kind. We do not guarantee that:
+          </p>
+          <ul class="list-disc list-inside text-text-muted space-y-2 ml-4 mt-3">
+            <li>The Platform will be error-free or uninterrupted</li>
+            <li>The content will guarantee passing the CCNA exam</li>
+            <li>The Platform will meet your specific requirements</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">8. Limitation of Liability</h2>
+          <p class="text-text-muted leading-relaxed">
+            To the maximum extent permitted by law, NetAcad shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of the Platform.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">9. Cisco Disclaimer</h2>
+          <p class="text-text-muted leading-relaxed">
+            CCNA® is a registered trademark of Cisco Systems, Inc. NetAcad is an independent educational platform and is not affiliated with, endorsed by, or sponsored by Cisco Systems, Inc.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">10. Termination</h2>
+          <p class="text-text-muted leading-relaxed">
+            We reserve the right to suspend or terminate your account if you violate these Terms of Service. Upon termination, your right to use the Platform ceases immediately.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">11. Changes to Terms</h2>
+          <p class="text-text-muted leading-relaxed">
+            We may modify these Terms at any time. We will notify users of material changes via email or a notice on the Platform. Continued use after changes constitutes acceptance of the new terms.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">12. Governing Law</h2>
+          <p class="text-text-muted leading-relaxed">
+            These Terms are governed by the laws of the European Union and the country of Greece.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">13. Contact</h2>
+          <p class="text-text-muted leading-relaxed">
+            For questions about these Terms of Service, contact us at:<br/>
+            <strong>Email:</strong> tsiartasantreas@gmail.com
+          </p>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <Footer locale={locale} translations={t} />
+</BaseLayout>

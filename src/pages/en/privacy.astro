@@ -1,0 +1,171 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/layout/Header.tsx';
+import Footer from '../../components/layout/Footer.tsx';
+import en from '../../i18n/en.json';
+
+const locale = 'en' as const;
+const t = en;
+---
+
+<BaseLayout title="Privacy Policy" description="NetAcad Privacy Policy - How we collect, use, and protect your data" lang={locale}>
+  <Header locale={locale} translations={t} client:load />
+
+  <main class="pt-24 pb-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl font-bold text-text mb-4">Privacy Policy</h1>
+      <p class="text-text-muted mb-8">Last updated: August 4, 2026</p>
+
+      <div class="prose max-w-none space-y-8">
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">1. Introduction</h2>
+          <p class="text-text-muted leading-relaxed">
+            Welcome to NetAcad ("we," "our," or "us"). We are committed to protecting your personal data and respecting your privacy. This Privacy Policy explains how we collect, use, store, and protect your information when you use our CCNA training platform at <strong>networklearn.wasmer.app</strong>.
+          </p>
+          <p class="text-text-muted leading-relaxed mt-3">
+            This policy complies with the General Data Protection Regulation (GDPR) (EU) 2016/679 and other applicable data protection laws.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">2. Data Controller</h2>
+          <p class="text-text-muted leading-relaxed">
+            The data controller responsible for your personal data is:<br/>
+            <strong>NetAcad</strong><br/>
+            Email: tsiartasantreas@gmail.com
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">3. Data We Collect</h2>
+          <h3 class="text-xl font-semibold text-text mb-2">3.1 Account Data</h3>
+          <ul class="list-disc list-inside text-text-muted space-y-2 ml-4">
+            <li>Email address (required for account creation)</li>
+            <li>Display name (optional)</li>
+            <li>Password (stored encrypted via Supabase Auth)</li>
+            <li>Authentication provider (email or Google)</li>
+          </ul>
+
+          <h3 class="text-xl font-semibold text-text mb-2 mt-4">3.2 Learning Data</h3>
+          <ul class="list-disc list-inside text-text-muted space-y-2 ml-4">
+            <li>Lesson progress (which lessons you've completed)</li>
+            <li>Quiz scores and attempt history</li>
+            <li>Points, streaks, and achievement data</li>
+            <li>Time spent on lessons</li>
+          </ul>
+
+          <h3 class="text-xl font-semibold text-text mb-2 mt-4">3.3 Preference Data</h3>
+          <ul class="list-disc list-inside text-text-muted space-y-2 ml-4">
+            <li>Language preference (English or Greek)</li>
+            <li>Theme preference (dark or light mode)</li>
+            <li>Cookie consent choices</li>
+          </ul>
+
+          <h3 class="text-xl font-semibold text-text mb-2 mt-4">3.4 Technical Data</h3>
+          <ul class="list-disc list-inside text-text-muted space-y-2 ml-4">
+            <li>IP address (for security and authentication)</li>
+            <li>Browser type and version</li>
+            <li>Device information</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">4. How We Use Your Data</h2>
+          <ul class="list-disc list-inside text-text-muted space-y-2 ml-4">
+            <li><strong>Service Provision:</strong> To provide and maintain our learning platform</li>
+            <li><strong>Authentication:</strong> To verify your identity and secure your account</li>
+            <li><strong>Progress Tracking:</strong> To track your learning progress and quiz scores</li>
+            <li><strong>Personalization:</strong> To remember your language and theme preferences</li>
+            <li><strong>Communication:</strong> To send account-related emails (verification, password reset)</li>
+            <li><strong>Payments:</strong> To process subscription payments via Revolut</li>
+            <li><strong>Legal Compliance:</strong> To comply with legal obligations</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">5. Data Storage & Security</h2>
+          <p class="text-text-muted leading-relaxed">
+            Your data is stored securely using <strong>Supabase</strong>, which provides:
+          </p>
+          <ul class="list-disc list-inside text-text-muted space-y-2 ml-4 mt-3">
+            <li>Encryption at rest for all stored data</li>
+            <li>Encryption in transit (TLS/SSL)</li>
+            <li>Row-Level Security (RLS) ensuring you can only access your own data</li>
+            <li>Password hashing using bcrypt</li>
+            <li>Regular security updates and monitoring</li>
+          </ul>
+          <p class="text-text-muted leading-relaxed mt-3">
+            Supabase is hosted in the EU and complies with GDPR requirements.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">6. Data Sharing</h2>
+          <p class="text-text-muted leading-relaxed">
+            We do <strong>not</strong> sell, trade, or rent your personal data to third parties. We may share data only with:
+          </p>
+          <ul class="list-disc list-inside text-text-muted space-y-2 ml-4 mt-3">
+            <li><strong>Supabase:</strong> For data storage and authentication (EU-based, GDPR-compliant)</li>
+            <li><strong>Revolut:</strong> For payment processing (when you subscribe to Pro)</li>
+            <li><strong>Google:</strong> For OAuth authentication (if you choose to sign in with Google)</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">7. Your Rights (GDPR)</h2>
+          <p class="text-text-muted leading-relaxed">Under GDPR, you have the following rights:</p>
+          <ul class="list-disc list-inside text-text-muted space-y-2 ml-4 mt-3">
+            <li><strong>Right to Access:</strong> Request a copy of your personal data</li>
+            <li><strong>Right to Rectification:</strong> Request correction of inaccurate data</li>
+            <li><strong>Right to Erasure:</strong> Request deletion of your data ("right to be forgotten")</li>
+            <li><strong>Right to Restrict Processing:</strong> Request limitation of data processing</li>
+            <li><strong>Right to Data Portability:</strong> Receive your data in a structured format</li>
+            <li><strong>Right to Object:</strong> Object to certain types of processing</li>
+            <li><strong>Right to Withdraw Consent:</strong> Withdraw consent at any time</li>
+          </ul>
+          <p class="text-text-muted leading-relaxed mt-3">
+            To exercise these rights, use the <strong>"Download My Data"</strong> or <strong>"Delete Account"</strong> features in your profile settings, or contact us at tsiartasantreas@gmail.com.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">8. Data Retention</h2>
+          <p class="text-text-muted leading-relaxed">
+            We retain your data for as long as your account is active. If you delete your account, all personal data will be permanently removed within 30 days.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">9. Cookies</h2>
+          <p class="text-text-muted leading-relaxed">
+            We use essential cookies for authentication and functionality. We do not use tracking or advertising cookies. You can manage your cookie preferences through the cookie consent banner.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">10. Children's Privacy</h2>
+          <p class="text-text-muted leading-relaxed">
+            Our service is not intended for children under 16. We do not knowingly collect data from children.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">11. Changes to This Policy</h2>
+          <p class="text-text-muted leading-relaxed">
+            We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new policy on this page and updating the "Last updated" date.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">12. Contact Us</h2>
+          <p class="text-text-muted leading-relaxed">
+            If you have any questions about this Privacy Policy or wish to exercise your rights, please contact us:<br/>
+            <strong>Email:</strong> tsiartasantreas@gmail.com
+          </p>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <Footer locale={locale} translations={t} />
+</BaseLayout>

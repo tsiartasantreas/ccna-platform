@@ -1,0 +1,103 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/layout/Header.tsx';
+import Footer from '../../components/layout/Footer.tsx';
+import el from '../../i18n/el.json';
+
+const locale = 'el' as const;
+const t = el;
+---
+
+<BaseLayout title="Πολιτική Απορρήτου" description="Πολιτική Απορρήτου NetAcad" lang={locale}>
+  <Header locale={locale} translations={t} client:load />
+
+  <main class="pt-24 pb-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl font-bold text-text mb-4">Πολιτική Απορρήτου</h1>
+      <p class="text-text-muted mb-8">Τελευταία ενημέρωση: 4 Αυγούστου 2026</p>
+
+      <div class="prose max-w-none space-y-8">
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">1. Εισαγωγή</h2>
+          <p class="text-text-muted leading-relaxed">
+            Καλώς ήρθατε στο NetAcad. Δεσμευόμαστε να προστατεύουμε τα προσωπικά σας δεδομένα και να σεβόμαστε το απόρρητό σας. Αυτή η Πολιτική Απορρήτου εξηγεί πώς συλλέγουμε, χρησιμοποιούμε, αποθηκεύουμε και προστατεύουμε τις πληροφορίες σας όταν χρησιμοποιείτε την πλατφόρμα εκπαίδευσης CCNA μας.
+          </p>
+          <p class="text-text-muted leading-relaxed mt-3">
+            Αυτή η πολιτική συμμορφώνεται με τον Γενικό Κανονισμό Προστασίας Δεδομένων (GDPR) (ΕΕ) 2016/679.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">2. Υπεύθυνος Επεξεργασίας</h2>
+          <p class="text-text-muted leading-relaxed">
+            Ο υπεύθυνος επεξεργασίας των προσωπικών σας δεδομένων είναι:<br/>
+            <strong>NetAcad</strong><br/>
+            Email: tsiartasantreas@gmail.com
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">3. Δεδομένα που Συλλέγουμε</h2>
+          <h3 class="text-xl font-semibold text-text mb-2">3.1 Δεδομένα Λογαριασμού</h3>
+          <ul class="list-disc list-inside text-text-muted space-y-2 ml-4">
+            <li>Διεύθυνση email (απαιτείται)</li>
+            <li>Όμα εμφάνισης (προαιρετικό)</li>
+            <li>Κωδικός πρόσβασης (αποθηκεύεται κρυπτογραφημένος)</li>
+          </ul>
+
+          <h3 class="text-xl font-semibold text-text mb-2 mt-4">3.2 Δεδομένα Μάθησης</h3>
+          <ul class="list-disc list-inside text-text-muted space-y-2 ml-4">
+            <li>Πρόοδος μαθημάτων</li>
+            <li>Βαθμολογίες τεστ</li>
+            <li>Πόντοι και επιτεύγματα</li>
+          </ul>
+
+          <h3 class="text-xl font-semibold text-text mb-2 mt-4">3.3 Προτιμήσεις</h3>
+          <ul class="list-disc list-inside text-text-muted space-y-2 ml-4">
+            <li>Γλώσσα (Αγγλικά ή Ελληνικά)</li>
+            <li>Θέμα (σκοτεινό ή φωτεινό)</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">4. Χρήση Δεδομένων</h2>
+          <ul class="list-disc list-inside text-text-muted space-y-2 ml-4">
+            <li><strong>Παροχή Υπηρεσίας:</strong> Για τη λειτουργία της πλατφόρμας</li>
+            <li><strong>Ταυτοποίηση:</strong> Για επιβεβαίωση ταυτότητας</li>
+            <li><strong>Παρακολούθηση:</strong> Για καταγραφή προόδου</li>
+            <li><strong>Πληρωμές:</strong> Για επεξεργασία συνδρομών</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">5. Ασφάλεια Δεδομένων</h2>
+          <p class="text-text-muted leading-relaxed">
+            Τα δεδομένα σας αποθηκεύονται με ασφάλεια χρησιμοποιώντας το <strong>Supabase</strong>, το οποίο παρέχει κρυπτογράφηση, Row-Level Security και συμμόρφωση με GDPR.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">6. Τα Δικαιώματά σας (GDPR)</h2>
+          <ul class="list-disc list-inside text-text-muted space-y-2 ml-4">
+            <li><strong>Δικαίωμα Πρόσβασης:</strong> Αίτημα αντιγραφής δεδομένων</li>
+            <li><strong>Δικαίωμα Διαγραφής:</strong> Αίτημα διαγραφής δεδομένων</li>
+            <li><strong>Δικαίωμα Φορητότητας:</strong> Λήψη δεδομένων σε δομημένη μορφή</li>
+            <li><strong>Δικαίωμα Εναντίωσης:</strong> Εναντίωση σε επεξεργασία</li>
+          </ul>
+          <p class="text-text-muted leading-relaxed mt-3">
+            Για να ασκήσετε τα δικαιώματά σας, χρησιμοποιήστε τις λειτουργίες <strong>"Λήψη Δεδομένων"</strong> ή <strong>"Διαγραφή Λογαριασμού"</strong> στις ρυθμίσεις προφίλ.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold text-text mb-4">7. Επικοινωνία</h2>
+          <p class="text-text-muted leading-relaxed">
+            <strong>Email:</strong> tsiartasantreas@gmail.com
+          </p>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <Footer locale={locale} translations={t} />
+</BaseLayout>
