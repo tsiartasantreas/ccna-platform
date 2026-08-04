@@ -2,18 +2,96 @@
 import BaseLayout from '../../../../layouts/BaseLayout.astro';
 import Header from '../../../../components/layout/Header.tsx';
 import Footer from '../../../../components/layout/Footer.tsx';
+import QuizEngine from '../../../../components/quiz/QuizEngine.tsx';
 import el from '../../../../i18n/el.json';
 
 const locale = 'el' as const;
 const t = el;
 
 const moduleNames: Record<number, string> = {
-  1: 'Θεμέλια Δικτύων',
-  2: 'Πρόσβαση Δικτύου',
-  3: 'Συνδεσιμότητα IP',
-  4: 'Υπηρεσίες IP',
-  5: 'Θεμέλια Ασφάλειας',
-  6: 'Αυτοματοποίηση & Προγραμματισμός',
+  1: 'Θεμέλια Δικτύων', 2: 'Πρόσβαση Δικτύου', 3: 'Συνδεσιμότητα IP',
+  4: 'Υπηρεσίες IP', 5: 'Θεμέλια Ασφάλειας', 6: 'Αυτοματοποίηση & Προγραμματισμός',
+};
+
+const allQuizzes: Record<number, { question: string; options: string[]; correct: number; explanation: string }[]> = {
+  1: [
+    { question: 'Ποιο επίπεδο OSI είναι υπεύθυνο για τη δρομολόγηση;', options: ['Επίπεδο 1', 'Επίπεδο 2', 'Επίπεδο 3', 'Επίπεδο 4'], correct: 2, explanation: 'Το Επίπεδο 3 χειρίζεται τη δρομολόγηση.' },
+    { question: 'Ποια είναι η προεπιλεγμένη μάσκα για Class C;', options: ['255.0.0.0', '255.255.0.0', '255.255.255.0', '255.255.255.255'], correct: 2, explanation: 'Το Class C χρησιμοποιεί /24 (255.255.255.0).' },
+    { question: 'Ποιο πρωτόκολλο χρησιμοποιεί θύρα 443;', options: ['HTTP', 'HTTPS', 'FTP', 'SSH'], correct: 1, explanation: 'Το HTTPS χρησιμοποιεί θύρα 443.' },
+    { question: 'Πόσα bits έχει μια διεύθυνση IPv4;', options: ['32 bits', '64 bits', '128 bits', '256 bits'], correct: 0, explanation: 'Οι διευθύνσεις IPv4 είναι 32 bits.' },
+    { question: 'Τι σημαίνει ARP;', options: ['Address Resolution Protocol', 'Automatic Routing Protocol', 'Advanced Resource Protocol', 'Address Routing Process'], correct: 0, explanation: 'Το ARP αντιστοιχίζει IP σε MAC διευθύνσεις.' },
+    { question: 'Ποιο TCP flag ξεκινά μια σύνδεση;', options: ['ACK', 'FIN', 'SYN', 'RST'], correct: 2, explanation: 'Το SYN flag χρησιμοποιείται στο three-way handshake.' },
+    { question: 'Ποιο είναι το ιδιωτικό εύρος IP για Class A;', options: ['10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16', '169.254.0.0/16'], correct: 0, explanation: 'Το Class A ιδιωτικό εύρος είναι 10.0.0.0/8.' },
+    { question: 'Ποια εντολή δείχνει τη διαμόρφωση IP;', options: ['show interfaces', 'show ip route', 'show running-config', 'show ip interface brief'], correct: 3, explanation: 'Το "show ip interface brief" εμφανίζει σύνοψη διεπιφών.' },
+    { question: 'Ποιος είναι ο σκοπός του DNS;', options: ['Αντιστοίχιση IP', 'Ανάλυση ονομάτων σε IP', 'Κρυπτογράφηση', 'Δρομολόγηση'], correct: 1, explanation: 'Το DNS μετατρέπει ονόματα τομέα σε IP.' },
+    { question: 'Πόσοι hosts χωρούν σε /26 υποδίκτυο;', options: ['30', '62', '126', '254'], correct: 1, explanation: 'Ένα /26 έχει 64 διευθύνσεις - 2 = 62 hosts.' },
+    { question: 'Ποια είναι η loopback διεύθυνση IPv4;', options: ['0.0.0.0', '127.0.0.1', '255.255.255.255', '192.168.0.1'], correct: 1, explanation: 'Η 127.0.0.1 είναι η loopback διεύθυνση.' },
+    { question: 'Ποιο πρωτόκολλο είναι connectionless;', options: ['TCP', 'UDP', 'Και τα δύο', 'Κανένα'], correct: 1, explanation: 'Το UDP είναι connectionless.' },
+  ],
+  2: [
+    { question: 'Τι χρησιμοποιεί ένα switch για forward frames;', options: ['IP', 'MAC', 'Θύρα', 'Hostname'], correct: 1, explanation: 'Τα switches χρησιμοποιούν MAC διευθύνσεις.' },
+    { question: 'Τι είναι ένα VLAN;', options: ['Φυσική συσκευή', 'Εικονικό broadcast domain', 'Τύπος καλωδίου', 'Πρωτόκολλο'], correct: 1, explanation: 'Ένα VLAN δημιουργεί ξεχωριστά broadcast domains.' },
+    { question: 'Ποιο πρωτόκολλο αποτρέπει loops Layer 2;', options: ['OSPF', 'STP', 'ARP', 'DHCP'], correct: 1, explanation: 'Το STP αποτρέπει loops.' },
+    { question: 'Ποια είναι η μέγιστη απόσταση καλωδίου Cat 5e;', options: ['50m', '100m', '200m', '500m'], correct: 1, explanation: 'Μέγιστη απόσταση UTP: 100 μέτρα.' },
+    { question: 'Τι κάνει το 802.1Q;', options: ['Ασύρματα', 'Ετικέτα VLAN', 'Δρομολόγηση', 'Αντιστοίχιση IP'], correct: 1, explanation: 'Το 802.1Q εισάγει VLAN tag.' },
+    { question: 'Ποιο είναι το default native VLAN;', options: ['VLAN 0', 'VLAN 1', 'VLAN 10', 'VLAN 100'], correct: 1, explanation: 'Default native VLAN: VLAN 1.' },
+    { question: 'Ποιο PoE standard δίνει 30W;', options: ['802.3af', '802.3at', '802.3bt', '802.3ab'], correct: 1, explanation: '802.3at (PoE+) δίνει 30W.' },
+    { question: 'Τι κάνει το PortFast;', options: ['Μπλοκάρει', 'Άμεσο forwarding', 'Κλείνει θύρα', 'Ενεργοποιεί trunking'], correct: 1, explanation: 'PortFast: άμεσο forwarding.' },
+    { question: 'Ποιο wireless standard λειτουργεί μόνο 5 GHz;', options: ['802.11b', '802.11g', '802.11a', '802.11n'], correct: 2, explanation: '802.11a: μόνο 5 GHz.' },
+    { question: 'Τι είναι EtherChannel;', options: ['Ασύρματο', 'Ομαδοποίηση links', 'Firewall', 'Αλγόριθμος'], correct: 1, explanation: 'EtherChannel: πολλαπλά links σε ένα λογικό.' },
+    { question: 'Ποιο πρωτόκολλο ασφάλειας προτείνεται;', options: ['WEP', 'WPA', 'WPA2', 'WPA3'], correct: 3, explanation: 'WPA3: το πιο ασφαλές.' },
+    { question: 'Τι κάνει BPDU Guard;', options: ['Αποτροπή loops', 'Απενεργοποίηση θυρών', 'Κρυπτογράφηση', 'Αντιστοίχιση VLAN'], correct: 1, explanation: 'BPDU Guard: απενεργοποιεί θύρες.' },
+  ],
+  3: [
+    { question: 'Ποιο είναι το default AD του OSPF;', options: ['90', '110', '120', '170'], correct: 1, explanation: 'OSPF AD: 110.' },
+    { question: 'Τι αντιπροσωπεύει static route με AD 250;', options: ['Κύρια', 'Default', 'Floating backup', 'Connected'], correct: 2, explanation: 'Floating static route: υψηλότερο AD = backup.' },
+    { question: 'Ποια εντολή δημιουργεί default route;', options: ['ip route 0.0.0.0 0.0.0.0', 'ip default-route', 'default-route', 'route default'], correct: 0, explanation: '"ip route 0.0.0.0 0.0.0.0" = default route.' },
+    { question: 'Τι είναι Router-on-a-Stick;', options: ['Ασύρματο', 'Inter-VLAN με subinterfaces', 'Switch', 'Πρωτόκολλο'], correct: 1, explanation: 'Router-on-a-Stick: inter-VLAN με subinterfaces.' },
+    { question: 'Τι χρησιμοποιεί OSPF για DR election;', options: ['Υψηλότερο IP', 'Υψηλότερο router ID', 'Χαμηλότερο IP', 'Χαμηλότερο router ID'], correct: 1, explanation: 'OSPF DR: υψηλότερο router ID.' },
+    { question: 'Ποιος είναι ο default OSPF hello timer;', options: ['10 sec', '30 sec', '40 sec', '120 sec'], correct: 0, explanation: 'OSPF hello: 10 δευτερόλεπτα.' },
+    { question: 'Τι παρέχει HSRP;', options: ['Load balancing', 'First hop redundancy', 'Ασύρματα', 'Κρυπτογράφηση'], correct: 1, explanation: 'HSRP: first hop redundancy.' },
+    { question: 'Ποια εντολή δείχνει OSPF neighbors;', options: ['show ip ospf', 'show ip ospf neighbor', 'show ip route ospf', 'show ospf database'], correct: 1, explanation: '"show ip ospf neighbor" = OSPF neighbors.' },
+    { question: 'Τι είναι ο κανόνας longest prefix match;', options: ['Χαμηλότερο AD', 'Πιο συγκεκριμένο match', 'Χαμηλότερο metric', 'Υψηλότερο priority'], correct: 1, explanation: 'Πιο συγκεκριμένη διαδρομή κερδίζει.' },
+    { question: 'Τι είναι ABR σε OSPF;', options: ['AS Border Router', 'Area Border Router', 'Active Backup Router', 'Address Broadcast Router'], correct: 1, explanation: 'ABR: Area Border Router.' },
+    { question: 'Ποιος είναι ο default OSPF dead timer;', options: ['10 sec', '30 sec', '40 sec', '120 sec'], correct: 2, explanation: 'OSPF dead: 40 δευτερόλεπτα.' },
+    { question: 'Ποια εντολή ενεργοποιεί OSPF process 1;', options: ['ospf 1', 'router ospf 1', 'enable ospf 1', 'ip ospf 1'], correct: 1, explanation: '"router ospf 1" = OSPF process.' },
+  ],
+  4: [
+    { question: 'Ποια είναι τα 4 μηνύματα DHCP;', options: ['Discover, Offer, Request, Ack', 'Request, Offer, Discover, Ack', 'Offer, Discover, Ack, Request', 'Discover, Request, Offer, Ack'], correct: 0, explanation: 'DHCP DORA: Discover, Offer, Request, Ack.' },
+    { question: 'Τι σημαίνει PAT;', options: ['Port Address Translation', 'Private Address Translation', 'Protocol Address Translation', 'Public Address Translation'], correct: 0, explanation: 'PAT: Port Address Translation.' },
+    { question: 'Ποιο είναι το syslog severity για Emergency;', options: ['0', '1', '7', '6'], correct: 0, explanation: 'Emergency: severity 0.' },
+    { question: 'Ποια έκδοση SNMP παρέχει κρυπτογράφηση;', options: ['SNMPv1', 'SNMPv2c', 'SNMPv3', 'Όλες'], correct: 2, explanation: 'SNMPv3: κρυπτογράφηση.' },
+    { question: 'Ποια εντολή ρυθμίζει DHCP relay;', options: ['ip dhcp relay', 'ip helper-address', 'dhcp forward', 'ip dhcp forwarder'], correct: 1, explanation: '"ip helper-address" = DHCP relay.' },
+    { question: 'Ποια είναι η διαφορά SSH vs Telnet;', options: ['SSH ταχύτερο', 'SSH κρυπτογραφεί', 'Telnet άλλη θύρα', 'Καμία'], correct: 1, explanation: 'SSH κρυπτογραφεί, Telnet όχι.' },
+    { question: 'Τι συγχρονίζει NTP;', options: ['IP', 'Ρολόγια', 'Πίνακες', 'VLAN'], correct: 1, explanation: 'NTP: συγχρονισμός ρολογιών.' },
+    { question: 'Ποιο QoS marking χρησιμοποιείται στο Layer 3;', options: ['CoS', 'DSCP', '802.1p', 'MPLS'], correct: 1, explanation: 'DSCP: Layer 3 QoS.' },
+    { question: 'Ποια εντολή ενεργοποιεί SSH;', options: ['ssh enable', 'crypto key generate rsa', 'ip ssh enable', 'ssh server enable'], correct: 1, explanation: '"crypto key generate rsa" = SSH.' },
+    { question: 'Τι ρυθμίζει NAT overload;', options: ['Static NAT', 'Dynamic NAT', 'PAT', 'Κανένα NAT'], correct: 2, explanation: 'NAT overload = PAT.' },
+  ],
+  5: [
+    { question: 'Τι χρησιμοποιεί ACL για matching;', options: ['MAC μόνο', 'ACEs', 'VLAN tags', 'Θύρες μόνο'], correct: 1, explanation: 'ACLs: ACEs για matching.' },
+    { question: 'Ποιος είναι ο implicit κανόνας ACL;', options: ['Permit all', 'Deny all', 'Log all', 'Forward all'], correct: 1, explanation: 'Implicit deny all.' },
+    { question: 'Ποιο ACL φιλτράρει βάσει source IP;', options: ['Extended', 'Standard', 'Named', 'Reflexive'], correct: 1, explanation: 'Standard ACL: source IP.' },
+    { question: 'Τι κάνει port security "shutdown";', options: ['Ρίπτει frames', 'Ρίπτει και log', 'Κλείνει θύρα', 'Επιτρέπει όλα'], correct: 2, explanation: 'Shutdown: err-disable θύρα.' },
+    { question: 'Τι σημαίνει AAA;', options: ['Authentication, Authorization, Accounting', 'Access, Authentication, Authorization', 'Authentication, Access, Accounting', 'Authorization, Access, Authentication'], correct: 0, explanation: 'AAA = Authentication, Authorization, Accounting.' },
+    { question: 'Ποιο πρωτόκολλο χρησιμοποιεί 802.1X;', options: ['SSH', 'HTTPS', 'RADIUS', 'SNMP'], correct: 2, explanation: '802.1X: RADIUS.' },
+    { question: 'Τι είναι DHCP snooping;', options: ['Παρακολούθηση', 'Αποκλεισμός unauthorized DHCP', 'Κρυπτογράφηση', 'Επιτάχυνση'], correct: 1, explanation: 'DHCP snooping: αποκλεισμός unauthorized.' },
+    { question: 'Ποιο VPN ενώνει 2 sites μόνιμα;', options: ['Remote access', 'Site-to-site', 'SSL VPN', 'Client VPN'], correct: 1, explanation: 'Site-to-site: μόνιμη σύνδεση.' },
+    { question: 'Τι παρέχει IPSec ESP;', options: ['Auth μόνο', 'Κρυπτογράφηση μόνο', 'Auth + κρυπτογράφηση', 'Τίποτα'], correct: 2, explanation: 'ESP: auth + encryption.' },
+    { question: 'Ποια είναι η wildcard mask 0.0.0.255;', options: ['/8', '/16', '/24', '/32'], correct: 2, explanation: '0.0.0.255 = /24.' },
+  ],
+  6: [
+    { question: 'Τι χωρίζει SDN;', options: ['Hardware/Software', 'Control/Data plane', 'LAN/WAN', 'IPv4/IPv6'], correct: 1, explanation: 'SDN: control plane από data plane.' },
+    { question: 'Ποια HTTP μέθοδος δημιουργεί resource;', options: ['GET', 'POST', 'PUT', 'DELETE'], correct: 1, explanation: 'POST = δημιουργία.' },
+    { question: 'Ποια μορφή χρησιμοποιούν REST APIs;', options: ['XML μόνο', 'JSON μόνο', 'JSON + XML', 'HTML'], correct: 2, explanation: 'REST APIs: JSON + XML.' },
+    { question: 'Τι είναι Ansible;', options: ['Γλώσσα', 'Agentless εργαλείο', 'Πρωτόκολλο', 'Firewall'], correct: 1, explanation: 'Ansible: agentless automation.' },
+    { question: 'Τι χρησιμοποιεί NETCONF για modeling;', options: ['JSON', 'XML', 'YANG', 'HTML'], correct: 2, explanation: 'NETCONF: YANG.' },
+    { question: 'Ποιο HTTP code = "Not Found";', options: ['200', '400', '401', '404'], correct: 3, explanation: '404 = Not Found.' },
+    { question: 'Τι είναι Cisco DNA Center;', options: ['Firewall', 'Intent-based networking', 'Πρωτόκολλο', 'Κάλωδο'], correct: 1, explanation: 'DNA Center: intent-based networking.' },
+    { question: 'Τι χρησιμοποιεί RESTCONF;', options: ['SSH', 'Telnet', 'HTTP/HTTPS', 'SNMP'], correct: 2, explanation: 'RESTCONF: HTTP/HTTPS.' },
+    { question: 'Ποιο εργαλείο είναι agent-based;', options: ['Ansible', 'Puppet', 'Και τα δύο', 'Κανένα'], correct: 1, explanation: 'Puppet: agent-based.' },
+    { question: 'Τι είναι YANG;', options: ['Routing', 'Data modeling', 'Ασφάλεια', 'Κάλωδο'], correct: 1, explanation: 'YANG: data modeling language.' },
+  ],
 };
 
 export function getStaticPaths() {
@@ -26,58 +104,30 @@ export function getStaticPaths() {
 const { module: moduleParam } = Astro.params;
 const moduleNum = parseInt(moduleParam || '1');
 const moduleName = moduleNames[moduleNum] || 'Θεμέλια Δικτύων';
-
-const sampleQuestions = [
-  { question: 'Ποιο επίπεδο OSI είναι υπεύθυνο για τη δρομολόγηση;', options: ['Επίπεδο 1', 'Επίπεδο 2', 'Επίπεδο 3', 'Επίπεδο 4'], correct: 2, explanation: 'Το Επίπεδο 3 (Δίκτυο) χειρίζεται τη δρομολόγηση και τη λογική διευθυνσιοδότηση.' },
-  { question: 'Ποια είναι η προεπιλεγμένη μάσκα υποδικτύου για Class C;', options: ['255.0.0.0', '255.255.0.0', '255.255.255.0', '255.255.255.255'], correct: 2, explanation: 'Το Class C χρησιμοποιεί /24 (255.255.255.0) ως προεπιλεγμένη μάσκα.' },
-  { question: 'Ποιο πρωτόκολλο χρησιμοποιεί θύρα 443;', options: ['HTTP', 'HTTPS', 'FTP', 'SSH'], correct: 1, explanation: 'Το HTTPS χρησιμοποιεί θύρα 443 για κρυπτογραφημένη κίνηση ιστού.' },
-];
+const questions = allQuizzes[moduleNum] || [];
+const quizQuestions = questions.map((q, i) => ({ id: `m${moduleNum}q${i + 1}`, ...q }));
 ---
 
 <BaseLayout title={`${t.quiz.title} - ${moduleName}`} lang={locale}>
   <Header locale={locale} translations={t} client:load />
 
-  <main class="pt-24 pb-16 min-h-screen">
-    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+  <main class="pt-24 pb-16 min-h-height min-h-screen">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-12">
-        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">🎯 {t.modules.module} {moduleNum}</div>
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
+          🎯 {t.modules.module} {moduleNum}
+        </div>
         <h1 class="text-3xl sm:text-4xl font-bold mb-2">{t.quiz.title}: {moduleName}</h1>
-        <p class="text-text-muted">Δοκιμάστε τις γνώσεις σας με {sampleQuestions.length} ερωτήσεις</p>
+        <p class="text-text-muted">{questions.length} ερωτήσεις</p>
       </div>
 
-      <div class="bg-gradient-to-r from-primary/10 to-accent/10 rounded-2xl border border-primary/20 p-6 mb-8 text-center">
-        <div class="text-2xl mb-2">🔒</div>
-        <h3 class="text-lg font-bold text-text mb-2">Χαρακτηριστικό Pro</h3>
-        <p class="text-text-muted text-sm mb-4">Τα πλήρη gamified τεστ με βαθμολογία, σερί και επιτεύγματα είναι διαθέσιμα για χρήστες Pro.</p>
-        <a href={`/${locale}/pricing`} class="inline-flex px-6 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity">{t.pricing.upgrade} →</a>
-      </div>
-
-      <div class="space-y-6">
-        {sampleQuestions.map((q, idx) => (
-          <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
-            <div class="flex items-center gap-2 mb-4">
-              <span class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-sm font-bold">{idx + 1}</span>
-              <h3 class="text-lg font-bold text-text">{q.question}</h3>
-            </div>
-            <div class="space-y-3 mb-4">
-              {q.options.map((opt, optIdx) => (
-                <label class={`flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition-all ${optIdx === q.correct ? 'border-success/30 bg-success/5' : 'border-primary/10 hover:border-primary/30 hover:bg-surface-light'}`}>
-                  <span class={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm font-medium ${optIdx === q.correct ? 'border-success text-success' : 'border-text-muted text-text-muted'}`}>{String.fromCharCode(65 + optIdx)}</span>
-                  <span class="text-text-muted">{opt}</span>
-                  {optIdx === q.correct && <svg class="w-5 h-5 text-success ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width={2} d="M5 13l4 4L19 7" /></svg>}
-                </label>
-              ))}
-            </div>
-            <div class="bg-surface-light rounded-lg p-4">
-              <p class="text-sm text-text-muted"><span class="font-bold text-primary">{t.quiz.explanation}:</span> {q.explanation}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div class="mt-12 text-center">
-        <a href={`/${locale}/curriculum`} class="inline-flex px-6 py-3 bg-primary/10 text-primary rounded-xl font-medium hover:bg-primary/20 transition-colors">{t.lesson.back_to_curriculum}</a>
-      </div>
+      <QuizEngine
+        moduleNumber={moduleNum}
+        moduleName={moduleName}
+        questions={quizQuestions}
+        locale={locale}
+        client:load
+      />
     </div>
   </main>
 
