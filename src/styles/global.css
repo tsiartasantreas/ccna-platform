@@ -167,3 +167,33 @@ code, pre {
 .light .bg-surface {
   background-color: #f0f2f5;
 }
+
+/* Header smooth transition */
+header {
+  transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Ensure main content doesn't overlap with fixed header */
+main, .main-content {
+  padding-top: 4rem;
+}
+
+/* Back to top button animation */
+button[title="Back to top"],
+button[title="Επιστροφή στην κορυφή"] {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Logo frame styling */
+header a .relative {
+  box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.2);
+}
+
+header a:hover .relative {
+  box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.5), 0 0 15px rgba(0, 212, 255, 0.2);
+}

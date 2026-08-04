@@ -154,22 +154,24 @@ export default function Header({ locale, translations }: HeaderProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <a href={`/${locale}/`} className="flex items-center gap-2 group">
-            <img
-              src={logoUrl}
-              alt={siteName}
-              className="w-10 h-10 rounded-xl object-cover group-hover:scale-105 transition-transform"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-                const fallback = target.nextElementSibling as HTMLElement;
-                if (fallback) fallback.style.display = 'flex';
-              }}
-            />
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent items-center justify-center text-white font-bold text-xl group-hover:scale-105 transition-transform" style={{ display: logoUrl ? 'none' : 'flex' }}>
-              {siteName.charAt(0).toUpperCase()}
+          <a href={`/${locale}/`} className="flex items-center gap-3 group">
+            <div className="relative w-10 h-10 rounded-xl overflow-hidden border-2 border-primary/30 group-hover:border-primary transition-colors shadow-lg shadow-primary/10">
+              <img
+                src={logoUrl}
+                alt={siteName}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  const fallback = target.nextElementSibling as HTMLElement;
+                  if (fallback) fallback.style.display = 'flex';
+                }}
+              />
+              <div className="w-full h-full bg-gradient-to-br from-primary to-accent items-center justify-center text-white font-bold text-xl" style={{ display: logoUrl ? 'none' : 'flex', position: 'absolute', top: 0, left: 0 }}>
+                {siteName.charAt(0).toUpperCase()}
+              </div>
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent hidden sm:block">
               {siteName}
             </span>
           </a>
