@@ -1,0 +1,10 @@
+[package]
+name = "netacad/ccna-platform"
+version = "0.1.0"
+description = "Interactive CCNA Training Platform with 3D lessons and gamified quizzes"
+
+[dependencies]
+"sharrattj/static-web-server" = "1"
+
+[fs]
+public = "dist"

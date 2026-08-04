@@ -1,0 +1,159 @@
+{
+  "site": {
+    "title": "NetAcad",
+    "subtitle": "Interactive CCNA Training Platform",
+    "description": "Master networking fundamentals with interactive 3D lessons and gamified quizzes"
+  },
+  "nav": {
+    "home": "Home",
+    "curriculum": "Curriculum",
+    "pricing": "Pricing",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "login": "Login",
+    "signup": "Sign Up",
+    "logout": "Logout"
+  },
+  "hero": {
+    "title": "Master CCNA Networking",
+    "subtitle": "Interactive 3D lessons, gamified quizzes, and a structured path to your Cisco certification",
+    "cta_primary": "Start Learning Free",
+    "cta_secondary": "View Curriculum"
+  },
+  "modules": {
+    "title": "CCNA Curriculum",
+    "subtitle": "6 comprehensive modules covering the entire CCNA 200-301 exam",
+    "module": "Module",
+    "lessons": "lessons",
+    "progress": "Progress",
+    "start": "Start Module",
+    "continue": "Continue",
+    "completed": "Completed",
+    "locked": "Pro Only"
+  },
+  "module_names": {
+    "1": "Network Fundamentals",
+    "2": "Network Access",
+    "3": "IP Connectivity",
+    "4": "IP Services",
+    "5": "Security Fundamentals",
+    "6": "Automation & Programmability"
+  },
+  "module_descriptions": {
+    "1": "OSI model, TCP/IP, IPv4/IPv6 addressing, subnetting, and Cisco CLI basics",
+    "2": "Switching, VLANs, trunking, STP, wireless fundamentals, and PoE",
+    "3": "Routing table, static routes, OSPF, inter-VLAN routing, and FHRPs",
+    "4": "DHCP, NAT/PAT, NTP, Syslog, SNMP, QoS, and SSH",
+    "5": "Security threats, ACLs, port security, AAA, 802.1X, and VPNs",
+    "6": "SDN concepts, REST APIs, configuration management, and Cisco DNA Center"
+  },
+  "lesson": {
+    "objectives": "Learning Objectives",
+    "key_terms": "Key Terms",
+    "test_knowledge": "Test Your Knowledge",
+    "next_lesson": "Next Lesson",
+    "prev_lesson": "Previous Lesson",
+    "back_to_curriculum": "Back to Curriculum",
+    "mark_complete": "Mark as Complete",
+    "time_spent": "Time Spent"
+  },
+  "quiz": {
+    "title": "Module Quiz",
+    "start": "Start Quiz",
+    "next": "Next Question",
+    "submit": "Submit Answer",
+    "finish": "Finish Quiz",
+    "score": "Your Score",
+    "passed": "Congratulations! You passed!",
+    "failed": "Keep practicing! You need 80% to pass.",
+    "try_again": "Try Again",
+    "review": "Review Answers",
+    "streak": "Streak",
+    "points": "Points",
+    "time": "Time",
+    "question": "Question",
+    "of": "of",
+    "correct": "Correct!",
+    "incorrect": "Incorrect",
+    "explanation": "Explanation"
+  },
+  "pricing": {
+    "title": "Choose Your Plan",
+    "subtitle": "Start free, upgrade when you're ready for the full experience",
+    "free": "Free",
+    "pro": "Pro",
+    "per_month": "/month",
+    "per_year": "/year",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "save": "Save 33%",
+    "upgrade": "Upgrade to Pro",
+    "current_plan": "Current Plan",
+    "features": "Features",
+    "included": "Included"
+  },
+  "auth": {
+    "login_title": "Welcome Back",
+    "signup_title": "Create Account",
+    "email": "Email",
+    "password": "Password",
+    "confirm_password": "Confirm Password",
+    "display_name": "Display Name",
+    "login_button": "Login",
+    "signup_button": "Sign Up",
+    "forgot_password": "Forgot Password?",
+    "no_account": "Don't have an account?",
+    "has_account": "Already have an account?",
+    "or_continue": "Or continue with",
+    "google": "Google",
+    "verify_email": "Please verify your email address"
+  },
+  "dashboard": {
+    "welcome": "Welcome back",
+    "your_progress": "Your Progress",
+    "total_points": "Total Points",
+    "current_streak": "Current Streak",
+    "modules_completed": "Modules Completed",
+    "lessons_completed": "Lessons Completed",
+    "recent_activity": "Recent Activity",
+    "continue_learning": "Continue Learning",
+    "leaderboard": "Leaderboard"
+  },
+  "profile": {
+    "title": "Profile Settings",
+    "display_name": "Display Name",
+    "language": "Language",
+    "theme": "Theme",
+    "dark": "Dark",
+    "light": "Light",
+    "plan": "Current Plan",
+    "download_data": "Download My Data",
+    "delete_account": "Delete Account",
+    "save": "Save Changes",
+    "saved": "Changes saved!",
+    "gdpr_notice": "Your data is encrypted and stored securely. You can download or delete your data at any time."
+  },
+  "gdpr": {
+    "cookie_title": "Cookie Consent",
+    "cookie_description": "We use essential cookies to make this site work. We'd also like to set optional analytics cookies to help us improve.",
+    "accept_all": "Accept All",
+    "reject_optional": "Reject Optional",
+    "privacy_policy": "Privacy Policy",
+    "terms_of_service": "Terms of Service"
+  },
+  "footer": {
+    "copyright": "© 2026 NetAcad. All rights reserved.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "contact": "Contact"
+  },
+  "certificate": {
+    "title": "Certificate of Completion",
+    "subtitle": "CCNA Training Program",
+    "certifies": "This certifies that",
+    "has_completed": "has successfully completed the",
+    "program": "CCNA Training Program",
+    "download": "Download Certificate",
+    "share": "Share"
+  }
+}

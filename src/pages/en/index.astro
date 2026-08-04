@@ -1,0 +1,223 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/layout/Header.tsx';
+import Footer from '../../components/layout/Footer.tsx';
+import en from '../../i18n/en.json';
+
+const locale = 'en';
+const t = en;
+---
+
+<BaseLayout title={t.site.title} description={t.site.description} lang={locale}>
+  <Header locale={locale} translations={t} client:load />
+
+  <!-- Hero Section -->
+  <section class="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
+    <!-- Background gradient -->
+    <div class="absolute inset-0 bg-gradient-to-b from-surface via-surface-light to-surface"></div>
+
+    <!-- Animated grid background -->
+    <div class="absolute inset-0 opacity-10">
+      <div class="absolute inset-0" style="background-image: radial-gradient(circle at 1px 1px, var(--color-primary) 1px, transparent 0); background-size: 40px 40px;"></div>
+    </div>
+
+    <!-- Glowing orbs -->
+    <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse"></div>
+    <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <!-- Badge -->
+      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-8 animate-fade-in">
+        <span class="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+        CCNA 200-301 Exam Preparation
+      </div>
+
+      <!-- Main heading -->
+      <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 animate-fade-in" style="animation-delay: 0.1s;">
+        <span class="bg-gradient-to-r from-primary via-accent-light to-accent bg-clip-text text-transparent">
+          {t.hero.title}
+        </span>
+      </h1>
+
+      <!-- Subtitle -->
+      <p class="text-lg sm:text-xl text-text-muted max-w-3xl mx-auto mb-10 animate-fade-in" style="animation-delay: 0.2s;">
+        {t.hero.subtitle}
+      </p>
+
+      <!-- CTA Buttons -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16 animate-fade-in" style="animation-delay: 0.3s;">
+        <a
+          href={`/${locale}/login?mode=signup`}
+          class="px-8 py-4 text-lg font-semibold bg-gradient-to-r from-primary to-accent text-white rounded-xl hover:opacity-90 transition-all hover:scale-105 shadow-lg shadow-primary/25"
+        >
+          {t.hero.cta_primary} →
+        </a>
+        <a
+          href={`/${locale}/curriculum`}
+          class="px-8 py-4 text-lg font-semibold border border-primary/30 text-primary rounded-xl hover:bg-primary/10 transition-all"
+        >
+          {t.hero.cta_secondary}
+        </a>
+      </div>
+
+      <!-- Stats -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 max-w-2xl mx-auto animate-fade-in" style="animation-delay: 0.4s;">
+        <div class="text-center">
+          <div class="text-3xl font-bold text-primary">35</div>
+          <div class="text-sm text-text-muted">Lessons</div>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-primary">6</div>
+          <div class="text-sm text-text-muted">Modules</div>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-primary">80+</div>
+          <div class="text-sm text-text-muted">Quiz Questions</div>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-primary">3D</div>
+          <div class="text-sm text-text-muted">Interactive</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Curriculum Overview -->
+  <section class="py-24 relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Section header -->
+      <div class="text-center mb-16">
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+          {t.modules.title}
+        </h2>
+        <p class="text-text-muted max-w-2xl mx-auto">
+          {t.modules.subtitle}
+        </p>
+      </div>
+
+      <!-- Module cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[
+          { num: 1, name: t.module_names['1'], desc: t.module_descriptions['1'], lessons: 8, weight: '20%', color: 'from-blue-500 to-cyan-500' },
+          { num: 2, name: t.module_names['2'], desc: t.module_descriptions['2'], lessons: 7, weight: '20%', color: 'from-purple-500 to-pink-500' },
+          { num: 3, name: t.module_names['3'], desc: t.module_descriptions['3'], lessons: 6, weight: '25%', color: 'from-green-500 to-emerald-500' },
+          { num: 4, name: t.module_names['4'], desc: t.module_descriptions['4'], lessons: 5, weight: '10%', color: 'from-orange-500 to-red-500' },
+          { num: 5, name: t.module_names['5'], desc: t.module_descriptions['5'], lessons: 5, weight: '15%', color: 'from-red-500 to-rose-500' },
+          { num: 6, name: t.module_names['6'], desc: t.module_descriptions['6'], lessons: 4, weight: '10%', color: 'from-indigo-500 to-violet-500' },
+        ].map((module) => (
+          <a
+            href={`/${locale}/lessons/${module.num}/1`}
+            class="group relative bg-surface-card rounded-2xl border border-primary/10 hover:border-primary/30 p-6 transition-all hover:scale-[1.02] hover:shadow-lg hover:shadow-primary/10"
+          >
+            <!-- Module number badge -->
+            <div class={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br ${module.color} text-white font-bold text-lg mb-4`}>
+              {module.num}
+            </div>
+
+            <!-- Exam weight -->
+            <div class="absolute top-4 right-4 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+              {module.weight} exam
+            </div>
+
+            <!-- Content -->
+            <h3 class="text-xl font-bold text-text mb-2 group-hover:text-primary transition-colors">
+              {module.name}
+            </h3>
+            <p class="text-text-muted text-sm mb-4 line-clamp-2">
+              {module.desc}
+            </p>
+
+            <!-- Footer -->
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-text-muted">
+                {module.lessons} {t.modules.lessons}
+              </span>
+              <span class="text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                Start →
+              </span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="py-24 bg-surface-light">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+          Why Choose NetAcad?
+        </h2>
+        <p class="text-text-muted max-w-2xl mx-auto">
+          A modern, interactive approach to learning networking
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {[
+          {
+            icon: '🎮',
+            title: 'Gamified Learning',
+            description: 'Earn points, maintain streaks, and unlock achievements as you progress through the curriculum.'
+          },
+          {
+            icon: '🌐',
+            title: '3D Interactive Diagrams',
+            description: 'Explore network concepts with rotatable 3D models that bring abstract ideas to life.'
+          },
+          {
+            icon: '📋',
+            title: 'Structured Curriculum',
+            description: 'Follow a carefully designed learning path aligned with the CCNA 200-301 exam objectives.'
+          },
+          {
+            icon: '🧠',
+            title: 'Active Recall Quizzes',
+            description: 'Test your knowledge with multiple choice, drag-and-drop, and CLI simulation exercises.'
+          },
+          {
+            icon: '📊',
+            title: 'Progress Tracking',
+            description: 'Monitor your advancement with detailed dashboards showing completion and scores.'
+          },
+          {
+            icon: '🌍',
+            title: 'Bilingual Support',
+            description: 'Learn in English or Greek with fully translated content and interface.'
+          },
+        ].map((feature) => (
+          <div class="flex gap-4 p-6 rounded-2xl bg-surface border border-primary/10 hover:border-primary/20 transition-all">
+            <div class="text-4xl flex-shrink-0">{feature.icon}</div>
+            <div>
+              <h3 class="text-lg font-bold text-text mb-2">{feature.title}</h3>
+              <p class="text-text-muted text-sm">{feature.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-24">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div class="bg-gradient-to-r from-primary/10 to-accent/10 rounded-3xl border border-primary/20 p-12">
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+          Ready to Start Your Networking Journey?
+        </h2>
+        <p class="text-text-muted mb-8 max-w-xl mx-auto">
+          Join thousands of learners mastering CCNA fundamentals. Start free, upgrade when you're ready.
+        </p>
+        <a
+          href={`/${locale}/login?mode=signup`}
+          class="inline-flex px-8 py-4 text-lg font-semibold bg-gradient-to-r from-primary to-accent text-white rounded-xl hover:opacity-90 transition-all hover:scale-105 shadow-lg shadow-primary/25"
+        >
+          Get Started Free →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <Footer locale={locale} translations={t} />
+</BaseLayout>

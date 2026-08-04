@@ -1,0 +1,15 @@
+kind: wasmer.io/App.v0
+owner: netacad
+name: ccna-platform
+package: .
+description: "Interactive CCNA Training Platform with 3D lessons and gamified quizzes"
+
+capabilities:
+  cdn_cache:
+    enabled: true
+
+scaling:
+  mode: single_concurrency
+
+redirect:
+  force_https: true
