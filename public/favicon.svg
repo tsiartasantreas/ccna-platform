@@ -6,8 +6,6 @@
     </linearGradient>
   </defs>
   <rect width="100" height="100" rx="20" fill="#0a0f1e"/>
-  <text x="50" y="68" font-family="Arial, sans-serif" font-size="52" font-weight="bold" fill="url(#grad)" text-anchor="middle">N</text>
-  <circle cx="75" cy="25" r="8" fill="#00d4ff" opacity="0.8"/>
-  <circle cx="25" cy="75" r="6" fill="#7c3aed" opacity="0.6"/>
-  <line x1="25" y1="75" x2="75" y2="25" stroke="#00d4ff" stroke-width="2" opacity="0.4"/>
+  <text x="50" y="55" font-family="Arial, sans-serif" font-size="40" font-weight="bold" fill="url(#grad)" text-anchor="middle">NL</text>
+  <text x="50" y="80" font-family="Arial, sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">NetworkLearn</text>
 </svg>
