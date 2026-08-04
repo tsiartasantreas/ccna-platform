@@ -7,87 +7,47 @@ import en from '../../../../i18n/en.json';
 const locale = 'en' as const;
 const t = en;
 
-const allModules: Record<number, { name: string; lessons: string[] }> = {
-  1: {
-    name: 'Network Fundamentals',
-    lessons: [
-      'OSI & TCP/IP Models',
-      'Network Topologies & Types',
-      'Cabling & Physical Infrastructure',
-      'IPv4 Addressing & Binary Math',
-      'IPv4 Subnetting & VLSM',
-      'IPv6 Addressing',
-      'TCP, UDP, ARP, DNS, ICMP',
-      'Cisco CLI Basics',
-    ],
-  },
-  2: {
-    name: 'Network Access',
-    lessons: [
-      'Ethernet & MAC Addresses',
-      'Switch Operations',
-      'VLANs & Trunking (802.1Q)',
-      'EtherChannel',
-      'Spanning Tree Protocol (STP)',
-      'Wireless Fundamentals',
-      'PoE & Wireless Security',
-    ],
-  },
-  3: {
-    name: 'IP Connectivity',
-    lessons: [
-      'Routing Table & Path Selection',
-      'Static Routes',
-      'Inter-VLAN Routing',
-      'OSPF Single Area',
-      'OSPF Multi-Area Concepts',
-      'First Hop Redundancy (HSRP/VRRP)',
-    ],
-  },
-  4: {
-    name: 'IP Services',
-    lessons: [
-      'DHCP',
-      'NAT & PAT',
-      'NTP & Syslog',
-      'SNMP & QoS',
-      'SSH & Remote Access',
-    ],
-  },
-  5: {
-    name: 'Security Fundamentals',
-    lessons: [
-      'Security Threats Overview',
-      'Access Control Lists (ACLs)',
-      'Port Security & DHCP Snooping',
-      'AAA & 802.1X',
-      'VPN Concepts & Firewalls',
-    ],
-  },
-  6: {
-    name: 'Automation & Programmability',
-    lessons: [
-      'SDN Concepts',
-      'REST APIs & Data Formats',
-      'Configuration Management',
-      'Cisco DNA Center & Programmability',
-    ],
-  },
+// Import lesson content for all modules
+import { module1Lessons } from '../../../../lib/lessons/module1';
+import { module2Lessons } from '../../../../lib/lessons/module2';
+import { module3Lessons } from '../../../../lib/lessons/module3';
+import { module4Lessons } from '../../../../lib/lessons/module4';
+import { module5Lessons } from '../../../../lib/lessons/module5';
+import { module6Lessons } from '../../../../lib/lessons/module6';
+
+const allModuleLessons: Record<number, Record<number, { objectives: string[]; keyTerms: { term: string; definition: string }[]; content: string }>> = {
+  1: module1Lessons,
+  2: module2Lessons,
+  3: module3Lessons,
+  4: module4Lessons,
+  5: module5Lessons,
+  6: module6Lessons,
+};
+
+const moduleNames: Record<number, string> = {
+  1: 'Network Fundamentals',
+  2: 'Network Access',
+  3: 'IP Connectivity',
+  4: 'IP Services',
+  5: 'Security Fundamentals',
+  6: 'Automation & Programmability',
+};
+
+const moduleLessonTitles: Record<number, string[]> = {
+  1: ['OSI & TCP/IP Models', 'Network Topologies & Types', 'Cabling & Physical Infrastructure', 'IPv4 Addressing & Binary Math', 'IPv4 Subnetting & VLSM', 'IPv6 Addressing', 'TCP, UDP, ARP, DNS, ICMP', 'Cisco CLI Basics'],
+  2: ['Ethernet & MAC Addresses', 'Switch Operations', 'VLANs & Trunking (802.1Q)', 'EtherChannel', 'Spanning Tree Protocol (STP)', 'Wireless Fundamentals', 'PoE & Wireless Security'],
+  3: ['Routing Table & Path Selection', 'Static Routes', 'Inter-VLAN Routing', 'OSPF Single Area', 'OSPF Multi-Area Concepts', 'First Hop Redundancy (HSRP/VRRP)'],
+  4: ['DHCP', 'NAT & PAT', 'NTP & Syslog', 'SNMP & QoS', 'SSH & Remote Access'],
+  5: ['Security Threats Overview', 'Access Control Lists (ACLs)', 'Port Security & DHCP Snooping', 'AAA & 802.1X', 'VPN Concepts & Firewalls'],
+  6: ['SDN Concepts', 'REST APIs & Data Formats', 'Configuration Management', 'Cisco DNA Center & Programmability'],
 };
 
 export function getStaticPaths() {
-  const moduleLessons: Record<number, string[]> = {
-    1: ['osi-tcp-ip-models', 'network-topologies', 'cabling', 'ipv4-addressing', 'ipv4-subnetting', 'ipv6-addressing', 'tcp-udp-arp', 'cisco-cli'],
-    2: ['ethernet-mac', 'switch-operations', 'vlans-trunking', 'etherchannel', 'stp', 'wireless', 'poe-security'],
-    3: ['routing-table', 'static-routes', 'inter-vlan', 'ospf-single', 'ospf-multi', 'fhrp'],
-    4: ['dhcp', 'nat-pat', 'ntp-syslog', 'snmp-qos', 'ssh'],
-    5: ['security-threats', 'acls', 'port-security', 'aaa-8021x', 'vpn-firewalls'],
-    6: ['sdn', 'rest-apis', 'config-management', 'dna-center'],
-  };
   const paths: { params: { module: string; lesson: string } }[] = [];
-  for (const [m, lessons] of Object.entries(moduleLessons)) {
-    for (let l = 1; l <= lessons.length; l++) {
-      paths.push({ params: { module: m, lesson: String(l) } });
+  for (let m = 1; m <= 6; m++) {
+    const lessonCount = [8, 7, 6, 5, 5, 4][m - 1];
+    for (let l = 1; l <= lessonCount; l++) {
+      paths.push({ params: { module: String(m), lesson: String(l) } });
     }
   }
   return paths;
@@ -97,26 +57,59 @@ const { module: moduleParam, lesson: lessonParam } = Astro.params;
 const moduleNum = parseInt(moduleParam || '1');
 const lessonNum = parseInt(lessonParam || '1');
 
-const moduleData = allModules[moduleNum];
-if (!moduleData) {
-  return Astro.redirect(`/${locale}/curriculum`);
-}
+const moduleName = moduleNames[moduleNum] || 'Network Fundamentals';
+const lessonTitle = moduleLessonTitles[moduleNum]?.[lessonNum - 1] || 'Lesson';
+const content = allModuleLessons[moduleNum]?.[lessonNum] || null;
 
-const lessonTitle = moduleData.lessons[lessonNum - 1];
-if (!lessonTitle) {
-  return Astro.redirect(`/${locale}/curriculum`);
-}
-
+const lessonCount = moduleLessonTitles[moduleNum]?.length || 1;
 const prevLesson = lessonNum > 1
   ? { module: moduleNum, lesson: lessonNum - 1 }
   : moduleNum > 1
-    ? { module: moduleNum - 1, lesson: allModules[moduleNum - 1]?.lessons.length || 1 }
+    ? { module: moduleNum - 1, lesson: moduleLessonTitles[moduleNum - 1]?.length || 1 }
     : null;
-const nextLesson = lessonNum < moduleData.lessons.length
+const nextLesson = lessonNum < lessonCount
   ? { module: moduleNum, lesson: lessonNum + 1 }
   : moduleNum < 6
     ? { module: moduleNum + 1, lesson: 1 }
     : null;
+
+// Simple markdown to HTML converter
+function mdToHtml(md: string): string {
+  let html = md
+    // Headers
+    .replace(/^### (.+)$/gm, '<h3 class="text-xl font-bold text-text mt-8 mb-3">$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2 class="text-2xl font-bold text-text mt-10 mb-4 pb-2 border-b border-primary/10">$1</h2>')
+    // Bold
+    .replace(/\*\*(.+?)\*\*/g, '<strong class="text-text font-semibold">$1</strong>')
+    // Inline code
+    .replace(/`([^`]+)`/g, '<code class="px-1.5 py-0.5 bg-surface-light rounded text-primary text-sm font-mono">$1</code>')
+    // Code blocks
+    .replace(/```(\w*)\n([\s\S]*?)```/g, '<pre class="bg-surface-light rounded-xl p-4 overflow-x-auto my-4 border border-primary/10"><code class="text-sm font-mono text-text-muted">$2</code></pre>')
+    // Tables (basic)
+    .replace(/\|(.+)\|/g, (match) => {
+      const cells = match.split('|').filter(c => c.trim());
+      if (cells.some(c => c.trim().match(/^[-:]+$/))) return ''; // separator row
+      const isHeader = !match.includes('---');
+      return '<tr>' + cells.map(c => {
+        const cell = c.trim();
+        return isHeader
+          ? `<th class="px-4 py-2 bg-surface-light text-left text-sm font-semibold text-text border border-primary/10">${cell}</th>`
+          : `<td class="px-4 py-2 text-sm text-text-muted border border-primary/10">${cell}</td>`;
+      }).join('') + '</tr>';
+    })
+    // Blockquotes
+    .replace(/^> (.+)$/gm, '<blockquote class="pl-4 border-l-4 border-primary/30 text-text-muted italic my-4">$1</blockquote>')
+    // Unordered lists
+    .replace(/^- (.+)$/gm, '<li class="flex items-start gap-2 text-text-muted"><span class="text-primary mt-1.5">•</span><span>$1</span></li>')
+    // Paragraphs (lines not starting with < and not empty)
+    .replace(/^(?!<|$|\s*$)(.+)$/gm, '<p class="text-text-muted leading-relaxed mb-4">$1</p>')
+    // Clean up empty paragraphs
+    .replace(/<p class="[^"]*"><\/p>/g, '')
+    // Wrap tables
+    .replace(/(<tr>[\s\S]*?<\/tr>\s*)+/g, (match) => `<div class="overflow-x-auto my-4"><table class="w-full border-collapse">${match}</table></div>`);
+
+  return html;
+}
 ---
 
 <BaseLayout title={`${lessonTitle} - Module ${moduleNum}`} lang={locale}>
@@ -129,10 +122,10 @@ const nextLesson = lessonNum < moduleData.lessons.length
         <div class="sticky top-24 space-y-4">
           <div class="bg-surface-card rounded-xl border border-primary/10 p-4">
             <h3 class="text-sm font-bold text-primary mb-3">
-              {t.modules.module} {moduleNum}: {moduleData.name}
+              {t.modules.module} {moduleNum}: {moduleName}
             </h3>
             <ul class="space-y-1">
-              {moduleData.lessons.map((lesson, idx) => (
+              {(moduleLessonTitles[moduleNum] || []).map((lesson, idx) => (
                 <li>
                   <a
                     href={`/${locale}/lessons/${moduleNum}/${idx + 1}`}
@@ -143,11 +136,9 @@ const nextLesson = lessonNum < moduleData.lessons.length
                     }`}
                   >
                     <span class={`w-6 h-6 rounded flex items-center justify-center text-xs ${
-                      idx + 1 < lessonNum ? 'bg-success/20 text-success' :
-                      idx + 1 === lessonNum ? 'bg-primary/20 text-primary' :
-                      'bg-surface text-text-muted'
+                      idx + 1 === lessonNum ? 'bg-primary/20 text-primary' : 'bg-surface text-text-muted'
                     }`}>
-                      {idx + 1 < lessonNum ? '✓' : idx + 1}
+                      {idx + 1}
                     </span>
                     <span class="truncate">{lesson}</span>
                   </a>
@@ -184,7 +175,7 @@ const nextLesson = lessonNum < moduleData.lessons.length
               {t.modules.module} {moduleNum}
             </span>
             <span class="px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-medium">
-              Lesson {lessonNum}
+              Lesson {lessonNum} of {lessonCount}
             </span>
           </div>
           <h1 class="text-3xl sm:text-4xl font-bold text-text">
@@ -192,31 +183,72 @@ const nextLesson = lessonNum < moduleData.lessons.length
           </h1>
         </div>
 
-        {/* Placeholder content for all lessons */}
-        <div class="bg-surface-card rounded-xl border border-primary/10 p-12 text-center">
-          <div class="text-6xl mb-4">📚</div>
-          <h2 class="text-2xl font-bold text-text mb-2">{lessonTitle}</h2>
-          <p class="text-text-muted mb-6 max-w-lg mx-auto">
-            This lesson covers {lessonTitle.toLowerCase()} as part of the CCNA 200-301 curriculum.
-            Full interactive content with diagrams and 3D elements is being prepared.
-          </p>
-          <div class="flex flex-wrap gap-3 justify-center">
-            <a
-              href={`/${locale}/curriculum`}
-              class="px-6 py-3 bg-primary/10 text-primary rounded-xl font-medium hover:bg-primary/20 transition-colors"
-            >
+        {content ? (
+          <>
+            {/* Learning Objectives */}
+            <div class="bg-primary/5 rounded-xl border border-primary/10 p-6 mb-8">
+              <h2 class="text-lg font-bold text-primary mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {t.lesson.objectives}
+              </h2>
+              <ul class="space-y-2">
+                {content.objectives.map((obj) => (
+                  <li class="flex items-start gap-2 text-text-muted">
+                    <span class="text-primary mt-1">•</span>
+                    {obj}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Lesson content */}
+            <div class="prose max-w-none" set:html={mdToHtml(content.content)} />
+
+            {/* Key Terms */}
+            <div class="mt-12 bg-surface-card rounded-xl border border-primary/10 p-6">
+              <h2 class="text-lg font-bold text-text mb-4 flex items-center gap-2">
+                📖 {t.lesson.key_terms}
+              </h2>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {content.keyTerms.map((kt) => (
+                  <div class="p-4 bg-surface-light rounded-lg">
+                    <div class="font-bold text-primary text-sm mb-1">{kt.term}</div>
+                    <div class="text-text-muted text-sm">{kt.definition}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Test Your Knowledge */}
+            <div class="mt-12 bg-gradient-to-r from-primary/5 to-accent/5 rounded-xl border border-primary/10 p-6">
+              <h2 class="text-lg font-bold text-text mb-4 flex items-center gap-2">
+                🧠 {t.lesson.test_knowledge}
+              </h2>
+              <p class="text-text-muted mb-4">
+                Ready to test what you've learned? Take the module quiz to earn points and track your progress.
+              </p>
+              <a
+                href={`/${locale}/lessons/${moduleNum}/quiz`}
+                class="inline-flex px-6 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity"
+              >
+                Start Module {moduleNum} Quiz →
+              </a>
+            </div>
+          </>
+        ) : (
+          <div class="bg-surface-card rounded-xl border border-primary/10 p-12 text-center">
+            <div class="text-6xl mb-4">📚</div>
+            <h2 class="text-2xl font-bold text-text mb-2">{lessonTitle}</h2>
+            <p class="text-text-muted mb-6">
+              Content for this lesson is being prepared. Check back soon.
+            </p>
+            <a href={`/${locale}/curriculum`} class="inline-flex px-6 py-3 bg-primary/10 text-primary rounded-xl font-medium hover:bg-primary/20 transition-colors">
               {t.lesson.back_to_curriculum}
             </a>
-            {nextLesson && (
-              <a
-                href={`/${locale}/lessons/${nextLesson.module}/${nextLesson.lesson}`}
-                class="px-6 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity"
-              >
-                {t.lesson.next_lesson} →
-              </a>
-            )}
           </div>
-        </div>
+        )}
 
         {/* Navigation */}
         <div class="mt-12 flex items-center justify-between">
