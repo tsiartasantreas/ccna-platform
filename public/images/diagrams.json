@@ -1,0 +1,64 @@
+{
+  "module1": {
+    "osi-model": {
+      "title": "OSI 7 Layer Model",
+      "canvaUrl": "https://www.canva.com/d/tdJgk8t7STceeGU",
+      "description": "Visual diagram of the OSI model showing all 7 layers with their PDUs"
+    },
+    "tcp-ip-comparison": {
+      "title": "TCP/IP vs OSI Model",
+      "canvaUrl": "https://www.canva.com/d/WC0Aqeb_fW2acib",
+      "description": "Side-by-side comparison of TCP/IP and OSI models"
+    }
+  },
+  "module2": {
+    "vlan-topology": {
+      "title": "VLAN and Trunk Topology",
+      "description": "Diagram showing VLAN segmentation with access and trunk ports"
+    },
+    "stp-topology": {
+      "title": "Spanning Tree Protocol",
+      "description": "STP topology with root bridge, root ports, and blocked ports"
+    }
+  },
+  "module3": {
+    "routing-table": {
+      "title": "Routing Table Breakdown",
+      "description": "Annotated routing table showing route sources and metrics"
+    },
+    "ospf-states": {
+      "title": "OSPF Neighbor States",
+      "description": "OSPF neighbor state machine diagram"
+    }
+  },
+  "module4": {
+    "dhcp-dora": {
+      "title": "DHCP DORA Process",
+      "description": "Four-step DHCP process: Discover, Offer, Request, Acknowledge"
+    },
+    "nat-translation": {
+      "title": "NAT Translation Table",
+      "description": "NAT address translation showing inside/outside local/global"
+    }
+  },
+  "module5": {
+    "acl-flowchart": {
+      "title": "ACL Processing Logic",
+      "description": "Flowchart showing how ACLs process packets"
+    },
+    "ipsec-vpn": {
+      "title": "IPSec VPN Tunnel",
+      "description": "Site-to-site IPSec VPN tunnel diagram"
+    }
+  },
+  "module6": {
+    "sdn-architecture": {
+      "title": "SDN Architecture",
+      "description": "Traditional vs SDN architecture comparison"
+    },
+    "rest-api": {
+      "title": "REST API Request/Response",
+      "description": "REST API communication flow diagram"
+    }
+  }
+}
