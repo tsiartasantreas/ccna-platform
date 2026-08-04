@@ -122,6 +122,12 @@ const t = el;
 
         try {
           if (isSignup) {
+            // Validate password
+            if (password.length < 8) { alert('Ο κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες.'); return; }
+            if (!/[A-Z]/.test(password)) { alert('Ο κωδικός πρέπει να περιέχει τουλάχιστον 1 κεφαλαίο γράμμα.'); return; }
+            if (!/[a-z]/.test(password)) { alert('Ο κωδικός πρέπει να περιέχει τουλάχιστον 1 πεζό γράμμα.'); return; }
+            if (!/[0-9]/.test(password)) { alert('Ο κωδικός πρέπει να περιέχει τουλάχιστον 1 αριθμό.'); return; }
+            if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) { alert('Ο κωδικός πρέπει να περιέχει τουλάχιστον 1 ειδικό χαρακτήρα.'); return; }
             const { data, error } = await supabase.auth.signUp({ email, password });
             if (error) throw error;
             if (data.user) {
