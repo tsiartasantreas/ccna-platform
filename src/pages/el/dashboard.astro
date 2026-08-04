@@ -1,0 +1,131 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/layout/Header.tsx';
+import Footer from '../../components/layout/Footer.tsx';
+import el from '../../i18n/el.json';
+
+const locale = 'el' as const;
+const t = el;
+
+const modules = [
+  { num: 1, name: 'Θεμέλια Δικτύων', lessons: 8, weight: '20%', color: 'from-blue-500 to-cyan-500', icon: '🌐' },
+  { num: 2, name: 'Πρόσβαση Δικτύου', lessons: 7, weight: '20%', color: 'from-purple-500 to-pink-500', icon: '🔌' },
+  { num: 3, name: 'Συνδεσιμότητα IP', lessons: 6, weight: '25%', color: 'from-green-500 to-emerald-500', icon: '🛤️' },
+  { num: 4, name: 'Υπηρεσίες IP', lessons: 5, weight: '10%', color: 'from-orange-500 to-red-500', icon: '⚙️' },
+  { num: 5, name: 'Θεμέλια Ασφάλειας', lessons: 5, weight: '15%', color: 'from-red-500 to-rose-500', icon: '🔒' },
+  { num: 6, name: 'Αυτοματοποίηση & Προγραμματισμός', lessons: 4, weight: '10%', color: 'from-indigo-500 to-violet-500', icon: '🤖' },
+];
+---
+
+<BaseLayout title={t.dashboard.welcome} lang={locale}>
+  <Header locale={locale} translations={t} client:load />
+
+  <main class="pt-24 pb-16 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="mb-8">
+        <h1 class="text-3xl sm:text-4xl font-bold mb-2">{t.dashboard.welcome} 👋</h1>
+        <p class="text-text-muted">{t.dashboard.your_progress}</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-xl">🎯</div>
+            <span class="text-sm text-text-muted">{t.dashboard.total_points}</span>
+          </div>
+          <div class="text-3xl font-bold text-primary" id="total-points">0</div>
+        </div>
+        <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center text-xl">🔥</div>
+            <span class="text-sm text-text-muted">{t.dashboard.current_streak}</span>
+          </div>
+          <div class="text-3xl font-bold text-accent" id="current-streak">0</div>
+        </div>
+        <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center text-xl">📚</div>
+            <span class="text-sm text-text-muted">{t.dashboard.modules_completed}</span>
+          </div>
+          <div class="text-3xl font-bold text-success" id="modules-completed">0/6</div>
+        </div>
+        <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="w-10 h-10 rounded-lg bg-warning/10 flex items-center justify-center text-xl">📝</div>
+            <span class="text-sm text-text-muted">{t.dashboard.lessons_completed}</span>
+          </div>
+          <div class="text-3xl font-bold text-warning" id="lessons-completed">0/35</div>
+        </div>
+      </div>
+
+      <div class="mb-8">
+        <h2 class="text-2xl font-bold mb-6">{t.dashboard.your_progress}</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {modules.map((module) => (
+            <div class="bg-surface-card rounded-xl border border-primary/10 p-6 hover:border-primary/20 transition-colors">
+              <div class="flex items-center gap-3 mb-4">
+                <div class={`w-12 h-12 rounded-xl bg-gradient-to-br ${module.color} flex items-center justify-center text-xl`}>{module.icon}</div>
+                <div>
+                  <h3 class="font-bold text-text">{module.name}</h3>
+                  <p class="text-xs text-text-muted">{module.lessons} μαθήματα • {module.weight} εξέταση</p>
+                </div>
+              </div>
+              <div class="mb-3">
+                <div class="flex items-center justify-between text-sm mb-1">
+                  <span class="text-text-muted">Πρόοδος</span>
+                  <span class="text-primary font-medium" data-module-progress={module.num}>0%</span>
+                </div>
+                <div class="w-full h-2 bg-surface rounded-full overflow-hidden">
+                  <div class="h-full bg-gradient-to-r from-primary to-accent rounded-full transition-all duration-500" style="width: 0%" data-module-bar={module.num} />
+                </div>
+              </div>
+              <a href={`/${locale}/lessons/${module.num}/1`} class="block text-center text-sm text-primary hover:underline">{t.dashboard.continue_learning} →</a>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <a href={`/${locale}/curriculum`} class="bg-gradient-to-r from-primary/10 to-accent/10 rounded-xl border border-primary/20 p-6 hover:border-primary/40 transition-colors">
+          <div class="text-2xl mb-2">📖</div>
+          <h3 class="font-bold text-text mb-1">Πρόγραμμα Σπουδών</h3>
+          <p class="text-sm text-text-muted">Δείτε και τα 35 μαθήματα σε 6 ενότητες</p>
+        </a>
+        <a href={`/${locale}/pricing`} class="bg-gradient-to-r from-accent/10 to-primary/10 rounded-xl border border-accent/20 p-6 hover:border-accent/40 transition-colors">
+          <div class="text-2xl mb-2">⭐</div>
+          <h3 class="font-bold text-text mb-1">Αναβάθμιση σε Pro</h3>
+          <p class="text-sm text-text-muted">Ξεκλειδώστε τεστ και πιστοποιητικό</p>
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <Footer locale={locale} translations={t} />
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const progress = JSON.parse(localStorage.getItem('lessonProgress') || '{}');
+      let totalLessons = 0;
+      let completedModules = 0;
+      for (let m = 1; m <= 6; m++) {
+        const moduleProgress = progress[m] || {};
+        const completed = Object.values(moduleProgress).filter((s) => s === 'completed').length;
+        const total = [8, 7, 6, 5, 5, 4][m - 1];
+        const percent = Math.round((completed / total) * 100);
+        const bar = document.querySelector(`[data-module-bar="${m}"]`);
+        const label = document.querySelector(`[data-module-progress="${m}"]`);
+        if (bar) bar.style.width = `${percent}%`;
+        if (label) label.textContent = `${percent}%`;
+        totalLessons += completed;
+        if (percent === 100) completedModules++;
+      }
+      const lessonsEl = document.getElementById('lessons-completed');
+      const modulesEl = document.getElementById('modules-completed');
+      if (lessonsEl) lessonsEl.textContent = `${totalLessons}/35`;
+      if (modulesEl) modulesEl.textContent = `${completedModules}/6`;
+      const points = localStorage.getItem('userPoints') || '0';
+      const pointsEl = document.getElementById('total-points');
+      if (pointsEl) pointsEl.textContent = points;
+    });
+  </script>
+</BaseLayout>

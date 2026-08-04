@@ -1,0 +1,130 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/layout/Header.tsx';
+import Footer from '../../components/layout/Footer.tsx';
+import el from '../../i18n/el.json';
+
+const locale = 'el' as const;
+const t = el;
+---
+
+<BaseLayout title={t.profile.title} lang={locale}>
+  <Header locale={locale} translations={t} client:load />
+
+  <main class="pt-24 pb-16 min-h-screen">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-3xl font-bold mb-8">{t.profile.title}</h1>
+
+      <div class="bg-surface-card rounded-2xl border border-primary/10 p-8 mb-8">
+        <h2 class="text-xl font-bold mb-6">Πληροφορίες Λογαριασμού</h2>
+        <form id="profile-form" class="space-y-6">
+          <div>
+            <label for="display-name" class="block text-sm font-medium text-text mb-2">{t.profile.display_name}</label>
+            <input type="text" id="display-name" name="display-name" class="w-full px-4 py-3 bg-surface border border-primary/10 rounded-xl text-text placeholder-text-muted focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="Το όνομά σας" />
+          </div>
+          <div>
+            <label for="email" class="block text-sm font-medium text-text mb-2">{t.auth.email}</label>
+            <input type="email" id="email" name="email" disabled class="w-full px-4 py-3 bg-surface-light border border-primary/10 rounded-xl text-text-muted cursor-not-allowed" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-text mb-2">{t.profile.language}</label>
+            <div class="flex gap-3">
+              <button type="button" class="lang-btn flex-1 px-4 py-3 rounded-xl border border-primary/10 text-text-muted hover:border-primary/30 transition-all" data-lang="en">🇬🇧 English</button>
+              <button type="button" class="lang-btn flex-1 px-4 py-3 rounded-xl border-2 border-primary bg-primary/10 text-primary font-medium transition-all" data-lang="el">🇬🇷 Ελληνικά</button>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-text mb-2">{t.profile.theme}</label>
+            <div class="flex gap-3">
+              <button type="button" class="theme-btn flex-1 px-4 py-3 rounded-xl border-2 border-primary bg-primary/10 text-primary font-medium transition-all" data-theme="dark">🌙 {t.profile.dark}</button>
+              <button type="button" class="theme-btn flex-1 px-4 py-3 rounded-xl border border-primary/10 text-text-muted hover:border-primary/30 transition-all" data-theme="light">☀️ {t.profile.light}</button>
+            </div>
+          </div>
+          <button type="submit" class="w-full py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity">{t.profile.save}</button>
+        </form>
+      </div>
+
+      <div class="bg-surface-card rounded-2xl border border-primary/10 p-8 mb-8">
+        <h2 class="text-xl font-bold mb-4">{t.profile.plan}</h2>
+        <div class="flex items-center justify-between p-4 bg-surface-light rounded-xl">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-lg">F</div>
+            <div>
+              <div class="font-bold text-text">{t.pricing.free} Plan</div>
+              <div class="text-sm text-text-muted">Βασική πρόσβαση στα μαθήματα</div>
+            </div>
+          </div>
+          <a href={`/${locale}/pricing`} class="px-4 py-2 bg-primary/10 text-primary rounded-lg text-sm font-medium hover:bg-primary/20 transition-colors">{t.pricing.upgrade}</a>
+        </div>
+      </div>
+
+      <div class="bg-surface-card rounded-2xl border border-primary/10 p-8 mb-8">
+        <h2 class="text-xl font-bold mb-2">Δεδομένα & Απόρρητο</h2>
+        <p class="text-text-muted text-sm mb-6">{t.profile.gdpr_notice}</p>
+        <div class="space-y-4">
+          <button id="download-data-btn" class="w-full flex items-center justify-between p-4 bg-surface-light rounded-xl hover:bg-surface transition-colors">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-xl">📥</div>
+              <div class="text-left">
+                <div class="font-medium text-text">{t.profile.download_data}</div>
+                <div class="text-xs text-text-muted">Εξαγωγή δεδομένων ως JSON</div>
+              </div>
+            </div>
+          </button>
+          <button id="delete-account-btn" class="w-full flex items-center justify-between p-4 bg-error/5 rounded-xl border border-error/20 hover:bg-error/10 transition-colors">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-error/10 flex items-center justify-center text-xl">🗑️</div>
+              <div class="text-left">
+                <div class="font-medium text-error">{t.profile.delete_account}</div>
+                <div class="text-xs text-text-muted">Μόνιμη διαγραφή λογαριασμού</div>
+              </div>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap gap-4 text-sm text-text-muted">
+        <a href={`/${locale}/privacy`} class="hover:text-primary">{t.gdpr.privacy_policy}</a>
+        <span>•</span>
+        <a href={`/${locale}/terms`} class="hover:text-primary">{t.gdpr.terms_of_service}</a>
+      </div>
+    </div>
+  </main>
+
+  <Footer locale={locale} translations={t} />
+
+  <script>
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const theme = btn.getAttribute('data-theme') || 'dark';
+        document.documentElement.classList.toggle('dark', theme === 'dark');
+        document.documentElement.classList.toggle('light', theme === 'light');
+        localStorage.setItem('theme', theme);
+      });
+    });
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const lang = btn.getAttribute('data-lang') || 'el';
+        window.location.href = `/${lang}/profile`;
+      });
+    });
+    document.getElementById('download-data-btn')?.addEventListener('click', () => {
+      const data = { exportDate: new Date().toISOString(), message: 'Εξαγωγή δεδομένων' };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `netacad-data-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+    });
+    document.getElementById('delete-account-btn')?.addEventListener('click', () => {
+      if (confirm('Είστε σίγουροι; Όλα τα δεδομένα θα διαγραφούν μόνιμα.')) {
+        alert('Αίτημα διαγραφής υποβλήθηκε.');
+      }
+    });
+    document.getElementById('profile-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      alert('Το προφίλ αποθηκεύτηκε!');
+    });
+  </script>
+</BaseLayout>
