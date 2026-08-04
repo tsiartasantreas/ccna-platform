@@ -38,9 +38,20 @@ export default function Header({ locale, translations }: HeaderProps) {
     setIsDark(theme === 'dark');
 
     // Load site settings
-    const settings = JSON.parse(localStorage.getItem('adminSettings') || '{}');
-    if (settings.siteName) setSiteName(settings.siteName);
-    setLogoUrl(settings.logoUrl || '/images/logo.png');
+    const loadSettings = () => {
+      const settings = JSON.parse(localStorage.getItem('adminSettings') || '{}');
+      if (settings.siteName) setSiteName(settings.siteName);
+      const url = settings.logoUrl || '/images/logo.png';
+      // Add cache busting for custom URLs
+      setLogoUrl(url.includes('github') || url.includes('http') ? `${url}?v=${Date.now()}` : url);
+    };
+
+    loadSettings();
+
+    // Listen for storage changes (when admin updates settings)
+    window.addEventListener('storage', loadSettings);
+    // Also listen for focus (when user comes back from admin page)
+    window.addEventListener('focus', loadSettings);
 
     // Check Supabase session
     const checkAuth = async () => {

@@ -708,7 +708,9 @@ const t = en;
         siteUrl: siteUrlInput?.value || '',
       };
       localStorage.setItem('adminSettings', JSON.stringify({ ...JSON.parse(localStorage.getItem('adminSettings') || '{}'), ...settings }));
-      alert('General settings saved! Refresh the page to see changes.');
+      // Dispatch storage event so Header picks up changes
+      window.dispatchEvent(new Event('storage'));
+      alert('General settings saved! Logo will update on all pages.');
     });
     document.getElementById('save-email')?.addEventListener('click', () => alert('Email settings saved!'));
     document.getElementById('save-stripe')?.addEventListener('click', () => alert('Stripe settings saved!'));
