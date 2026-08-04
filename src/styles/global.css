@@ -19,11 +19,11 @@
 
 /* Light mode overrides */
 .light {
-  --color-surface: #fafafa;
-  --color-surface-light: #f1f5f9;
+  --color-surface: #f0f2f5;
+  --color-surface-light: #e4e7ec;
   --color-surface-card: #ffffff;
-  --color-text: #1e293b;
-  --color-text-muted: #64748b;
+  --color-text: #1a1a2e;
+  --color-text-muted: #4a5568;
 }
 
 /* Base styles */
@@ -110,6 +110,60 @@ code, pre {
 }
 
 .light .glass {
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Light mode card shadows */
+.light .bg-surface-card {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Light mode header */
+.light header {
+  background-color: rgba(240, 242, 245, 0.9);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.light header.scrolled {
+  background-color: rgba(240, 242, 245, 0.95);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* Light mode footer */
+.light footer {
+  background-color: #e4e7ec;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Light mode borders */
+.light .border-primary\/10 {
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.light .border-primary\/20 {
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+/* Light mode inputs */
+.light input, .light select, .light textarea {
+  background-color: #ffffff;
+  border-color: rgba(0, 0, 0, 0.15);
+  color: #1a1a2e;
+}
+
+.light input:focus, .light select:focus, .light textarea:focus {
+  border-color: #00d4ff;
+  box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.15);
+}
+
+/* Light mode buttons */
+.light .bg-surface-light {
+  background-color: #e4e7ec;
+}
+
+.light .bg-surface {
+  background-color: #f0f2f5;
 }
