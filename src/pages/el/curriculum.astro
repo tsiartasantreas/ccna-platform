@@ -1,0 +1,63 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/layout/Header.tsx';
+import Footer from '../../components/layout/Footer.tsx';
+import el from '../../i18n/el.json';
+
+const locale = 'el';
+const t = el;
+---
+
+<BaseLayout title={t.modules.title} description={t.modules.subtitle} lang={locale}>
+  <Header locale={locale} translations={t} client:load />
+
+  <main class="pt-24 pb-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h1 class="text-4xl sm:text-5xl font-bold mb-4">{t.modules.title}</h1>
+        <p class="text-text-muted max-w-2xl mx-auto text-lg">{t.modules.subtitle}</p>
+      </div>
+
+      <div class="space-y-8">
+        {[
+          { num: 1, name: t.module_names['1'], desc: t.module_descriptions['1'], lessons: ['Μοντέλο OSI & TCP/IP', 'Τοπολογίες Δικτύου', 'Καλωδίωση', 'Διευθυνσιοδότηση IPv4', 'Υποδίκτυα IPv4', 'Διευθυνσιοδότηση IPv6', 'TCP, UDP, ARP, DNS', 'Βασικά Cisco CLI'], weight: '20%', color: 'from-blue-500 to-cyan-500' },
+          { num: 2, name: t.module_names['2'], desc: t.module_descriptions['2'], lessons: ['Ethernet & MAC', 'Λειτουργία Switch', 'VLANs & Trunking', 'EtherChannel', 'STP', 'Ασύρματα', 'PoE & Ασφάλεια'], weight: '20%', color: 'from-purple-500 to-pink-500' },
+          { num: 3, name: t.module_names['3'], desc: t.module_descriptions['3'], lessons: ['Πίνακας Δρομολόγησης', 'Στατικές Διαδρομές', 'Inter-VLAN', 'OSPF Μονή Περιοχή', 'OSPF Πολλαπλές Περιοχές', 'FHRP'], weight: '25%', color: 'from-green-500 to-emerald-500' },
+          { num: 4, name: t.module_names['4'], desc: t.module_descriptions['4'], lessons: ['DHCP', 'NAT & PAT', 'NTP & Syslog', 'SNMP & QoS', 'SSH'], weight: '10%', color: 'from-orange-500 to-red-500' },
+          { num: 5, name: t.module_names['5'], desc: t.module_descriptions['5'], lessons: ['Απειλές Ασφάλειας', 'ACLs', 'Ασφάλεια Θυρών', 'AAA & 802.1X', 'VPN & Firewalls'], weight: '15%', color: 'from-red-500 to-rose-500' },
+          { num: 6, name: t.module_names['6'], desc: t.module_descriptions['6'], lessons: ['Έννοιες SDN', 'REST APIs', 'Διαχείριση Ρυθμίσεων', 'Cisco DNA Center'], weight: '10%', color: 'from-indigo-500 to-violet-500' },
+        ].map((module) => (
+          <div class="bg-surface-card rounded-2xl border border-primary/10 overflow-hidden">
+            <div class="p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class={`flex-shrink-0 w-16 h-16 rounded-2xl bg-gradient-to-br ${module.color} flex items-center justify-center text-white font-bold text-2xl`}>
+                {module.num}
+              </div>
+              <div class="flex-grow">
+                <div class="flex items-center gap-3 mb-1">
+                  <h2 class="text-2xl font-bold text-text">{t.modules.module} {module.num}: {module.name}</h2>
+                  <span class="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">{module.weight} εξέταση</span>
+                </div>
+                <p class="text-text-muted">{module.desc}</p>
+              </div>
+              <a href={`/${locale}/lessons/${module.num}/1`} class="flex-shrink-0 px-6 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity">
+                {t.modules.start} →
+              </a>
+            </div>
+            <div class="border-t border-primary/10 bg-surface-light/50">
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0">
+                {module.lessons.map((lesson, idx) => (
+                  <a href={`/${locale}/lessons/${module.num}/${idx + 1}`} class="flex items-center gap-3 px-6 py-4 border-b border-r border-primary/5 hover:bg-primary/5 transition-colors group">
+                    <span class="w-8 h-8 rounded-lg bg-surface flex items-center justify-center text-text-muted text-sm font-medium group-hover:bg-primary/20 group-hover:text-primary transition-all">{idx + 1}</span>
+                    <span class="text-sm text-text-muted group-hover:text-primary transition-colors">{lesson}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </main>
+
+  <Footer locale={locale} translations={t} />
+</BaseLayout>
