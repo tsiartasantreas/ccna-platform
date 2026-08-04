@@ -440,7 +440,7 @@ const t = en;
 
         const totalUsers = profiles?.length || 0;
         const proUsers = profiles?.filter(p => p.plan === 'pro').length || 0;
-        const revenue = proUsers * 1.99;
+        const revenue = proUsers * 0.99;
 
         // Update stats
         document.getElementById('stat-total-users')!.textContent = String(totalUsers);
@@ -584,7 +584,7 @@ const t = en;
         if (subsBody && profiles) {
           const proProfiles = profiles.filter(p => p.plan === 'pro');
           const monthlyUsers = proProfiles.length;
-          const revenue = monthlyUsers * 1.99;
+          const revenue = monthlyUsers * 0.99;
 
           document.getElementById('active-subs-count')!.textContent = String(monthlyUsers);
           document.getElementById('monthly-revenue')!.textContent = `€${revenue.toFixed(2)}`;
@@ -595,7 +595,7 @@ const t = en;
               <td class="px-4 py-3 text-sm text-text-muted">${p.id.substring(0, 8)}...</td>
               <td class="px-4 py-3 text-sm text-text">Pro</td>
               <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full bg-success/10 text-success text-xs font-medium">Active</span></td>
-              <td class="px-4 py-3 text-sm text-text">€1.99</td>
+              <td class="px-4 py-3 text-sm text-text">€0.99</td>
               <td class="px-4 py-3 text-sm text-text-muted">${new Date(p.updated_at).toLocaleDateString()}</td>
               <td class="px-4 py-3">
                 <button class="cancel-sub-btn text-xs text-error hover:underline" data-user-id="${p.id}">Cancel</button>
