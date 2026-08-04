@@ -1,0 +1,147 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import Header from '../../../../components/layout/Header.tsx';
+import Footer from '../../../../components/layout/Footer.tsx';
+import en from '../../../../i18n/en.json';
+
+const locale = 'en' as const;
+const t = en;
+
+const moduleNames: Record<number, string> = {
+  1: 'Network Fundamentals',
+  2: 'Network Access',
+  3: 'IP Connectivity',
+  4: 'IP Services',
+  5: 'Security Fundamentals',
+  6: 'Automation & Programmability',
+};
+
+export function getStaticPaths() {
+  return [
+    { params: { module: '1' } },
+    { params: { module: '2' } },
+    { params: { module: '3' } },
+    { params: { module: '4' } },
+    { params: { module: '5' } },
+    { params: { module: '6' } },
+  ];
+}
+
+const { module: moduleParam } = Astro.params;
+const moduleNum = parseInt(moduleParam || '1');
+const moduleName = moduleNames[moduleNum] || 'Network Fundamentals';
+
+// Sample questions for the quiz
+const sampleQuestions = [
+  {
+    question: 'Which OSI layer is responsible for routing?',
+    options: ['Layer 1', 'Layer 2', 'Layer 3', 'Layer 4'],
+    correct: 2,
+    explanation: 'Layer 3 (Network layer) handles routing and logical addressing.',
+  },
+  {
+    question: 'What is the default subnet mask for Class C?',
+    options: ['255.0.0.0', '255.255.0.0', '255.255.255.0', '255.255.255.255'],
+    correct: 2,
+    explanation: 'Class C uses /24 (255.255.255.0) as the default mask.',
+  },
+  {
+    question: 'Which protocol uses TCP port 443?',
+    options: ['HTTP', 'HTTPS', 'FTP', 'SSH'],
+    correct: 1,
+    explanation: 'HTTPS uses port 443 for encrypted web traffic.',
+  },
+];
+---
+
+<BaseLayout title={`${t.quiz.title} - ${moduleName}`} lang={locale}>
+  <Header locale={locale} translations={t} client:load />
+
+  <main class="pt-24 pb-16 min-h-screen">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Quiz header */}
+      <div class="text-center mb-12">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
+          🎯 {t.modules.module} {moduleNum}
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-bold mb-2">
+          {t.quiz.title}: {moduleName}
+        </h1>
+        <p class="text-text-muted">
+          Test your knowledge with {sampleQuestions.length} questions
+        </p>
+      </div>
+
+      {/* Pro upgrade banner */}
+      <div class="bg-gradient-to-r from-primary/10 to-accent/10 rounded-2xl border border-primary/20 p-6 mb-8 text-center">
+        <div class="text-2xl mb-2">🔒</div>
+        <h3 class="text-lg font-bold text-text mb-2">Pro Feature</h3>
+        <p class="text-text-muted text-sm mb-4">
+          Full gamified quizzes with scoring, streaks, and achievements are available for Pro users.
+        </p>
+        <a
+          href={`/${locale}/pricing`}
+          class="inline-flex px-6 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity"
+        >
+          {t.pricing.upgrade} →
+        </a>
+      </div>
+
+      {/* Quiz preview */}
+      <div class="space-y-6">
+        {sampleQuestions.map((q, idx) => (
+          <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
+            <div class="flex items-center gap-2 mb-4">
+              <span class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-sm font-bold">
+                {idx + 1}
+              </span>
+              <h3 class="text-lg font-bold text-text">{q.question}</h3>
+            </div>
+
+            <div class="space-y-3 mb-4">
+              {q.options.map((opt, optIdx) => (
+                <label class={`flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition-all ${
+                  optIdx === q.correct
+                    ? 'border-success/30 bg-success/5'
+                    : 'border-primary/10 hover:border-primary/30 hover:bg-surface-light'
+                }`}>
+                  <span class={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm font-medium ${
+                    optIdx === q.correct
+                      ? 'border-success text-success'
+                      : 'border-text-muted text-text-muted'
+                  }`}>
+                    {String.fromCharCode(65 + optIdx)}
+                  </span>
+                  <span class="text-text-muted">{opt}</span>
+                  {optIdx === q.correct && (
+                    <svg class="w-5 h-5 text-success ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </label>
+              ))}
+            </div>
+
+            <div class="bg-surface-light rounded-lg p-4">
+              <p class="text-sm text-text-muted">
+                <span class="font-bold text-primary">{t.quiz.explanation}:</span> {q.explanation}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Back to curriculum */}
+      <div class="mt-12 text-center">
+        <a
+          href={`/${locale}/curriculum`}
+          class="inline-flex px-6 py-3 bg-primary/10 text-primary rounded-xl font-medium hover:bg-primary/20 transition-colors"
+        >
+          {t.lesson.back_to_curriculum}
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <Footer locale={locale} translations={t} />
+</BaseLayout>

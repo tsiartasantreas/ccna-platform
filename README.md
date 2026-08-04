@@ -1,43 +1,74 @@
-# Astro Starter Kit: Minimal
+# NetAcad — Interactive CCNA Training Platform
 
-```sh
-npm create astro@latest -- --template minimal
+An interactive 3D-accented web platform for learning CCNA networking concepts from scratch. Built with Astro, React, Tailwind CSS, and Supabase.
+
+## Features
+
+- **35 lessons** across 6 CCNA modules
+- **3D interactive diagrams** powered by React Three Fiber
+- **Gamified quizzes** with multiple question types
+- **Progress tracking** with points, streaks, and achievements
+- **Bilingual support** — English and Greek
+- **Dark/Light mode** with dark as primary
+- **GDPR compliant** with encrypted user data
+- **Revolut payment integration** for Pro plan
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | Astro 4.x |
+| Interactive UI | React 18 |
+| 3D Graphics | React Three Fiber + Three.js |
+| Styling | Tailwind CSS |
+| Backend | Supabase (Auth + PostgreSQL) |
+| Payment | Revolut Business API |
+| Hosting | Wasmer.io (free tier) |
+
+## Quick Start
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Project Structure
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+```
+src/
+├── pages/          # Route pages (en/, el/)
+├── components/     # React components (3d/, quiz/, auth/, layout/, ui/)
+├── content/        # Lesson content (MDX)
+├── i18n/           # Translation files (en.json, el.json)
+├── lib/            # Utilities (supabase, quiz-data, etc.)
+├── layouts/        # Base layout
+└── styles/         # Global CSS
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## Curriculum
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+1. **Network Fundamentals** (20%) — 8 lessons
+2. **Network Access** (20%) — 7 lessons
+3. **IP Connectivity** (25%) — 6 lessons
+4. **IP Services** (10%) — 5 lessons
+5. **Security Fundamentals** (15%) — 5 lessons
+6. **Automation & Programmability** (10%) — 4 lessons
 
-Any static assets, like images, can be placed in the `public/` directory.
+## Deployment
 
-## 🧞 Commands
+Deployed to Wasmer.io via GitHub auto-deploy on push to `main`.
 
-All commands are run from the root of the project, from a terminal:
+```bash
+# Manual deploy
+wasmer deploy
+```
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+## License
 
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+MIT

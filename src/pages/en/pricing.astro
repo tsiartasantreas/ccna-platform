@@ -1,0 +1,160 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/layout/Header.tsx';
+import Footer from '../../components/layout/Footer.tsx';
+import en from '../../i18n/en.json';
+
+const locale = 'en';
+const t = en;
+---
+
+<BaseLayout title={t.pricing.title} description={t.pricing.subtitle} lang={locale}>
+  <Header locale={locale} translations={t} client:load />
+
+  <main class="pt-24 pb-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Page header -->
+      <div class="text-center mb-16">
+        <h1 class="text-4xl sm:text-5xl font-bold mb-4">
+          {t.pricing.title}
+        </h1>
+        <p class="text-text-muted max-w-2xl mx-auto text-lg">
+          {t.pricing.subtitle}
+        </p>
+      </div>
+
+      <!-- Pricing cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <!-- Free Plan -->
+        <div class="bg-surface-card rounded-2xl border border-primary/10 p-8">
+          <div class="mb-6">
+            <h3 class="text-2xl font-bold text-text mb-2">{t.pricing.free}</h3>
+            <div class="flex items-baseline gap-1">
+              <span class="text-5xl font-bold text-text">€0</span>
+              <span class="text-text-muted">{t.pricing.per_month}</span>
+            </div>
+          </div>
+
+          <ul class="space-y-4 mb-8">
+            {[
+              'All 35 lessons',
+              'Text content & diagrams',
+              '3D interactive elements',
+              'Basic knowledge review',
+              'Progress tracking',
+              'Dark/Light mode',
+              'Greek & English',
+            ].map((feature) => (
+              <li class="flex items-center gap-3">
+                <svg class="w-5 h-5 text-success flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="text-text-muted">{feature}</span>
+              </li>
+            ))}
+            {[
+              'Full gamified quizzes',
+              'Points & streaks',
+              'Completion certificate',
+            ].map((feature) => (
+              <li class="flex items-center gap-3 opacity-50">
+                <svg class="w-5 h-5 text-text-muted flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                <span class="text-text-muted line-through">{feature}</span>
+              </li>
+            ))}
+          </ul>
+
+          <a
+            href={`/${locale}/login?mode=signup`}
+            class="block w-full text-center px-6 py-3 border border-primary/30 text-primary rounded-xl font-medium hover:bg-primary/10 transition-all"
+          >
+            Get Started Free
+          </a>
+        </div>
+
+        <!-- Pro Plan -->
+        <div class="relative bg-surface-card rounded-2xl border-2 border-primary p-8 shadow-lg shadow-primary/10">
+          <!-- Popular badge -->
+          <div class="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-primary to-accent text-white text-sm font-medium rounded-full">
+            Most Popular
+          </div>
+
+          <div class="mb-6">
+            <h3 class="text-2xl font-bold text-text mb-2">{t.pricing.pro}</h3>
+            <div class="flex items-baseline gap-1">
+              <span class="text-5xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">€9.99</span>
+              <span class="text-text-muted">{t.pricing.per_month}</span>
+            </div>
+            <p class="text-sm text-text-muted mt-2">
+              or €79.99/year — <span class="text-success font-medium">{t.pricing.save}</span>
+            </p>
+          </div>
+
+          <ul class="space-y-4 mb-8">
+            {[
+              'Everything in Free, plus:',
+              'Full gamified quizzes (80+ questions)',
+              'Multiple choice, drag & drop, CLI sim',
+              'Points, streaks & achievements',
+              'Completion certificate (PDF)',
+              'Priority support',
+            ].map((feature) => (
+              <li class="flex items-center gap-3">
+                <svg class="w-5 h-5 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="text-text">{feature}</span>
+              </li>
+            ))}
+          </ul>
+
+          <a
+            href={`/${locale}/login?mode=signup`}
+            class="block w-full text-center px-6 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-medium hover:opacity-90 transition-all shadow-lg shadow-primary/25"
+          >
+            {t.pricing.upgrade} →
+          </a>
+        </div>
+      </div>
+
+      <!-- FAQ -->
+      <div class="mt-24 max-w-3xl mx-auto">
+        <h2 class="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
+
+        <div class="space-y-6">
+          {[
+            {
+              q: 'Can I switch between plans?',
+              a: 'Yes! You can upgrade to Pro at any time. If you downgrade, you\'ll keep access until the end of your billing period.',
+            },
+            {
+              q: 'What payment methods do you accept?',
+              a: 'We accept payments through Revolut, which supports all major credit/debit cards and bank transfers.',
+            },
+            {
+              q: 'Is there a refund policy?',
+              a: 'Yes, we offer a 14-day money-back guarantee. If you\'re not satisfied, contact us for a full refund.',
+            },
+            {
+              q: 'Do I get a real certificate?',
+              a: 'Pro users who complete all modules with passing scores receive a downloadable PDF certificate that they can share on LinkedIn or with employers.',
+            },
+            {
+              q: 'Is this affiliated with Cisco?',
+              a: 'No, NetAcad is an independent training platform. CCNA® is a registered trademark of Cisco Systems, Inc.',
+            },
+          ].map((faq) => (
+            <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
+              <h3 class="text-lg font-bold text-text mb-2">{faq.q}</h3>
+              <p class="text-text-muted">{faq.a}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <Footer locale={locale} translations={t} />
+</BaseLayout>

@@ -1,0 +1,245 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import Header from '../../../../components/layout/Header.tsx';
+import Footer from '../../../../components/layout/Footer.tsx';
+import en from '../../../../i18n/en.json';
+
+const locale = 'en' as const;
+const t = en;
+
+const allModules: Record<number, { name: string; lessons: string[] }> = {
+  1: {
+    name: 'Network Fundamentals',
+    lessons: [
+      'OSI & TCP/IP Models',
+      'Network Topologies & Types',
+      'Cabling & Physical Infrastructure',
+      'IPv4 Addressing & Binary Math',
+      'IPv4 Subnetting & VLSM',
+      'IPv6 Addressing',
+      'TCP, UDP, ARP, DNS, ICMP',
+      'Cisco CLI Basics',
+    ],
+  },
+  2: {
+    name: 'Network Access',
+    lessons: [
+      'Ethernet & MAC Addresses',
+      'Switch Operations',
+      'VLANs & Trunking (802.1Q)',
+      'EtherChannel',
+      'Spanning Tree Protocol (STP)',
+      'Wireless Fundamentals',
+      'PoE & Wireless Security',
+    ],
+  },
+  3: {
+    name: 'IP Connectivity',
+    lessons: [
+      'Routing Table & Path Selection',
+      'Static Routes',
+      'Inter-VLAN Routing',
+      'OSPF Single Area',
+      'OSPF Multi-Area Concepts',
+      'First Hop Redundancy (HSRP/VRRP)',
+    ],
+  },
+  4: {
+    name: 'IP Services',
+    lessons: [
+      'DHCP',
+      'NAT & PAT',
+      'NTP & Syslog',
+      'SNMP & QoS',
+      'SSH & Remote Access',
+    ],
+  },
+  5: {
+    name: 'Security Fundamentals',
+    lessons: [
+      'Security Threats Overview',
+      'Access Control Lists (ACLs)',
+      'Port Security & DHCP Snooping',
+      'AAA & 802.1X',
+      'VPN Concepts & Firewalls',
+    ],
+  },
+  6: {
+    name: 'Automation & Programmability',
+    lessons: [
+      'SDN Concepts',
+      'REST APIs & Data Formats',
+      'Configuration Management',
+      'Cisco DNA Center & Programmability',
+    ],
+  },
+};
+
+export function getStaticPaths() {
+  const moduleLessons: Record<number, string[]> = {
+    1: ['osi-tcp-ip-models', 'network-topologies', 'cabling', 'ipv4-addressing', 'ipv4-subnetting', 'ipv6-addressing', 'tcp-udp-arp', 'cisco-cli'],
+    2: ['ethernet-mac', 'switch-operations', 'vlans-trunking', 'etherchannel', 'stp', 'wireless', 'poe-security'],
+    3: ['routing-table', 'static-routes', 'inter-vlan', 'ospf-single', 'ospf-multi', 'fhrp'],
+    4: ['dhcp', 'nat-pat', 'ntp-syslog', 'snmp-qos', 'ssh'],
+    5: ['security-threats', 'acls', 'port-security', 'aaa-8021x', 'vpn-firewalls'],
+    6: ['sdn', 'rest-apis', 'config-management', 'dna-center'],
+  };
+  const paths: { params: { module: string; lesson: string } }[] = [];
+  for (const [m, lessons] of Object.entries(moduleLessons)) {
+    for (let l = 1; l <= lessons.length; l++) {
+      paths.push({ params: { module: m, lesson: String(l) } });
+    }
+  }
+  return paths;
+}
+
+const { module: moduleParam, lesson: lessonParam } = Astro.params;
+const moduleNum = parseInt(moduleParam || '1');
+const lessonNum = parseInt(lessonParam || '1');
+
+const moduleData = allModules[moduleNum];
+if (!moduleData) {
+  return Astro.redirect(`/${locale}/curriculum`);
+}
+
+const lessonTitle = moduleData.lessons[lessonNum - 1];
+if (!lessonTitle) {
+  return Astro.redirect(`/${locale}/curriculum`);
+}
+
+const prevLesson = lessonNum > 1
+  ? { module: moduleNum, lesson: lessonNum - 1 }
+  : moduleNum > 1
+    ? { module: moduleNum - 1, lesson: allModules[moduleNum - 1]?.lessons.length || 1 }
+    : null;
+const nextLesson = lessonNum < moduleData.lessons.length
+  ? { module: moduleNum, lesson: lessonNum + 1 }
+  : moduleNum < 6
+    ? { module: moduleNum + 1, lesson: 1 }
+    : null;
+---
+
+<BaseLayout title={`${lessonTitle} - Module ${moduleNum}`} lang={locale}>
+  <Header locale={locale} translations={t} client:load />
+
+  <main class="pt-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex gap-8">
+      {/* Sidebar */}
+      <aside class="hidden lg:block w-64 flex-shrink-0">
+        <div class="sticky top-24 space-y-4">
+          <div class="bg-surface-card rounded-xl border border-primary/10 p-4">
+            <h3 class="text-sm font-bold text-primary mb-3">
+              {t.modules.module} {moduleNum}: {moduleData.name}
+            </h3>
+            <ul class="space-y-1">
+              {moduleData.lessons.map((lesson, idx) => (
+                <li>
+                  <a
+                    href={`/${locale}/lessons/${moduleNum}/${idx + 1}`}
+                    class={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${
+                      idx + 1 === lessonNum
+                        ? 'bg-primary/10 text-primary font-medium'
+                        : 'text-text-muted hover:text-primary hover:bg-surface-light'
+                    }`}
+                  >
+                    <span class={`w-6 h-6 rounded flex items-center justify-center text-xs ${
+                      idx + 1 < lessonNum ? 'bg-success/20 text-success' :
+                      idx + 1 === lessonNum ? 'bg-primary/20 text-primary' :
+                      'bg-surface text-text-muted'
+                    }`}>
+                      {idx + 1 < lessonNum ? '✓' : idx + 1}
+                    </span>
+                    <span class="truncate">{lesson}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <a
+            href={`/${locale}/lessons/${moduleNum}/quiz`}
+            class="block bg-gradient-to-r from-primary/10 to-accent/10 rounded-xl border border-primary/20 p-4 hover:border-primary/40 transition-colors"
+          >
+            <div class="text-sm font-bold text-primary mb-1">🎯 {t.quiz.title}</div>
+            <div class="text-xs text-text-muted">Test your knowledge</div>
+          </a>
+        </div>
+      </aside>
+
+      {/* Main content */}
+      <article class="flex-grow max-w-4xl pb-16">
+        {/* Breadcrumb */}
+        <nav class="flex items-center gap-2 text-sm text-text-muted mb-8">
+          <a href={`/${locale}/curriculum`} class="hover:text-primary">{t.nav.curriculum}</a>
+          <span>/</span>
+          <a href={`/${locale}/curriculum`} class="hover:text-primary">{t.modules.module} {moduleNum}</a>
+          <span>/</span>
+          <span class="text-primary">{lessonTitle}</span>
+        </nav>
+
+        {/* Lesson header */}
+        <div class="mb-8">
+          <div class="flex items-center gap-3 mb-2">
+            <span class="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+              {t.modules.module} {moduleNum}
+            </span>
+            <span class="px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-medium">
+              Lesson {lessonNum}
+            </span>
+          </div>
+          <h1 class="text-3xl sm:text-4xl font-bold text-text">
+            {lessonTitle}
+          </h1>
+        </div>
+
+        {/* Placeholder content for all lessons */}
+        <div class="bg-surface-card rounded-xl border border-primary/10 p-12 text-center">
+          <div class="text-6xl mb-4">📚</div>
+          <h2 class="text-2xl font-bold text-text mb-2">{lessonTitle}</h2>
+          <p class="text-text-muted mb-6 max-w-lg mx-auto">
+            This lesson covers {lessonTitle.toLowerCase()} as part of the CCNA 200-301 curriculum.
+            Full interactive content with diagrams and 3D elements is being prepared.
+          </p>
+          <div class="flex flex-wrap gap-3 justify-center">
+            <a
+              href={`/${locale}/curriculum`}
+              class="px-6 py-3 bg-primary/10 text-primary rounded-xl font-medium hover:bg-primary/20 transition-colors"
+            >
+              {t.lesson.back_to_curriculum}
+            </a>
+            {nextLesson && (
+              <a
+                href={`/${locale}/lessons/${nextLesson.module}/${nextLesson.lesson}`}
+                class="px-6 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity"
+              >
+                {t.lesson.next_lesson} →
+              </a>
+            )}
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <div class="mt-12 flex items-center justify-between">
+          {prevLesson ? (
+            <a
+              href={`/${locale}/lessons/${prevLesson.module}/${prevLesson.lesson}`}
+              class="flex items-center gap-2 px-4 py-2 text-text-muted hover:text-primary transition-colors"
+            >
+              ← {t.lesson.prev_lesson}
+            </a>
+          ) : <div />}
+          {nextLesson ? (
+            <a
+              href={`/${locale}/lessons/${nextLesson.module}/${nextLesson.lesson}`}
+              class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity"
+            >
+              {t.lesson.next_lesson} →
+            </a>
+          ) : <div />}
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <Footer locale={locale} translations={t} />
+</BaseLayout>
