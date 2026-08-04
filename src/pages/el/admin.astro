@@ -28,7 +28,7 @@ const t = el;
       <div class="flex items-center justify-between mb-8">
         <div>
           <h1 class="text-3xl font-bold text-text">🔧 Admin Dashboard</h1>
-          <p class="text-text-muted">Διαχείριση πλατφόρμας NetAcad</p>
+          <p class="text-text-muted">Διαχείριση πλατφόρμας NetworkLearn</p>
         </div>
         <div class="flex items-center gap-3">
           <span class="px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">Admin</span>
@@ -271,7 +271,7 @@ const t = el;
               doc.text(`Date: ${new Date().toLocaleDateString('el-GR')}`, w / 2, 130, { align: 'center' });
               doc.setTextColor(148, 163, 184);
               doc.setFontSize(8);
-              doc.text('NetAcad - networklearn.wasmer.app', w / 2, h - 20, { align: 'center' });
+              doc.text('NetworkLearn - networklearn.wasmer.app', w / 2, h - 20, { align: 'center' });
 
               doc.save(`certificate-${userName.replace(/\s+/g, '-').toLowerCase()}.pdf`);
               alert(`Το πιστοποιητικό λήφθηκε για ${userName}!`);

@@ -31,7 +31,7 @@ const t = en;
       <div class="flex items-center justify-between mb-8">
         <div>
           <h1 class="text-3xl font-bold text-text">🔧 Admin Dashboard</h1>
-          <p class="text-text-muted">Manage your NetAcad platform</p>
+          <p class="text-text-muted">Manage your NetworkLearn platform</p>
         </div>
         <div class="flex items-center gap-3">
           <span class="px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">Admin</span>
@@ -317,7 +317,7 @@ const t = en;
             <div class="space-y-4">
               <div>
                 <label class="block text-sm font-medium text-text mb-1">Site Name</label>
-                <input type="text" id="site-name" value="NetAcad" class="w-full px-4 py-2 bg-surface border border-primary/10 rounded-lg text-text" />
+                <input type="text" id="site-name" value="NetworkLearn" class="w-full px-4 py-2 bg-surface border border-primary/10 rounded-lg text-text" />
                 <p class="text-xs text-text-muted mt-1">Displayed in the header and page titles</p>
               </div>
               <div>
@@ -329,7 +329,7 @@ const t = en;
                 <label class="block text-sm font-medium text-text mb-1">Logo Preview</label>
                 <div class="flex items-center gap-3 p-3 bg-surface rounded-lg border border-primary/10">
                   <div id="logo-preview" class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-xl">N</div>
-                  <span id="logo-name-preview" class="text-text font-medium">NetAcad</span>
+                  <span id="logo-name-preview" class="text-text font-medium">NetworkLearn</span>
                 </div>
               </div>
               <div>
@@ -569,7 +569,7 @@ const t = en;
               // Footer
               doc.setTextColor(148, 163, 184);
               doc.setFontSize(8);
-              doc.text('NetAcad - CCNA Training Platform', width / 2, height - 25, { align: 'center' });
+              doc.text('NetworkLearn - CCNA Training Platform', width / 2, height - 25, { align: 'center' });
               doc.text('https://networklearn.wasmer.app', width / 2, height - 20, { align: 'center' });
 
               // Download
@@ -681,7 +681,7 @@ const t = en;
       const preview = document.getElementById('logo-preview');
       const namePreview = document.getElementById('logo-name-preview');
       const logoUrl = logoUrlInput?.value;
-      const siteName = siteNameInput?.value || 'NetAcad';
+      const siteName = siteNameInput?.value || 'NetworkLearn';
       if (preview) {
         if (logoUrl) {
           preview.innerHTML = `<img src="${logoUrl}" alt="Logo" class="w-10 h-10 rounded-xl object-cover" onerror="this.parentElement.innerHTML='N'" />`;
@@ -697,7 +697,7 @@ const t = en;
 
     document.getElementById('save-general')?.addEventListener('click', () => {
       const settings = {
-        siteName: siteNameInput?.value || 'NetAcad',
+        siteName: siteNameInput?.value || 'NetworkLearn',
         logoUrl: logoUrlInput?.value || '',
         siteUrl: siteUrlInput?.value || '',
       };

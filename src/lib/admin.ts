@@ -40,7 +40,7 @@ const defaultSettings: AdminSettings = {
   emailSmtpPort: '587',
   emailSmtpUser: '',
   emailSmtpPass: '',
-  siteName: 'NetAcad',
+  siteName: 'NetworkLearn',
   siteUrl: 'https://ccna-platform.wasmer.app',
   enableRegistration: true,
   enablePasswordReset: true,

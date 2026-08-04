@@ -30,7 +30,7 @@ export default function Header({ locale, translations }: HeaderProps) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState('');
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [siteName, setSiteName] = useState('NetAcad');
+  const [siteName, setSiteName] = useState('NetworkLearn');
   const [logoUrl, setLogoUrl] = useState('');
 
   useEffect(() => {

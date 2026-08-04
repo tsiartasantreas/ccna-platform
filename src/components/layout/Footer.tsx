@@ -22,7 +22,7 @@ export default function Footer({ locale, translations }: FooterProps) {
                 N
               </div>
               <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                NetAcad
+                NetworkLearn
               </span>
             </div>
             <p className="text-text-muted text-sm max-w-md">
