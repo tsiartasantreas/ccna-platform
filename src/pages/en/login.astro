@@ -134,20 +134,34 @@ const t = en;
   <Footer locale={locale} translations={t} />
 
   <script>
+    import { createClient } from '@supabase/supabase-js';
+
+    const supabaseUrl = 'https://jhesstimsojwmkdysmpy.supabase.co';
+    const supabaseKey = 'sb_publishable_bKD9biIulcfC5iNipD-8IA_3Zu4bmWD';
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    const ADMIN_EMAIL = 'tsiartasantreas@gmail.com';
+
     let isSignup = false;
 
     const title = document.getElementById('auth-title');
     const nameField = document.getElementById('name-field');
     const confirmField = document.getElementById('confirm-field');
-    const submitBtn = document.getElementById('submit-btn');
+    const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
     const toggleBtn = document.getElementById('toggle-auth');
     const toggleText = document.getElementById('toggle-text');
     const forgotLink = document.getElementById('forgot-link');
 
     // Check URL params
     const params = new URLSearchParams(window.location.search);
-    if (params.get('mode') === 'signup') {
-      toggleMode();
+    if (params.get('mode') === 'signup') toggleMode();
+
+    // Check if already logged in
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+      localStorage.setItem('userEmail', session.user.email || '');
+      localStorage.setItem('userId', session.user.id);
+      window.location.href = '/en/dashboard';
     }
 
     function toggleMode() {
@@ -163,10 +177,74 @@ const t = en;
 
     toggleBtn?.addEventListener('click', toggleMode);
 
-    document.getElementById('auth-form')?.addEventListener('submit', (e) => {
+    // Forgot password
+    forgotLink?.querySelector('a')?.addEventListener('click', async (e) => {
       e.preventDefault();
-      // Supabase auth will be integrated here
-      alert('Authentication will be connected to Supabase. For now, this is a demo.');
+      const email = (document.getElementById('email') as HTMLInputElement)?.value;
+      if (!email) {
+        alert('Please enter your email address first.');
+        return;
+      }
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + '/en/login?mode=reset',
+      });
+      if (error) {
+        alert('Error: ' + error.message);
+      } else {
+        alert('Password reset email sent! Check your inbox.');
+      }
+    });
+
+    // Form submission
+    document.getElementById('auth-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (submitBtn) submitBtn.disabled = true;
+      if (submitBtn) submitBtn.textContent = 'Processing...';
+
+      const email = (document.getElementById('email') as HTMLInputElement)?.value;
+      const password = (document.getElementById('password') as HTMLInputElement)?.value;
+      const displayName = (document.getElementById('display-name') as HTMLInputElement)?.value;
+
+      try {
+        if (isSignup) {
+          // Sign up
+          const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              data: { display_name: displayName || email?.split('@')[0] },
+            },
+          });
+          if (error) throw error;
+          if (data.user) {
+            localStorage.setItem('userEmail', data.user.email || '');
+            localStorage.setItem('userId', data.user.id);
+            if (data.user.identities?.length === 0) {
+              alert('An account with this email already exists. Please login instead.');
+            } else {
+              alert('Account created! Please check your email to verify your account.');
+              window.location.href = '/en/dashboard';
+            }
+          }
+        } else {
+          // Login
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+          if (error) throw error;
+          if (data.user) {
+            localStorage.setItem('userEmail', data.user.email || '');
+            localStorage.setItem('userId', data.user.id);
+            window.location.href = '/en/dashboard';
+          }
+        }
+      } catch (err: any) {
+        alert('Error: ' + (err.message || 'Authentication failed'));
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+        if (submitBtn) submitBtn.textContent = isSignup ? 'Sign Up' : 'Login';
+      }
     });
   </script>
 </BaseLayout>

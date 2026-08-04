@@ -1,4 +1,12 @@
 import { useState, useEffect } from 'react';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  'https://jhesstimsojwmkdysmpy.supabase.co',
+  'sb_publishable_bKD9biIulcfC5iNipD-8IA_3Zu4bmWD'
+);
+
+const ADMIN_EMAIL = 'tsiartasantreas@gmail.com';
 
 interface HeaderProps {
   locale: 'en' | 'el';
@@ -19,15 +27,28 @@ export default function Header({ locale, translations }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     const theme = localStorage.getItem('theme') || 'dark';
     setIsDark(theme === 'dark');
 
-    // Check if admin user
-    const adminEmail = 'tsiartasantreas@gmail.com';
-    const userEmail = localStorage.getItem('userEmail');
-    setIsAdmin(userEmail === adminEmail);
+    // Check Supabase session
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        setIsLoggedIn(true);
+        localStorage.setItem('userEmail', session.user.email || '');
+        localStorage.setItem('userId', session.user.id);
+        setIsAdmin(session.user.email === ADMIN_EMAIL);
+      } else {
+        setIsLoggedIn(false);
+        setIsAdmin(false);
+        localStorage.removeItem('userEmail');
+        localStorage.removeItem('userId');
+      }
+    };
+    checkAuth();
 
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -121,18 +142,42 @@ export default function Header({ locale, translations }: HeaderProps) {
             </button>
 
             {/* Auth Buttons */}
-            <a
-              href={`/${locale}/login`}
-              className="hidden sm:block px-4 py-2 text-sm font-medium text-text-muted hover:text-primary transition-colors"
-            >
-              {translations.nav.login}
-            </a>
-            <a
-              href={`/${locale}/login?mode=signup`}
-              className="px-4 py-2 text-sm font-medium bg-gradient-to-r from-primary to-accent text-white rounded-lg hover:opacity-90 transition-opacity"
-            >
-              {translations.nav.signup}
-            </a>
+            {isLoggedIn ? (
+              <>
+                <a
+                  href={`/${locale}/dashboard`}
+                  className="hidden sm:block px-4 py-2 text-sm font-medium text-text-muted hover:text-primary transition-colors"
+                >
+                  {translations.nav.dashboard}
+                </a>
+                <button
+                  onClick={async () => {
+                    await supabase.auth.signOut();
+                    localStorage.removeItem('userEmail');
+                    localStorage.removeItem('userId');
+                    window.location.href = `/${locale}/`;
+                  }}
+                  className="px-4 py-2 text-sm font-medium bg-surface-light text-text-muted rounded-lg hover:text-primary transition-all"
+                >
+                  {translations.nav.logout}
+                </button>
+              </>
+            ) : (
+              <>
+                <a
+                  href={`/${locale}/login`}
+                  className="hidden sm:block px-4 py-2 text-sm font-medium text-text-muted hover:text-primary transition-colors"
+                >
+                  {translations.nav.login}
+                </a>
+                <a
+                  href={`/${locale}/login?mode=signup`}
+                  className="px-4 py-2 text-sm font-medium bg-gradient-to-r from-primary to-accent text-white rounded-lg hover:opacity-90 transition-opacity"
+                >
+                  {translations.nav.signup}
+                </a>
+              </>
+            )}
 
             {/* Mobile Menu Button */}
             <button
@@ -164,12 +209,26 @@ export default function Header({ locale, translations }: HeaderProps) {
                 {link.label}
               </a>
             ))}
-            <a
-              href={`/${locale}/login`}
-              className="block px-4 py-3 rounded-lg text-text-muted hover:text-primary hover:bg-surface transition-all"
-            >
-              {translations.nav.login}
-            </a>
+            {isLoggedIn ? (
+              <button
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  localStorage.removeItem('userEmail');
+                  localStorage.removeItem('userId');
+                  window.location.href = `/${locale}/`;
+                }}
+                className="block w-full text-left px-4 py-3 rounded-lg text-text-muted hover:text-primary hover:bg-surface transition-all"
+              >
+                {translations.nav.logout}
+              </button>
+            ) : (
+              <a
+                href={`/${locale}/login`}
+                className="block px-4 py-3 rounded-lg text-text-muted hover:text-primary hover:bg-surface transition-all"
+              >
+                {translations.nav.login}
+              </a>
+            )}
           </div>
         </div>
       )}

@@ -95,9 +95,57 @@ const t = el;
     }
 
     toggleBtn?.addEventListener('click', toggleMode);
-    document.getElementById('auth-form')?.addEventListener('submit', (e) => {
-      e.preventDefault();
-      alert('Η ταυτοποίηση θα συνδεθεί με το Supabase.');
-    });
+
+    // Connect to Supabase
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+    script.onload = async () => {
+      const supabase = (window as any).supabase.createClient(
+        'https://jhesstimsojwmkdysmpy.supabase.co',
+        'sb_publishable_bKD9biIulcfC5iNipD-8IA_3Zu4bmWD'
+      );
+
+      // Check if already logged in
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        localStorage.setItem('userEmail', session.user.email || '');
+        localStorage.setItem('userId', session.user.id);
+        window.location.href = '/el/dashboard';
+      }
+
+      document.getElementById('auth-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Επεξεργασία...'; }
+
+        const email = (document.getElementById('email') as HTMLInputElement)?.value;
+        const password = (document.getElementById('password') as HTMLInputElement)?.value;
+
+        try {
+          if (isSignup) {
+            const { data, error } = await supabase.auth.signUp({ email, password });
+            if (error) throw error;
+            if (data.user) {
+              localStorage.setItem('userEmail', data.user.email || '');
+              localStorage.setItem('userId', data.user.id);
+              alert('Ο λογαριασμός δημιουργήθηκε! Ελέγξτε το email σας.');
+              window.location.href = '/el/dashboard';
+            }
+          } else {
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) throw error;
+            if (data.user) {
+              localStorage.setItem('userEmail', data.user.email || '');
+              localStorage.setItem('userId', data.user.id);
+              window.location.href = '/el/dashboard';
+            }
+          }
+        } catch (err: any) {
+          alert('Σφάλμα: ' + (err.message || 'Η ταυτοποίηση απέτυχε'));
+        } finally {
+          if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = isSignup ? 'Εγγραφή' : 'Σύνδεση'; }
+        }
+      });
+    };
+    document.head.appendChild(script);
   </script>
 </BaseLayout>
