@@ -220,7 +220,10 @@ clear mac address-table dynamic
       { term: '802.1Q', definition: 'The IEEE standard for VLAN tagging on Ethernet frames' },
       { term: 'Native VLAN', definition: 'The VLAN that is not tagged on a trunk port (default: VLAN 1)' },
     ],
-    content: `## VLAN Concepts
+    content: `
+![Diagram](/images/diagrams/vlan-topology.svg)
+
+## VLAN Concepts
 
 A **VLAN (Virtual LAN)** is a logical grouping of devices that creates separate broadcast domains, regardless of physical location.
 
@@ -476,7 +479,10 @@ Group  Port-channel  Protocol    Ports
       { term: 'PortFast', definition: 'Immediately transitions a port to forwarding (for end devices only)' },
       { term: 'BPDU Guard', definition: 'Disables a port if BPDUs are received (protects against rogue switches)' },
     ],
-    content: `## Why STP?
+    content: `
+![Diagram](/images/diagrams/stp-topology.svg)
+
+## Why STP?
 
 **Spanning Tree Protocol (STP)** prevents Layer 2 loops in networks with redundant links. Without STP, broadcast frames would circulate endlessly, causing a **broadcast storm** that can crash the network.
 

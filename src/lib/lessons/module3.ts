@@ -415,7 +415,10 @@ Both methods achieve the same goal — routing between VLANs — but the Layer 3
       { term: "Hello Packet", definition: "OSPF messages sent periodically to discover neighbors, establish adjacencies, and maintain neighbor relationships. Default hello interval is 10 seconds on broadcast networks." },
       { term: "Link-State Advertisement (LSA)", definition: "OSPF data structures that describe the network topology. Routers exchange LSAs to build a complete picture of the network, stored in the Link-State Database (LSDB)." }
     ],
-    content: `## OSPF Overview
+    content: `
+![Diagram](/images/diagrams/ospf-states.svg)
+
+## OSPF Overview
 
 **OSPF (Open Shortest Path First)** is the most widely used interior gateway protocol in enterprise networks. It is:
 - **Open standard** (defined in RFC 2328 for OSPFv2)

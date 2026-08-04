@@ -42,7 +42,10 @@ export const module1Lessons: Record<
           "The reverse of encapsulation, where each layer strips its header as data moves up the receiving stack from Physical to Application.",
       },
     ],
-    content: `## The OSI Reference Model
+    content: `
+![Diagram](/images/diagrams/osi-model.svg)
+
+## The OSI Reference Model
 
 The **Open Systems Interconnection (OSI)** model was developed by the International Organization for Standardization (ISO) in the late 1970s. It provides a universal language for describing how network devices and software communicate. Understanding the OSI model is foundational for every networking professional because it gives you a structured way to troubleshoot, design, and discuss networks.
 
@@ -728,7 +731,10 @@ ifconfig
           "The last address in a subnet, where all host bits are 1 (e.g., 192.168.1.255/24); packets sent here reach all hosts in the subnet.",
       },
     ],
-    content: `## Why Subnetting?
+    content: `
+![Diagram](/images/diagrams/subnetting.svg)
+
+## Why Subnetting?
 
 Without subnetting, a Class B network like 172.16.0.0/16 would be a single flat network with 65,534 hosts — impractical for many reasons:
 
@@ -1187,7 +1193,10 @@ Router# show ipv6 neighbors
           "A Layer 3 protocol used for diagnostic and error-reporting functions, including ping (echo request/reply) and traceroute (time exceeded messages).",
       },
     ],
-    content: `## TCP (Transmission Control Protocol)
+    content: `
+![Diagram](/images/diagrams/tcp-handshake.svg)
+
+## TCP (Transmission Control Protocol)
 
 TCP is a **connection-oriented**, **reliable** transport protocol (Layer 4). Before data is exchanged, TCP establishes a connection using the **three-way handshake**. It guarantees that data arrives **complete, in order, and without errors**.
 

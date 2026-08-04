@@ -111,7 +111,10 @@ By layering these controls, an attacker must defeat multiple defenses to reach c
       { term: "Standard ACL", definition: "An ACL that filters traffic based solely on the source IP address; numbered 1-99 and 1300-1999" },
       { term: "Extended ACL", definition: "An ACL that filters traffic based on source and destination IP addresses, protocols, and port numbers; numbered 100-199 and 2000-2699" }
     ],
-    content: `## Access Control Lists (ACLs)
+    content: `
+![Diagram](/images/diagrams/acl-flowchart.svg)
+
+## Access Control Lists (ACLs)
 
 **Access Control Lists (ACLs)** are one of the most fundamental security tools available on Cisco routers and switches. ACLs are ordered lists of **permit** or **deny** statements, also called **Access Control Entries (ACEs)**, that are processed sequentially against network traffic.
 

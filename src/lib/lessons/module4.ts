@@ -14,7 +14,10 @@ export const module4Lessons: Record<number, { objectives: string[]; keyTerms: { 
       { term: "DHCP Pool", definition: "A configured range of IP addresses on a DHCP server that can be assigned to clients" },
       { term: "Lease Time", definition: "The duration for which a DHCP client is allowed to use an assigned IP address before it must renew" },
     ],
-    content: `## What Is DHCP?
+    content: `
+![Diagram](/images/diagrams/dhcp-dora.svg)
+
+## What Is DHCP?
 
 **Dynamic Host Configuration Protocol (DHCP)** is an application layer protocol that automatically provides IP configuration to hosts on a network. Without DHCP, every device would need to be manually configured with an IP address, subnet mask, default gateway, and DNS server — a tedious and error-prone process in any network of meaningful size.
 
@@ -133,7 +136,10 @@ Common troubleshooting steps:
       { term: "Inside Global", definition: "The public IP address that represents an inside host to the outside network (after NAT translation)" },
       { term: "Static NAT", definition: "A one-to-one permanent mapping between a private inside address and a public outside address" },
     ],
-    content: `## What Is NAT?
+    content: `
+![Diagram](/images/diagrams/nat-translation.svg)
+
+## What Is NAT?
 
 **Network Address Translation (NAT)** is a process that modifies the IP address information in packet headers as they pass through a router. NAT was developed primarily to solve the IPv4 address exhaustion problem by allowing networks to use **private IP addresses** internally while sharing a smaller number of **public IP addresses** for Internet access.
 

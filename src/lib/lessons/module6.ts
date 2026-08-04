@@ -29,7 +29,10 @@ export const module6Lessons: Record<number, { objectives: string[]; keyTerms: { 
         definition: "An API used by the SDN controller to communicate upward with applications and services. These APIs allow applications to interact with the network, such as REST APIs.",
       },
     ],
-    content: `## Understanding Software-Defined Networking (SDN)
+    content: `
+![Diagram](/images/diagrams/sdn-architecture.svg)
+
+## Understanding Software-Defined Networking (SDN)
 
 Traditional networking tightly couples the **control plane** and the **data plane** within each individual network device. Every router and switch independently runs routing protocols, builds its own forwarding tables, and makes its own decisions about how to handle traffic. While this distributed approach has served networking well for decades, it creates significant challenges when managing large-scale networks — each device must be configured and managed individually.
 
@@ -196,7 +199,10 @@ Combines traditional distributed routing protocols with SDN centralized control.
         definition: "A three-digit number returned by a server in response to an HTTP request, indicating whether the request was successful (2xx), redirected (3xx), client error (4xx), or server error (5xx).",
       },
     ],
-    content: `## Introduction to REST APIs
+    content: `
+![Diagram](/images/diagrams/rest-api.svg)
+
+## Introduction to REST APIs
 
 An **API (Application Programming Interface)** is a set of rules and protocols that allows different software applications to communicate with each other. In the context of network automation, APIs allow scripts, applications, and management platforms to interact with network devices programmatically — without needing to log in and type CLI commands manually.
 
