@@ -245,106 +245,94 @@ const t = el;
               const w = doc.internal.pageSize.getWidth();
               const h = doc.internal.pageSize.getHeight();
 
-              // White background
+              // Clean white background
               doc.setFillColor(255, 255, 255);
               doc.rect(0, 0, w, h, 'F');
 
-              // Top accent bar
+              // Top gradient bar
               doc.setFillColor(0, 212, 255);
-              doc.rect(0, 0, w, 8, 'F');
-
-              // Bottom accent bar
+              doc.rect(0, 0, w, 4, 'F');
               doc.setFillColor(124, 58, 237);
-              doc.rect(0, h - 8, w, 8, 'F');
+              doc.rect(0, 4, w, 4, 'F');
 
-              // Left/Right accent lines
+              // Bottom gradient bar
               doc.setFillColor(0, 212, 255);
-              doc.rect(15, 20, 3, h - 40, 'F');
+              doc.rect(0, h - 4, w, 4, 'F');
               doc.setFillColor(124, 58, 237);
-              doc.rect(w - 18, 20, 3, h - 40, 'F');
-
-              // Inner border
-              doc.setDrawColor(226, 232, 240);
-              doc.setLineWidth(0.5);
-              doc.rect(25, 18, w - 50, h - 36);
+              doc.rect(0, h - 8, w, 4, 'F');
 
               // Logo
-              doc.setFillColor(241, 245, 249);
-              doc.circle(w / 2, 45, 15, 'F');
-              doc.setDrawColor(0, 212, 255);
-              doc.setLineWidth(1);
-              doc.circle(w / 2, 45, 15, 'S');
-              doc.setTextColor(0, 212, 255);
-              doc.setFontSize(20);
-              doc.text('NL', w / 2, 48, { align: 'center' });
+              try {
+                const logoImg = await fetch('/images/logo.png');
+                const logoBlob = await logoImg.blob();
+                const logoReader = new FileReader();
+                logoReader.onload = function() { doc.addImage(logoReader.result, 'PNG', 30, 20, 15, 15); };
+                logoReader.readAsDataURL(logoBlob);
+              } catch(e) {
+                doc.setFillColor(0, 212, 255);
+                doc.roundedRect(30, 20, 15, 15, 3, 3, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(12);
+                doc.text('NL', 37.5, 30, { align: 'center' });
+              }
+
+              doc.setTextColor(30, 41, 59);
+              doc.setFontSize(14);
+              doc.text('NetworkLearn', 50, 28, { align: 'left' });
+              doc.setTextColor(148, 163, 184);
+              doc.setFontSize(8);
+              doc.text('CCNA Training Platform', 50, 33, { align: 'left' });
+
+              doc.setTextColor(148, 163, 184);
+              doc.setFontSize(8);
+              const certId = 'NL-' + Date.now().toString(36).toUpperCase();
+              doc.text(`ID: ${certId}`, w - 30, 28, { align: 'right' });
 
               // Title
               doc.setTextColor(30, 41, 59);
-              doc.setFontSize(28);
-              doc.text('CERTIFICATE', w / 2, 75, { align: 'center' });
-              doc.setFontSize(14);
+              doc.setFontSize(36);
+              doc.text('Πιστοποιητικό', w / 2, 65, { align: 'center' });
+              doc.setFontSize(16);
               doc.setTextColor(100, 116, 139);
-              doc.text('OF COMPLETION', w / 2, 85, { align: 'center' });
+              doc.text('ΟΛΟΚΛΗΡΩΣΗΣ', w / 2, 76, { align: 'center' });
 
-              // Decorative line
-              doc.setDrawColor(0, 212, 255);
-              doc.setLineWidth(1);
-              doc.line(w / 2 - 40, 90, w / 2 + 40, 90);
-              doc.setFillColor(0, 212, 255);
-              doc.circle(w / 2, 90, 2, 'F');
-
-              // Presented to
-              doc.setTextColor(100, 116, 139);
-              doc.setFontSize(11);
-              doc.text('Αυτό απονέμεται στον/στην', w / 2, 105, { align: 'center' });
-
-              // Name
-              doc.setTextColor(30, 41, 59);
-              doc.setFontSize(32);
-              doc.text(userName, w / 2, 120, { align: 'center' });
-              const nameWidth = doc.getTextWidth(userName);
               doc.setDrawColor(0, 212, 255);
               doc.setLineWidth(0.5);
-              doc.line(w / 2 - nameWidth / 2, 123, w / 2 + nameWidth / 2, 123);
+              doc.line(w / 2 - 50, 82, w / 2 + 50, 82);
 
-              // Description
-              doc.setTextColor(100, 116, 139);
+              doc.setTextColor(148, 163, 184);
               doc.setFontSize(11);
-              doc.text('για την επιτυχή ολοκλήρωση του', w / 2, 135, { align: 'center' });
+              doc.text('Αυτό το πιστοποιητικό απονέμεται στον/στην', w / 2, 100, { align: 'center' });
+
               doc.setTextColor(30, 41, 59);
-              doc.setFontSize(16);
-              doc.text('Προγράμματος Εκπαίδευσης CCNA', w / 2, 145, { align: 'center' });
+              doc.setFontSize(40);
+              doc.text(userName, w / 2, 120, { align: 'center' });
 
-              // Stats
-              doc.setFillColor(241, 245, 249);
-              doc.roundedRect(w / 2 - 60, 152, 120, 20, 3, 3, 'F');
+              const nameWidth = doc.getTextWidth(userName);
+              doc.setDrawColor(0, 212, 255);
+              doc.setLineWidth(0.3);
+              doc.line(w / 2 - nameWidth / 2 - 10, 124, w / 2 + nameWidth / 2 + 10, 124);
+
               doc.setTextColor(100, 116, 139);
-              doc.setFontSize(10);
-              doc.text(`Μαθήματα: ${lessons}/35  |  Βαθμολογία: ${score}%`, w / 2, 164, { align: 'center' });
+              doc.setFontSize(12);
+              doc.text('για την επιτυχή ολοκλήρωση του', w / 2, 140, { align: 'center' });
 
-              // Date
-              doc.setTextColor(100, 116, 139);
-              doc.setFontSize(10);
-              doc.text(`Έκδοση: ${new Date().toLocaleDateString('el-GR')}`, w / 2, 180, { align: 'center' });
+              doc.setTextColor(30, 41, 59);
+              doc.setFontSize(20);
+              doc.text('Προγράμματος Εκπαίδευσης CCNA', w / 2, 152, { align: 'center' });
 
-              // Footer
+              doc.setTextColor(148, 163, 184);
+              doc.setFontSize(10);
+              doc.text(`Εκδόθηκε στις ${new Date().toLocaleDateString('el-GR')}`, w / 2, 170, { align: 'center' });
+
               doc.setDrawColor(226, 232, 240);
               doc.setLineWidth(0.3);
-              doc.line(40, h - 30, w - 40, h - 30);
+              doc.line(60, h - 25, w - 60, h - 25);
               doc.setTextColor(148, 163, 184);
               doc.setFontSize(9);
-              doc.text('NetworkLearn', w / 2 - 30, h - 22, { align: 'center' });
-              doc.text('networklearn.wasmer.app', w / 2 + 30, h - 22, { align: 'center' });
+              doc.text('networklearn.wasmer.app', w / 2, h - 18, { align: 'center' });
 
-              // Corner decorations
-              doc.setFillColor(0, 212, 255);
-              doc.circle(30, 25, 3, 'F');
-              doc.circle(w - 30, 25, 3, 'F');
-              doc.setFillColor(124, 58, 237);
-              doc.circle(30, h - 25, 3, 'F');
-              doc.circle(w - 30, h - 25, 3, 'F');
-
-              doc.save(`networklearn-certificate-${userName.replace(/\s+/g, '-').toLowerCase()}.pdf`);
+              doc.save(`NetworkLearn-Certificate-${userName.replace(/\s+/g, '-').toLowerCase()}.pdf`);
               alert(`Το πιστοποιητικό λήφθηκε για ${userName}!`);
             });
           });
