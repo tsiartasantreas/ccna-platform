@@ -131,13 +131,20 @@ export default function Header({ locale, translations }: HeaderProps) {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <a href={`/${locale}/`} className="flex items-center gap-2 group">
-            {logoUrl ? (
-              <img src={logoUrl} alt={siteName} className="w-10 h-10 rounded-xl object-cover group-hover:scale-105 transition-transform" />
-            ) : (
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-xl group-hover:scale-105 transition-transform">
-                {siteName.charAt(0).toUpperCase()}
-              </div>
-            )}
+            <img
+              src={logoUrl}
+              alt={siteName}
+              className="w-10 h-10 rounded-xl object-cover group-hover:scale-105 transition-transform"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                const fallback = target.nextElementSibling as HTMLElement;
+                if (fallback) fallback.style.display = 'flex';
+              }}
+            />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent items-center justify-center text-white font-bold text-xl group-hover:scale-105 transition-transform" style={{ display: logoUrl ? 'none' : 'flex' }}>
+              {siteName.charAt(0).toUpperCase()}
+            </div>
             <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               {siteName}
             </span>
