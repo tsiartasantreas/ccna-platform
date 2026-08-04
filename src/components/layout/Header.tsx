@@ -18,10 +18,16 @@ export default function Header({ locale, translations }: HeaderProps) {
   const [isDark, setIsDark] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const theme = localStorage.getItem('theme') || 'dark';
     setIsDark(theme === 'dark');
+
+    // Check if admin user
+    const adminEmail = 'tsiartasantreas@gmail.com';
+    const userEmail = localStorage.getItem('userEmail');
+    setIsAdmin(userEmail === adminEmail);
 
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -49,6 +55,8 @@ export default function Header({ locale, translations }: HeaderProps) {
     { href: `/${locale}/`, label: translations.nav.home },
     { href: `/${locale}/curriculum`, label: translations.nav.curriculum },
     { href: `/${locale}/pricing`, label: translations.nav.pricing },
+    { href: `/${locale}/dashboard`, label: translations.nav.dashboard },
+    ...(isAdmin ? [{ href: `/${locale}/admin`, label: '🔧 Admin' }] : []),
   ];
 
   return (
