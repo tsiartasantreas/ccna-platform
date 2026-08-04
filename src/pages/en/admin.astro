@@ -11,6 +11,20 @@ const t = en;
 <BaseLayout title="Admin Dashboard" lang={locale}>
   <Header locale={locale} translations={t} client:load />
 
+  {/* Access Denied Screen - shown by default, hidden by JS if admin */}
+  <div id="access-denied" class="min-h-screen flex items-center justify-center pt-16">
+    <div class="text-center max-w-md mx-auto px-4">
+      <div class="text-6xl mb-6">🔒</div>
+      <h1 class="text-3xl font-bold text-text mb-4">Access Denied</h1>
+      <p class="text-text-muted mb-6">You must be logged in with the admin account to access this page.</p>
+      <a href={`/${locale}/login`} class="inline-flex px-6 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity">
+        Login as Admin →
+      </a>
+    </div>
+  </div>
+
+  {/* Admin Content - hidden by default, shown by JS if admin */}
+  <div id="admin-content" class="hidden">
   <main class="pt-24 pb-16 min-h-screen">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Admin Header */}
@@ -411,10 +425,31 @@ const t = en;
   </main>
 
   <Footer locale={locale} translations={t} />
+  </div>
 
   <script>
-    // Admin check
+    import { createClient } from '@supabase/supabase-js';
+
+    const supabase = createClient(
+      'https://jhesstimsojwmkdysmpy.supabase.co',
+      'sb_publishable_bKD9biIulcfC5iNipD-8IA_3Zu4bmWD'
+    );
     const ADMIN_EMAIL = 'tsiartasantreas@gmail.com';
+
+    // Check authentication
+    const { data: { session } } = await supabase.auth.getSession();
+    const accessDenied = document.getElementById('access-denied');
+    const adminContent = document.getElementById('admin-content');
+
+    if (!session?.user || session.user.email !== ADMIN_EMAIL) {
+      // Not logged in or not admin - show access denied
+      if (accessDenied) accessDenied.classList.remove('hidden');
+      if (adminContent) adminContent.classList.add('hidden');
+    } else {
+      // Admin authenticated - show content
+      if (accessDenied) accessDenied.classList.add('hidden');
+      if (adminContent) adminContent.classList.remove('hidden');
+    }
 
     // Tab switching
     document.querySelectorAll('.tab-btn').forEach(btn => {
