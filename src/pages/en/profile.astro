@@ -256,7 +256,7 @@ const t = en;
 
       if (confirm(`Send password reset email to ${session.user.email}?`)) {
         const { error } = await supabase.auth.resetPasswordForEmail(session.user.email, {
-          redirectTo: window.location.origin + '/en/profile',
+          redirectTo: window.location.origin + '/en/reset-password',
         });
         if (error) {
           alert('Error: ' + error.message);

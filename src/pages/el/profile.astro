@@ -141,7 +141,7 @@ const t = el;
       if (!session?.user?.email) return;
       if (confirm(`Αποστολή email επαναφοράς κωδικού στο ${session.user.email};`)) {
         const { error } = await supabase.auth.resetPasswordForEmail(session.user.email, {
-          redirectTo: window.location.origin + '/el/profile',
+          redirectTo: window.location.origin + '/el/reset-password',
         });
         alert(error ? 'Σφάλμα: ' + error.message : 'Email επαναφοράς κωδικού στάλθηκε!');
       }
