@@ -1,0 +1,216 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/layout/Header.tsx';
+import Footer from '../../components/layout/Footer.tsx';
+import el from '../../i18n/el.json';
+
+const locale = 'el' as const;
+const t = el;
+---
+
+<BaseLayout title="Admin Dashboard" lang={locale}>
+  <Header locale={locale} translations={t} client:load />
+
+  <div id="access-denied" class="min-h-screen flex items-center justify-center pt-16">
+    <div class="text-center max-w-md mx-auto px-4">
+      <div class="text-6xl mb-6">🔒</div>
+      <h1 class="text-3xl font-bold text-text mb-4">Απόρριψη Πρόσβασης</h1>
+      <p class="text-text-muted mb-6">Πρέπει να είστε συνδεδεμένοι με τον λογαριασμό admin για πρόσβαση.</p>
+      <a href={`/${locale}/login`} class="inline-flex px-6 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity">
+        Σύνδεση ως Admin →
+      </a>
+    </div>
+  </div>
+
+  <div id="admin-content" class="hidden">
+  <main class="pt-24 pb-16 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <h1 class="text-3xl font-bold text-text">🔧 Admin Dashboard</h1>
+          <p class="text-text-muted">Διαχείριση πλατφόρμας NetAcad</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">Admin</span>
+          <span class="text-sm text-text-muted" id="admin-email">tsiartasantreas@gmail.com</span>
+        </div>
+      </div>
+
+      <div class="flex gap-1 mb-8 bg-surface-card rounded-xl p-1 border border-primary/10 overflow-x-auto">
+        <button class="tab-btn active px-4 py-2 rounded-lg text-sm font-medium transition-all" data-tab="stats">📊 Στατιστικά</button>
+        <button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all" data-tab="users">👥 Χρήστες</button>
+        <button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all" data-tab="subscriptions">💳 Συνδρομές</button>
+        <button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all" data-tab="revolut">💰 Revolut</button>
+        <button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all" data-tab="supabase">🗄️ Supabase</button>
+        <button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all" data-tab="settings">⚙️ Ρυθμίσεις</button>
+      </div>
+
+      {/* Statistics Tab */}
+      <div id="tab-stats" class="tab-content">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
+            <div class="text-sm text-text-muted mb-1">Σύνολο Χρηστών</div>
+            <div class="text-3xl font-bold text-primary">156</div>
+            <div class="text-xs text-success mt-1">+5 σήμερα</div>
+          </div>
+          <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
+            <div class="text-sm text-text-muted mb-1">Ενεργοί Χρήστες</div>
+            <div class="text-3xl font-bold text-success">89</div>
+          </div>
+          <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
+            <div class="text-sm text-text-muted mb-1">Pro Χρήστες</div>
+            <div class="text-3xl font-bold text-accent">23</div>
+          </div>
+          <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
+            <div class="text-sm text-text-muted mb-1">Έσοδα (Μήνας)</div>
+            <div class="text-3xl font-bold text-warning">€229.77</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Users Tab */}
+      <div id="tab-users" class="tab-content hidden">
+        <div class="bg-surface-card rounded-xl border border-primary/10 overflow-hidden">
+          <div class="p-4 border-b border-primary/10">
+            <h3 class="text-lg font-bold text-text">Εγγεγραμμένοι Χρήστες</h3>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="border-b border-primary/10">
+                  <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Χρήστης</th>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Email</th>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Πλάνο</th>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Ενέργειες</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b border-primary/5 hover:bg-surface-light">
+                  <td class="px-4 py-3 text-sm text-text font-medium">Andreas Tsiartas</td>
+                  <td class="px-4 py-3 text-sm text-text-muted">tsiartasantreas@gmail.com</td>
+                  <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full bg-accent/10 text-accent text-xs font-medium">Pro</span></td>
+                  <td class="px-4 py-3"><button class="text-xs text-primary hover:underline">Επαναφορά Κωδικού</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      {/* Subscriptions Tab */}
+      <div id="tab-subscriptions" class="tab-content hidden">
+        <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
+          <h3 class="text-lg font-bold text-text mb-4">Ενεργές Συνδρομές</h3>
+          <p class="text-text-muted">3 ενεργές συνδρομές</p>
+        </div>
+      </div>
+
+      {/* Revolut Tab */}
+      <div id="tab-revolut" class="tab-content hidden">
+        <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
+          <h3 class="text-lg font-bold text-text mb-4">💰 Revolut Business API</h3>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-text mb-1">API Key</label>
+              <input type="password" id="revolut-api-key" placeholder="sk_live_..." class="w-full px-4 py-2 bg-surface border border-primary/10 rounded-lg text-text font-mono text-sm" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-text mb-1">Webhook Secret</label>
+              <input type="password" id="revolut-webhook-secret" placeholder="whsec_..." class="w-full px-4 py-2 bg-surface border border-primary/10 rounded-lg text-text font-mono text-sm" />
+            </div>
+            <button id="save-revolut" class="px-6 py-2 bg-gradient-to-r from-primary to-accent text-white rounded-lg font-medium">Αποθήκευση</button>
+          </div>
+        </div>
+      </div>
+
+      {/* Supabase Tab */}
+      <div id="tab-supabase" class="tab-content hidden">
+        <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
+          <h3 class="text-lg font-bold text-text mb-4">🗄️ Supabase</h3>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-text mb-1">Project URL</label>
+              <input type="text" value="https://jhesstimsojwmkdysmpy.supabase.co" class="w-full px-4 py-2 bg-surface border border-primary/10 rounded-lg text-text font-mono text-sm" />
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="flex items-center gap-3"><div class="w-3 h-3 rounded-full bg-success"></div><span class="text-sm text-text">profiles</span></div>
+              <div class="flex items-center gap-3"><div class="w-3 h-3 rounded-full bg-success"></div><span class="text-sm text-text">lesson_progress</span></div>
+              <div class="flex items-center gap-3"><div class="w-3 h-3 rounded-full bg-success"></div><span class="text-sm text-text">quiz_scores</span></div>
+              <div class="flex items-center gap-3"><div class="w-3 h-3 rounded-full bg-success"></div><span class="text-sm text-text">user_points</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Settings Tab */}
+      <div id="tab-settings" class="tab-content hidden">
+        <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
+          <h3 class="text-lg font-bold text-text mb-4">⚙️ Ρυθμίσεις</h3>
+          <div class="space-y-4">
+            <label class="flex items-center justify-between">
+              <span class="text-sm text-text">Ενεργοποίηση Εγγραφών</span>
+              <input type="checkbox" checked class="w-5 h-5 rounded" />
+            </label>
+            <label class="flex items-center justify-between">
+              <span class="text-sm text-text">Ενεργοποίηση Επαναφοράς Κωδικού</span>
+              <input type="checkbox" checked class="w-5 h-5 rounded" />
+            </label>
+            <label class="flex items-center justify-between">
+              <span class="text-sm text-text">Λειτουργία Συντήρησης</span>
+              <input type="checkbox" class="w-5 h-5 rounded" />
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <Footer locale={locale} translations={t} />
+  </div>
+
+  <script>
+    import { createClient } from '@supabase/supabase-js';
+
+    const supabase = createClient(
+      'https://jhesstimsojwmkdysmpy.supabase.co',
+      'sb_publishable_bKD9biIulcfC5iNipD-8IA_3Zu4bmWD'
+    );
+    const ADMIN_EMAIL = 'tsiartasantreas@gmail.com';
+
+    const { data: { session } } = await supabase.auth.getSession();
+    const accessDenied = document.getElementById('access-denied');
+    const adminContent = document.getElementById('admin-content');
+
+    if (!session?.user || session.user.email !== ADMIN_EMAIL) {
+      if (accessDenied) accessDenied.classList.remove('hidden');
+      if (adminContent) adminContent.classList.add('hidden');
+    } else {
+      if (accessDenied) accessDenied.classList.add('hidden');
+      if (adminContent) adminContent.classList.remove('hidden');
+    }
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.getAttribute('data-tab');
+        document.querySelectorAll('.tab-btn').forEach(b => {
+          b.classList.remove('active', 'bg-primary', 'text-white');
+          b.classList.add('text-text-muted');
+        });
+        btn.classList.add('active', 'bg-primary', 'text-white');
+        btn.classList.remove('text-text-muted');
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+        const content = document.getElementById(`tab-${tab}`);
+        if (content) content.classList.remove('hidden');
+      });
+    });
+
+    const firstTab = document.querySelector('.tab-btn');
+    if (firstTab) {
+      firstTab.classList.add('active', 'bg-primary', 'text-white');
+      firstTab.classList.remove('text-text-muted');
+    }
+
+    document.getElementById('save-revolut')?.addEventListener('click', () => {
+      alert('Οι ρυθμίσεις Revolut αποθηκεύτηκαν!');
+    });
+  </script>
+</BaseLayout>
