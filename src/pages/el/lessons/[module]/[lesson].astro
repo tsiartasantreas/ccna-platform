@@ -116,11 +116,11 @@ function mdToHtml(md: string): string {
             <h3 class="text-sm font-bold text-primary mb-3">
               {t.modules.module} {moduleNum}: {moduleName}
             </h3>
-            <ul class="space-y-1">
+            <ul class="space-y-1" id="lesson-sidebar">
               {(moduleLessonTitles[moduleNum] || []).map((lesson, idx) => (
                 <li>
                   <a href={`/${locale}/lessons/${moduleNum}/${idx + 1}`} class={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${idx + 1 === lessonNum ? 'bg-primary/10 text-primary font-medium' : 'text-text-muted hover:text-primary hover:bg-surface-light'}`}>
-                    <span class={`w-6 h-6 rounded flex items-center justify-center text-xs ${idx + 1 === lessonNum ? 'bg-primary/20 text-primary' : 'bg-surface text-text-muted'}`}>{idx + 1}</span>
+                    <span id={`lesson-badge-${idx + 1}`} class={`w-6 h-6 rounded flex items-center justify-center text-xs ${idx + 1 === lessonNum ? 'bg-primary/20 text-primary' : 'bg-surface text-text-muted'}`}>{idx + 1}</span>
                     <span class="truncate">{lesson}</span>
                   </a>
                 </li>
@@ -236,6 +236,22 @@ function mdToHtml(md: string): string {
       } catch (e) { console.error('Error saving progress:', e); }
     }
 
+    // Update sidebar badges
+    async function updateSidebarBadges() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return;
+      const { data: progress } = await supabase.from('lesson_progress').select('lesson_number, status').eq('user_id', session.user.id).eq('module_number', moduleNum);
+      if (progress) {
+        progress.forEach(p => {
+          if (p.status === 'completed') {
+            const badge = document.getElementById(`lesson-badge-${p.lesson_number}`);
+            if (badge) { badge.textContent = '✓'; badge.className = 'w-6 h-6 rounded flex items-center justify-center text-xs bg-success/20 text-success font-bold'; }
+          }
+        });
+      }
+    }
+    updateSidebarBadges();
+
     // Check if already completed
     async function checkCompletion() {
       const { data: { session } } = await supabase.auth.getSession();
@@ -261,6 +277,8 @@ function mdToHtml(md: string): string {
         const btnText = document.getElementById('complete-btn-text');
         if (btn) { btn.classList.remove('from-success', 'to-emerald-500', 'shadow-success/25'); btn.classList.add('bg-success/20', 'text-success', 'cursor-default'); }
         if (btnText) btnText.textContent = '✓ Ολοκληρώθηκε';
+        const badge = document.getElementById(`lesson-badge-${lessonNum}`);
+        if (badge) { badge.textContent = '✓'; badge.className = 'w-6 h-6 rounded flex items-center justify-center text-xs bg-success/20 text-success font-bold'; }
       }
     });
 
