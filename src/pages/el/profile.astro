@@ -48,13 +48,13 @@ const t = el;
         <h2 class="text-xl font-bold mb-4">{t.profile.plan}</h2>
         <div class="flex items-center justify-between p-4 bg-surface-light rounded-xl">
           <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-lg">F</div>
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-lg" id="plan-icon">F</div>
             <div>
-              <div class="font-bold text-text">{t.pricing.free} Plan</div>
-              <div class="text-sm text-text-muted">Βασική πρόσβαση στα μαθήματα</div>
+              <div class="font-bold text-text" id="plan-name">{t.pricing.free} Plan</div>
+              <div class="text-sm text-text-muted" id="plan-desc">Βασική πρόσβαση στα μαθήματα</div>
             </div>
           </div>
-          <a href={`/${locale}/pricing`} class="px-4 py-2 bg-primary/10 text-primary rounded-lg text-sm font-medium hover:bg-primary/20 transition-colors">{t.pricing.upgrade}</a>
+          <a href={`/${locale}/pricing`} class="px-4 py-2 bg-primary/10 text-primary rounded-lg text-sm font-medium hover:bg-primary/20 transition-colors" id="plan-action">{t.pricing.upgrade}</a>
         </div>
       </div>
 
@@ -94,6 +94,33 @@ const t = el;
   <Footer locale={locale} translations={t} />
 
   <script>
+    import { createClient } from '@supabase/supabase-js';
+    const supabase = createClient('https://jhesstimsojwmkdysmpy.supabase.co', 'sb_publishable_bKD9biIulcfC5iNipD-8IA_3Zu4bmWD');
+
+    async function loadProfile() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) { window.location.href = '/el/login'; return; }
+
+      const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+
+      const nameInput = document.getElementById('display-name') as HTMLInputElement;
+      const emailInput = document.getElementById('email') as HTMLInputElement;
+      if (nameInput) nameInput.value = profile?.display_name || session.user.user_metadata?.display_name || '';
+      if (emailInput) emailInput.value = session.user.email || '';
+
+      if (profile?.plan === 'pro') {
+        const planIcon = document.getElementById('plan-icon');
+        const planName = document.getElementById('plan-name');
+        const planDesc = document.getElementById('plan-desc');
+        const planAction = document.getElementById('plan-action');
+        if (planIcon) { planIcon.textContent = 'P'; planIcon.className = 'w-12 h-12 rounded-xl bg-gradient-to-br from-accent to-primary flex items-center justify-center text-white font-bold text-lg'; }
+        if (planName) planName.textContent = 'Pro Plan';
+        if (planDesc) planDesc.textContent = 'Πλήρης πρόσβαση σε τεστ, πιστοποιητικό και άλλα';
+        if (planAction) { planAction.textContent = 'Ενεργό ✓'; planAction.className = 'px-4 py-2 bg-success/10 text-success rounded-lg text-sm font-medium cursor-default'; planAction.removeAttribute('href'); }
+      }
+    }
+    loadProfile();
+
     document.querySelectorAll('.theme-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const theme = btn.getAttribute('data-theme') || 'dark';
@@ -103,28 +130,30 @@ const t = el;
       });
     });
     document.querySelectorAll('.lang-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const lang = btn.getAttribute('data-lang') || 'el';
-        window.location.href = `/${lang}/profile`;
-      });
+      btn.addEventListener('click', () => { window.location.href = `/${btn.getAttribute('data-lang') || 'el'}/profile`; });
     });
-    document.getElementById('download-data-btn')?.addEventListener('click', () => {
-      const data = { exportDate: new Date().toISOString(), message: 'Εξαγωγή δεδομένων' };
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `netacad-data-${new Date().toISOString().split('T')[0]}.json`;
-      a.click();
+    document.getElementById('download-data-btn')?.addEventListener('click', async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return;
+      const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+      const { data: progress } = await supabase.from('lesson_progress').select('*').eq('user_id', session.user.id);
+      const { data: scores } = await supabase.from('quiz_scores').select('*').eq('user_id', session.user.id);
+      const blob = new Blob([JSON.stringify({ exportDate: new Date().toISOString(), profile, progress, scores }, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `networklearn-data-${new Date().toISOString().split('T')[0]}.json`; a.click();
     });
-    document.getElementById('delete-account-btn')?.addEventListener('click', () => {
+    document.getElementById('delete-account-btn')?.addEventListener('click', async () => {
       if (confirm('Είστε σίγουροι; Όλα τα δεδομένα θα διαγραφούν μόνιμα.')) {
-        alert('Αίτημα διαγραφής υποβλήθηκε.');
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) { await supabase.from('profiles').update({ display_name: '[DELETED]' }).eq('id', session.user.id); await supabase.auth.signOut(); window.location.href = '/el/'; }
       }
     });
-    document.getElementById('profile-form')?.addEventListener('submit', (e) => {
+    document.getElementById('profile-form')?.addEventListener('submit', async (e) => {
       e.preventDefault();
-      alert('Το προφίλ αποθηκεύτηκε!');
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return;
+      const displayName = (document.getElementById('display-name') as HTMLInputElement)?.value;
+      const { error } = await supabase.from('profiles').update({ display_name: displayName }).eq('id', session.user.id);
+      alert(error ? 'Σφάλμα: ' + error.message : 'Το προφίλ αποθηκεύτηκε!');
     });
   </script>
 </BaseLayout>

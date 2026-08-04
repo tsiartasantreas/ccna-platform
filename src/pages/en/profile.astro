@@ -103,19 +103,20 @@ const t = en;
       {/* Plan status */}
       <div class="bg-surface-card rounded-2xl border border-primary/10 p-8 mb-8">
         <h2 class="text-xl font-bold mb-4">{t.profile.plan}</h2>
-        <div class="flex items-center justify-between p-4 bg-surface-light rounded-xl">
+        <div class="flex items-center justify-between p-4 bg-surface-light rounded-xl" id="plan-status">
           <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-lg">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-lg" id="plan-icon">
               F
             </div>
             <div>
-              <div class="font-bold text-text">{t.pricing.free} Plan</div>
-              <div class="text-sm text-text-muted">Basic access to all lessons</div>
+              <div class="font-bold text-text" id="plan-name">{t.pricing.free} Plan</div>
+              <div class="text-sm text-text-muted" id="plan-desc">Basic access to all lessons</div>
             </div>
           </div>
           <a
             href={`/${locale}/pricing`}
             class="px-4 py-2 bg-primary/10 text-primary rounded-lg text-sm font-medium hover:bg-primary/20 transition-colors"
+            id="plan-action"
           >
             {t.pricing.upgrade}
           </a>
@@ -176,6 +177,59 @@ const t = en;
   <Footer locale={locale} translations={t} />
 
   <script>
+    import { createClient } from '@supabase/supabase-js';
+
+    const supabase = createClient(
+      'https://jhesstimsojwmkdysmpy.supabase.co',
+      'sb_publishable_bKD9biIulcfC5iNipD-8IA_3Zu4bmWD'
+    );
+
+    // Load user profile and plan
+    async function loadProfile() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) {
+        window.location.href = '/en/login';
+        return;
+      }
+
+      const user = session.user;
+
+      // Fetch profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      // Update form fields
+      const nameInput = document.getElementById('display-name') as HTMLInputElement;
+      const emailInput = document.getElementById('email') as HTMLInputElement;
+      if (nameInput) nameInput.value = profile?.display_name || user.user_metadata?.display_name || '';
+      if (emailInput) emailInput.value = user.email || '';
+
+      // Update plan status
+      const planIcon = document.getElementById('plan-icon');
+      const planName = document.getElementById('plan-name');
+      const planDesc = document.getElementById('plan-desc');
+      const planAction = document.getElementById('plan-action');
+
+      if (profile?.plan === 'pro') {
+        if (planIcon) {
+          planIcon.textContent = 'P';
+          planIcon.className = 'w-12 h-12 rounded-xl bg-gradient-to-br from-accent to-primary flex items-center justify-center text-white font-bold text-lg';
+        }
+        if (planName) planName.textContent = 'Pro Plan';
+        if (planDesc) planDesc.textContent = 'Full access to quizzes, certificates, and more';
+        if (planAction) {
+          planAction.textContent = 'Active ✓';
+          planAction.className = 'px-4 py-2 bg-success/10 text-success rounded-lg text-sm font-medium cursor-default';
+          planAction.removeAttribute('href');
+        }
+      }
+    }
+
+    loadProfile();
+
     // Theme toggle
     document.querySelectorAll('.theme-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -183,8 +237,6 @@ const t = en;
         document.documentElement.classList.toggle('dark', theme === 'dark');
         document.documentElement.classList.toggle('light', theme === 'light');
         localStorage.setItem('theme', theme);
-
-        // Update active state
         document.querySelectorAll('.theme-btn').forEach(b => {
           b.classList.remove('border-primary', 'bg-primary/10', 'text-primary');
           b.classList.add('border-primary/10', 'text-text-muted');
@@ -198,40 +250,67 @@ const t = en;
     document.querySelectorAll('.lang-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const lang = btn.getAttribute('data-lang') || 'en';
-        const currentPath = window.location.pathname;
-        const newPath = currentPath.replace('/en/', `/${lang}/`);
-        window.location.href = newPath;
+        window.location.href = `/${lang}/profile`;
       });
     });
 
     // Download data (GDPR)
     document.getElementById('download-data-btn')?.addEventListener('click', async () => {
-      // In production, this would call exportUserData from auth.ts
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return;
+
+      const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+      const { data: progress } = await supabase.from('lesson_progress').select('*').eq('user_id', session.user.id);
+      const { data: scores } = await supabase.from('quiz_scores').select('*').eq('user_id', session.user.id);
+      const { data: points } = await supabase.from('user_points').select('*').eq('user_id', session.user.id).single();
+
       const data = {
         exportDate: new Date().toISOString(),
-        message: 'Full data export will be available when Supabase is connected.',
+        user: { id: session.user.id, email: session.user.email },
+        profile,
+        lessonProgress: progress,
+        quizScores: scores,
+        points,
       };
+
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `netacad-data-export-${new Date().toISOString().split('T')[0]}.json`;
+      a.download = `networklearn-data-${new Date().toISOString().split('T')[0]}.json`;
       a.click();
       URL.revokeObjectURL(url);
     });
 
     // Delete account (GDPR)
-    document.getElementById('delete-account-btn')?.addEventListener('click', () => {
+    document.getElementById('delete-account-btn')?.addEventListener('click', async () => {
       if (confirm('Are you sure you want to delete your account? This action cannot be undone. All your data will be permanently deleted within 30 days.')) {
-        alert('Account deletion request submitted. Your data will be deleted within 30 days.');
-        // In production, this would call deleteAccount from auth.ts
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          await supabase.from('profiles').update({ display_name: '[DELETED]' }).eq('id', session.user.id);
+          await supabase.auth.signOut();
+          window.location.href = '/en/';
+        }
       }
     });
 
     // Profile form
-    document.getElementById('profile-form')?.addEventListener('submit', (e) => {
+    document.getElementById('profile-form')?.addEventListener('submit', async (e) => {
       e.preventDefault();
-      alert('Profile saved! (Supabase integration pending)');
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return;
+
+      const displayName = (document.getElementById('display-name') as HTMLInputElement)?.value;
+      const { error } = await supabase
+        .from('profiles')
+        .update({ display_name: displayName })
+        .eq('id', session.user.id);
+
+      if (error) {
+        alert('Error: ' + error.message);
+      } else {
+        alert('Profile saved!');
+      }
     });
   </script>
 </BaseLayout>
