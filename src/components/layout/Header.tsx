@@ -40,7 +40,7 @@ export default function Header({ locale, translations }: HeaderProps) {
     // Load site settings
     const settings = JSON.parse(localStorage.getItem('adminSettings') || '{}');
     if (settings.siteName) setSiteName(settings.siteName);
-    if (settings.logoUrl) setLogoUrl(settings.logoUrl);
+    setLogoUrl(settings.logoUrl || '/images/logo.png');
 
     // Check Supabase session
     const checkAuth = async () => {
