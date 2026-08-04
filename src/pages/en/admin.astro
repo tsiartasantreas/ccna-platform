@@ -545,7 +545,7 @@ const t = en;
               const lessons = btn.getAttribute('data-lessons') || '0';
               const score = btn.getAttribute('data-score') || '0';
 
-              if (!confirm(`Generate and download certificate for ${userName}?\nLessons: ${lessons}/35 | Avg Score: ${score}%`)) return;
+              if (!confirm(`Generate certificate for ${userName}?`)) return;
 
               // Import jsPDF dynamically
               const { jsPDF } = await import('jspdf');
@@ -558,7 +558,7 @@ const t = en;
               doc.setFillColor(255, 255, 255);
               doc.rect(0, 0, w, h, 'F');
 
-              // Subtle top gradient bar
+              // Top gradient bar
               doc.setFillColor(0, 212, 255);
               doc.rect(0, 0, w, 4, 'F');
               doc.setFillColor(124, 58, 237);
@@ -570,23 +570,26 @@ const t = en;
               doc.setFillColor(124, 58, 237);
               doc.rect(0, h - 8, w, 4, 'F');
 
-              // Logo image (top left)
+              // Logo from GitHub raw URL
               try {
-                const logoImg = await fetch('/images/logo.png');
-                const logoBlob = await logoImg.blob();
-                const logoReader = new FileReader();
-                logoReader.onload = function() {
-                  const logoData = logoReader.result;
-                  doc.addImage(logoData, 'PNG', 30, 20, 15, 15);
-                };
-                logoReader.readAsDataURL(logoBlob);
+                const logoUrl = 'https://raw.githubusercontent.com/tsiartasantreas/ccna-platform/main/public/images/logo.png';
+                const response = await fetch(logoUrl);
+                const blob = await response.blob();
+                const reader = new FileReader();
+                await new Promise((resolve) => {
+                  reader.onload = function() {
+                    doc.addImage(reader.result, 'PNG', 30, 18, 18, 18);
+                    resolve();
+                  };
+                  reader.readAsDataURL(blob);
+                });
               } catch(e) {
-                // Fallback: draw NL text
+                // Fallback: styled NL badge
                 doc.setFillColor(0, 212, 255);
-                doc.roundedRect(30, 20, 15, 15, 3, 3, 'F');
+                doc.roundedRect(30, 18, 18, 18, 3, 3, 'F');
                 doc.setTextColor(255, 255, 255);
-                doc.setFontSize(12);
-                doc.text('NL', 37.5, 30, { align: 'center' });
+                doc.setFontSize(14);
+                doc.text('NL', 39, 30, { align: 'center' });
               }
 
               // Platform name next to logo

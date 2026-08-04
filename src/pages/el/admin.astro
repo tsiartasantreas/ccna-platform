@@ -294,19 +294,25 @@ const t = el;
               doc.setFillColor(124, 58, 237);
               doc.rect(0, h - 8, w, 4, 'F');
 
-              // Logo
+              // Logo from GitHub
               try {
-                const logoImg = await fetch('/images/logo.png');
-                const logoBlob = await logoImg.blob();
-                const logoReader = new FileReader();
-                logoReader.onload = function() { doc.addImage(logoReader.result, 'PNG', 30, 20, 15, 15); };
-                logoReader.readAsDataURL(logoBlob);
+                const logoUrl = 'https://raw.githubusercontent.com/tsiartasantreas/ccna-platform/main/public/images/logo.png';
+                const response = await fetch(logoUrl);
+                const blob = await response.blob();
+                const reader = new FileReader();
+                await new Promise((resolve) => {
+                  reader.onload = function() {
+                    doc.addImage(reader.result, 'PNG', 30, 18, 18, 18);
+                    resolve();
+                  };
+                  reader.readAsDataURL(blob);
+                });
               } catch(e) {
                 doc.setFillColor(0, 212, 255);
-                doc.roundedRect(30, 20, 15, 15, 3, 3, 'F');
+                doc.roundedRect(30, 18, 18, 18, 3, 3, 'F');
                 doc.setTextColor(255, 255, 255);
-                doc.setFontSize(12);
-                doc.text('NL', 37.5, 30, { align: 'center' });
+                doc.setFontSize(14);
+                doc.text('NL', 39, 30, { align: 'center' });
               }
 
               doc.setTextColor(30, 41, 59);
