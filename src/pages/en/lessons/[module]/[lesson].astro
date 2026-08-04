@@ -276,4 +276,69 @@ function mdToHtml(md: string): string {
   </main>
 
   <Footer locale={locale} translations={t} />
+
+  <script>
+    import { createClient } from '@supabase/supabase-js';
+
+    const supabase = createClient(
+      'https://jhesstimsojwmkdysmpy.supabase.co',
+      'sb_publishable_bKD9biIulcfC5iNipD-8IA_3Zu4bmWD'
+    );
+
+    const moduleNum = parseInt(window.location.pathname.split('/')[3] || '1');
+    const lessonNum = parseInt(window.location.pathname.split('/')[4] || '1');
+
+    // Track time spent
+    let startTime = Date.now();
+    let saved = false;
+
+    // Save lesson progress
+    async function saveLessonProgress(status: 'in_progress' | 'completed') {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) return;
+
+        const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+
+        await supabase.from('lesson_progress').upsert({
+          user_id: session.user.id,
+          module_number: moduleNum,
+          lesson_number: lessonNum,
+          status: status,
+          time_spent_seconds: timeSpent,
+          completed_at: status === 'completed' ? new Date().toISOString() : null,
+        }, { onConflict: 'user_id,module_number,lesson_number' });
+
+        saved = true;
+      } catch (error) {
+        console.error('Error saving lesson progress:', error);
+      }
+    }
+
+    // Mark as in_progress when page loads
+    saveLessonProgress('in_progress');
+
+    // Mark as completed when user scrolls to bottom or after 5 minutes
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !saved) {
+          saveLessonProgress('completed');
+        }
+      });
+    });
+
+    // Observe the navigation section at the bottom
+    const navSection = document.querySelector('.mt-12.flex.items-center.justify-between');
+    if (navSection) observer.observe(navSection);
+
+    // Also save as completed after 5 minutes of reading
+    setTimeout(() => {
+      if (!saved) saveLessonProgress('completed');
+    }, 5 * 60 * 1000);
+
+    // Save on page unload
+    window.addEventListener('beforeunload', () => {
+      if (!saved) saveLessonProgress('in_progress');
+    });
+  </script>
 </BaseLayout>

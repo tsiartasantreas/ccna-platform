@@ -205,4 +205,37 @@ function mdToHtml(md: string): string {
   </main>
 
   <Footer locale={locale} translations={t} />
+
+  <script>
+    import { createClient } from '@supabase/supabase-js';
+    const supabase = createClient('https://jhesstimsojwmkdysmpy.supabase.co', 'sb_publishable_bKD9biIulcfC5iNipD-8IA_3Zu4bmWD');
+    const moduleNum = parseInt(window.location.pathname.split('/')[3] || '1');
+    const lessonNum = parseInt(window.location.pathname.split('/')[4] || '1');
+    let startTime = Date.now();
+    let saved = false;
+
+    async function saveLessonProgress(status) {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) return;
+        const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+        await supabase.from('lesson_progress').upsert({
+          user_id: session.user.id, module_number: moduleNum, lesson_number: lessonNum,
+          status, time_spent_seconds: timeSpent,
+          completed_at: status === 'completed' ? new Date().toISOString() : null,
+        }, { onConflict: 'user_id,module_number,lesson_number' });
+        saved = true;
+      } catch (e) { console.error('Error saving progress:', e); }
+    }
+
+    saveLessonProgress('in_progress');
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => { if (entry.isIntersecting && !saved) saveLessonProgress('completed'); });
+    });
+    const nav = document.querySelector('.mt-12.flex.items-center.justify-between');
+    if (nav) observer.observe(nav);
+    setTimeout(() => { if (!saved) saveLessonProgress('completed'); }, 5 * 60 * 1000);
+    window.addEventListener('beforeunload', () => { if (!saved) saveLessonProgress('in_progress'); });
+  </script>
 </BaseLayout>
