@@ -255,11 +255,28 @@ function mdToHtml(md: string): string {
     // Mark Complete button
     document.getElementById('mark-complete-btn')?.addEventListener('click', async () => {
       if (saved) return;
-      await saveLessonProgress('completed');
-      const btn = document.getElementById('mark-complete-btn');
-      const btnText = document.getElementById('complete-btn-text');
-      if (btn) { btn.classList.remove('from-success', 'to-emerald-500', 'shadow-success/25'); btn.classList.add('bg-success/20', 'text-success', 'cursor-default'); }
-      if (btnText) btnText.textContent = '✓ Ολοκληρώθηκε';
+      if (confirm('Σημειώσει αυτό το μάθημα ως ολοκληρωμένο;')) {
+        await saveLessonProgress('completed');
+        const btn = document.getElementById('mark-complete-btn');
+        const btnText = document.getElementById('complete-btn-text');
+        if (btn) { btn.classList.remove('from-success', 'to-emerald-500', 'shadow-success/25'); btn.classList.add('bg-success/20', 'text-success', 'cursor-default'); }
+        if (btnText) btnText.textContent = '✓ Ολοκληρώθηκε';
+      }
+    });
+
+    // Next Lesson - ask if completed
+    document.querySelectorAll('a').forEach(link => {
+      const href = link.getAttribute('href');
+      if (href && href.includes('/lessons/') && link.textContent?.includes('Επόμενο')) {
+        link.addEventListener('click', async (e) => {
+          if (!saved) {
+            e.preventDefault();
+            const completed = confirm('Ολοκληρώσατε αυτό το μάθημα;\n\nΠατήστε OK για σημείωση ως ολοκληρωμένο, ή Ακύρωση για συνέχεια.');
+            if (completed) await saveLessonProgress('completed');
+            window.location.href = href;
+          }
+        });
+      }
     });
 
     window.addEventListener('beforeunload', () => { if (!saved) saveLessonProgress('in_progress'); });
