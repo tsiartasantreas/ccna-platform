@@ -32,6 +32,9 @@ export default function Header({ locale, translations }: HeaderProps) {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [siteName, setSiteName] = useState('NetworkLearn');
   const [logoUrl, setLogoUrl] = useState('');
+  const [isHidden, setIsHidden] = useState(false);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
 
   useEffect(() => {
     const theme = localStorage.getItem('theme') || 'dark';
@@ -90,11 +93,21 @@ export default function Header({ locale, translations }: HeaderProps) {
     return () => subscription.unsubscribe();
 
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      const currentScrollY = window.scrollY;
+      setIsScrolled(currentScrollY > 20);
+      // Hide header when scrolling down, show when scrolling up
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        setIsHidden(true);
+      } else {
+        setIsHidden(false);
+      }
+      setLastScrollY(currentScrollY);
+      // Show back to top button when scrolled down
+      setShowBackToTop(currentScrollY > 500);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [lastScrollY]);
 
   const toggleTheme = () => {
     const newTheme = isDark ? 'light' : 'dark';
@@ -119,9 +132,16 @@ export default function Header({ locale, translations }: HeaderProps) {
     ...(isAdmin ? [{ href: `/${locale}/admin`, label: '🔧 Admin' }] : []),
   ];
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
+    <>
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isHidden ? '-translate-y-full' : 'translate-y-0'
+      } ${
         isScrolled
           ? 'bg-surface/90 backdrop-blur-xl shadow-lg shadow-primary/5'
           : 'bg-transparent'
@@ -321,5 +341,19 @@ export default function Header({ locale, translations }: HeaderProps) {
         </div>
       )}
     </header>
+
+    {/* Back to Top Button */}
+    {showBackToTop && (
+      <button
+        onClick={scrollToTop}
+        className="fixed bottom-8 right-8 z-50 w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent text-white shadow-lg shadow-primary/25 hover:scale-110 transition-all duration-300 flex items-center justify-center"
+        title="Back to top"
+      >
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+        </svg>
+      </button>
+    )}
+    </>
   );
 }

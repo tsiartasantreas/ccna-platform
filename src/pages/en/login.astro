@@ -265,6 +265,7 @@ const t = en;
               // Create profile in database
               await supabase.from('profiles').upsert({
                 id: data.user.id,
+                email: email,
                 display_name: displayName || email?.split('@')[0],
                 preferred_language: 'en',
                 theme: 'dark',

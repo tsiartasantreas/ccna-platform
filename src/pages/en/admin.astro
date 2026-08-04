@@ -489,7 +489,7 @@ const t = en;
 
             return `<tr class="border-b border-primary/5 hover:bg-surface-light" data-user-id="${p.id}">
               <td class="px-4 py-3 text-sm text-text font-medium">${p.display_name || 'User'}</td>
-              <td class="px-4 py-3 text-sm text-text-muted">${p.id.substring(0, 8)}...</td>
+              <td class="px-4 py-3 text-sm text-text-muted font-mono text-xs">${p.email || p.id.substring(0, 8) + '...'}</td>
               <td class="px-4 py-3">
                 <select class="plan-select px-2 py-1 bg-surface border border-primary/10 rounded text-xs text-text" data-user-id="${p.id}">
                   <option value="free" ${p.plan === 'free' ? 'selected' : ''}>Free</option>
