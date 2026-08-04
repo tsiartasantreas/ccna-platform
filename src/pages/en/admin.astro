@@ -552,23 +552,30 @@ const t = en;
               const w = doc.internal.pageSize.getWidth();
               const h = doc.internal.pageSize.getHeight();
 
-              // Clean white background
-              doc.setFillColor(255, 255, 255);
-              doc.rect(0, 0, w, h, 'F');
+              // Load and add certificate template background
+              try {
+                const templateUrl = 'https://raw.githubusercontent.com/tsiartasantreas/ccna-platform/main/public/images/certificate-bg.png';
+                const response = await fetch(templateUrl);
+                const blob = await response.blob();
+                const reader = new FileReader();
+                await new Promise((resolve) => {
+                  reader.onload = function() {
+                    doc.addImage(reader.result, 'PNG', 0, 0, w, h);
+                    resolve();
+                  };
+                  reader.readAsDataURL(blob);
+                });
+              } catch(e) {
+                // Fallback: white background with gradient bars
+                doc.setFillColor(255, 255, 255);
+                doc.rect(0, 0, w, h, 'F');
+                doc.setFillColor(0, 212, 255);
+                doc.rect(0, 0, w, 3, 'F');
+                doc.setFillColor(124, 58, 237);
+                doc.rect(0, h - 3, w, 3, 'F');
+              }
 
-              // Top gradient bar
-              doc.setFillColor(0, 212, 255);
-              doc.rect(0, 0, w, 4, 'F');
-              doc.setFillColor(124, 58, 237);
-              doc.rect(0, 4, w, 4, 'F');
-
-              // Bottom gradient bar
-              doc.setFillColor(0, 212, 255);
-              doc.rect(0, h - 4, w, 4, 'F');
-              doc.setFillColor(124, 58, 237);
-              doc.rect(0, h - 8, w, 4, 'F');
-
-              // Logo from GitHub raw URL
+              // Logo (top left)
               try {
                 const logoUrl = 'https://raw.githubusercontent.com/tsiartasantreas/ccna-platform/main/public/images/logo.png';
                 const response = await fetch(logoUrl);
@@ -576,87 +583,82 @@ const t = en;
                 const reader = new FileReader();
                 await new Promise((resolve) => {
                   reader.onload = function() {
-                    doc.addImage(reader.result, 'PNG', 30, 18, 18, 18);
+                    doc.addImage(reader.result, 'PNG', 25, 15, 15, 15);
                     resolve();
                   };
                   reader.readAsDataURL(blob);
                 });
               } catch(e) {
-                // Fallback: styled NL badge
                 doc.setFillColor(0, 212, 255);
-                doc.roundedRect(30, 18, 18, 18, 3, 3, 'F');
+                doc.roundedRect(25, 15, 15, 15, 3, 3, 'F');
                 doc.setTextColor(255, 255, 255);
-                doc.setFontSize(14);
-                doc.text('NL', 39, 30, { align: 'center' });
+                doc.setFontSize(12);
+                doc.text('NL', 32.5, 25, { align: 'center' });
               }
 
-              // Platform name next to logo
+              // Platform name
               doc.setTextColor(30, 41, 59);
-              doc.setFontSize(14);
-              doc.text('NetworkLearn', 50, 28, { align: 'left' });
+              doc.setFontSize(12);
+              doc.text('NetworkLearn', 44, 23, { align: 'left' });
               doc.setTextColor(148, 163, 184);
-              doc.setFontSize(8);
-              doc.text('CCNA Training Platform', 50, 33, { align: 'left' });
+              doc.setFontSize(7);
+              doc.text('CCNA Training Platform', 44, 28, { align: 'left' });
 
               // Certificate ID (top right)
               doc.setTextColor(148, 163, 184);
-              doc.setFontSize(8);
+              doc.setFontSize(7);
               const certId = 'NL-' + Date.now().toString(36).toUpperCase();
-              doc.text(`Certificate ID: ${certId}`, w - 30, 28, { align: 'right' });
+              doc.text(`ID: ${certId}`, w - 25, 23, { align: 'right' });
 
               // Main title
               doc.setTextColor(30, 41, 59);
-              doc.setFontSize(36);
-              doc.text('Certificate', w / 2, 65, { align: 'center' });
-              doc.setFontSize(16);
+              doc.setFontSize(32);
+              doc.text('Certificate', w / 2, 58, { align: 'center' });
+              doc.setFontSize(14);
               doc.setTextColor(100, 116, 139);
-              doc.text('OF COMPLETION', w / 2, 76, { align: 'center' });
+              doc.text('OF COMPLETION', w / 2, 68, { align: 'center' });
 
-              // Thin decorative line
+              // Decorative line
               doc.setDrawColor(0, 212, 255);
               doc.setLineWidth(0.5);
-              doc.line(w / 2 - 50, 82, w / 2 + 50, 82);
+              doc.line(w / 2 - 40, 73, w / 2 + 40, 73);
 
               // Presented to
               doc.setTextColor(148, 163, 184);
-              doc.setFontSize(11);
-              doc.text('This certificate is proudly awarded to', w / 2, 100, { align: 'center' });
+              doc.setFontSize(10);
+              doc.text('This certificate is proudly awarded to', w / 2, 90, { align: 'center' });
 
-              // Name (large, prominent)
+              // Recipient name
               doc.setTextColor(30, 41, 59);
-              doc.setFontSize(40);
-              doc.text(userName, w / 2, 120, { align: 'center' });
+              doc.setFontSize(36);
+              doc.text(userName, w / 2, 108, { align: 'center' });
 
-              // Subtle name underline
+              // Name underline
               const nameWidth = doc.getTextWidth(userName);
               doc.setDrawColor(0, 212, 255);
               doc.setLineWidth(0.3);
-              doc.line(w / 2 - nameWidth / 2 - 10, 124, w / 2 + nameWidth / 2 + 10, 124);
+              doc.line(w / 2 - nameWidth / 2 - 10, 112, w / 2 + nameWidth / 2 + 10, 112);
 
-              // Description
+              // Completion text
               doc.setTextColor(100, 116, 139);
-              doc.setFontSize(12);
-              doc.text('for the successful completion of the', w / 2, 140, { align: 'center' });
+              doc.setFontSize(11);
+              doc.text('for the successful completion of the', w / 2, 128, { align: 'center' });
 
-              // Program name (bold)
+              // Program name
               doc.setTextColor(30, 41, 59);
-              doc.setFontSize(20);
-              doc.text('CCNA Training Program', w / 2, 152, { align: 'center' });
+              doc.setFontSize(18);
+              doc.text('CCNA Training Program', w / 2, 140, { align: 'center' });
 
               // Date
               const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
               doc.setTextColor(148, 163, 184);
-              doc.setFontSize(10);
-              doc.text(`Issued on ${date}`, w / 2, 170, { align: 'center' });
-
-              // Bottom section - website
-              doc.setDrawColor(226, 232, 240);
-              doc.setLineWidth(0.3);
-              doc.line(60, h - 25, w - 60, h - 25);
-
-              doc.setTextColor(148, 163, 184);
               doc.setFontSize(9);
-              doc.text('networklearn.wasmer.app', w / 2, h - 18, { align: 'center' });
+              doc.text(`Issued on ${date}`, w / 2, 158, { align: 'center' });
+
+              // Website footer
+              doc.setTextColor(148, 163, 184);
+              doc.setFontSize(8);
+              doc.text('networklearn.wasmer.app', w / 2, h - 15, { align: 'center' });
 
               doc.save(`NetworkLearn-Certificate-${userName.replace(/\s+/g, '-').toLowerCase()}.pdf`);
               alert(`Certificate downloaded for ${userName}!`);
