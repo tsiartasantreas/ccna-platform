@@ -185,66 +185,36 @@ const t = en;
 
       {/* Subscriptions Tab */}
       <div id="tab-subscriptions" class="tab-content hidden">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
           <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
             <div class="text-sm text-text-muted mb-1">Active Subscriptions</div>
-            <div class="text-3xl font-bold text-success">3</div>
+            <div class="text-3xl font-bold text-success" id="active-subs-count">0</div>
           </div>
           <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
             <div class="text-sm text-text-muted mb-1">Monthly Revenue</div>
-            <div class="text-3xl font-bold text-primary">€99.97</div>
-          </div>
-          <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
-            <div class="text-sm text-text-muted mb-1">Annual Revenue</div>
-            <div class="text-3xl font-bold text-accent">€79.99</div>
+            <div class="text-3xl font-bold text-primary" id="monthly-revenue">€0.00</div>
           </div>
         </div>
 
         <div class="bg-surface-card rounded-xl border border-primary/10 overflow-hidden">
           <div class="p-4 border-b border-primary/10">
-            <h3 class="text-lg font-bold text-text">Active Subscriptions</h3>
+            <h3 class="text-lg font-bold text-text">Pro Subscriptions</h3>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full">
               <thead>
                 <tr class="border-b border-primary/10">
                   <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">User</th>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">ID</th>
                   <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Plan</th>
                   <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Status</th>
                   <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Amount</th>
-                  <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Payment</th>
-                  <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Expires</th>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Since</th>
                   <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Actions</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr class="border-b border-primary/5 hover:bg-surface-light">
-                  <td class="px-4 py-3 text-sm text-text">tsiartasantreas@gmail.com</td>
-                  <td class="px-4 py-3 text-sm text-text">Yearly</td>
-                  <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full bg-success/10 text-success text-xs font-medium">Active</span></td>
-                  <td class="px-4 py-3 text-sm text-text">€79.99</td>
-                  <td class="px-4 py-3 text-sm text-text-muted">Revolut</td>
-                  <td class="px-4 py-3 text-sm text-text-muted">Aug 2027</td>
-                  <td class="px-4 py-3"><button class="text-xs text-error hover:underline">Cancel</button></td>
-                </tr>
-                <tr class="border-b border-primary/5 hover:bg-surface-light">
-                  <td class="px-4 py-3 text-sm text-text">john@example.com</td>
-                  <td class="px-4 py-3 text-sm text-text">Monthly</td>
-                  <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full bg-success/10 text-success text-xs font-medium">Active</span></td>
-                  <td class="px-4 py-3 text-sm text-text">€9.99</td>
-                  <td class="px-4 py-3 text-sm text-text-muted">Stripe</td>
-                  <td class="px-4 py-3 text-sm text-text-muted">Sep 2026</td>
-                  <td class="px-4 py-3"><button class="text-xs text-error hover:underline">Cancel</button></td>
-                </tr>
-                <tr class="border-b border-primary/5 hover:bg-surface-light">
-                  <td class="px-4 py-3 text-sm text-text">sarah@example.com</td>
-                  <td class="px-4 py-3 text-sm text-text">Monthly</td>
-                  <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full bg-success/10 text-success text-xs font-medium">Active</span></td>
-                  <td class="px-4 py-3 text-sm text-text">€9.99</td>
-                  <td class="px-4 py-3 text-sm text-text-muted">Revolut</td>
-                  <td class="px-4 py-3 text-sm text-text-muted">Sep 2026</td>
-                  <td class="px-4 py-3"><button class="text-xs text-error hover:underline">Cancel</button></td>
-                </tr>
+              <tbody id="subscriptions-table-body">
+                <tr><td colspan="7" class="px-4 py-8 text-center text-text-muted">Loading...</td></tr>
               </tbody>
             </table>
           </div>
@@ -436,7 +406,6 @@ const t = en;
     );
     const ADMIN_EMAIL = 'tsiartasantreas@gmail.com';
 
-    // Check authentication
     const { data: { session } } = await supabase.auth.getSession();
     const accessDenied = document.getElementById('access-denied');
     const adminContent = document.getElementById('admin-content');
@@ -448,54 +417,122 @@ const t = en;
       if (accessDenied) accessDenied.classList.add('hidden');
       if (adminContent) adminContent.classList.remove('hidden');
 
-      // Load real data from Supabase
+      // Set admin as pro user if not already
+      await supabase.from('profiles').update({ plan: 'pro' }).eq('id', session.user.id);
+
       async function loadAdminData() {
-        // Fetch all profiles
         const { data: profiles } = await supabase.from('profiles').select('*');
+        const { data: allProgress } = await supabase.from('lesson_progress').select('*');
+        const { data: allScores } = await supabase.from('quiz_scores').select('*');
+
         const totalUsers = profiles?.length || 0;
         const proUsers = profiles?.filter(p => p.plan === 'pro').length || 0;
-        const freeUsers = totalUsers - proUsers;
+        const revenue = proUsers * 9.99;
 
         // Update stats
-        const totalEl = document.getElementById('stat-total-users');
-        const proEl = document.getElementById('stat-pro-users');
-        if (totalEl) totalEl.textContent = String(totalUsers);
-        if (proEl) proEl.textContent = String(proUsers);
+        document.getElementById('stat-total-users')!.textContent = String(totalUsers);
+        document.getElementById('stat-pro-users')!.textContent = String(proUsers);
+        document.getElementById('stat-revenue')!.textContent = `€${revenue.toFixed(2)}`;
 
-        // Fetch all lesson progress
-        const { data: allProgress } = await supabase.from('lesson_progress').select('*');
-        const totalLessons = allProgress?.filter(p => p.status === 'completed').length || 0;
-
-        // Fetch all quiz scores
-        const { data: allScores } = await supabase.from('quiz_scores').select('*');
-        const totalQuizzes = allScores?.length || 0;
-        const avgScore = allScores?.length
-          ? Math.round(allScores.reduce((sum, s) => sum + Number(s.score), 0) / allScores.length)
-          : 0;
-
-        // Update users table
+        // Update users table with full management
         const tableBody = document.getElementById('users-table-body');
         if (tableBody && profiles) {
           tableBody.innerHTML = profiles.map(p => {
             const userProgress = allProgress?.filter(lp => lp.user_id === p.id) || [];
             const userScores = allScores?.filter(qs => qs.user_id === p.id) || [];
             const lessonsCompleted = userProgress.filter(lp => lp.status === 'completed').length;
-            const avgUserScore = userScores.length
-              ? Math.round(userScores.reduce((sum, s) => sum + Number(s.score), 0) / userScores.length)
-              : 0;
+            const avgScore = userScores.length ? Math.round(userScores.reduce((s, q) => s + Number(q.score), 0) / userScores.length) : 0;
 
-            return `<tr class="border-b border-primary/5 hover:bg-surface-light">
+            return `<tr class="border-b border-primary/5 hover:bg-surface-light" data-user-id="${p.id}">
               <td class="px-4 py-3 text-sm text-text font-medium">${p.display_name || 'User'}</td>
               <td class="px-4 py-3 text-sm text-text-muted">${p.id.substring(0, 8)}...</td>
-              <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full ${p.plan === 'pro' ? 'bg-accent/10 text-accent' : 'bg-surface-light text-text-muted'} text-xs font-medium">${p.plan === 'pro' ? 'Pro' : 'Free'}</span></td>
+              <td class="px-4 py-3">
+                <select class="plan-select px-2 py-1 bg-surface border border-primary/10 rounded text-xs text-text" data-user-id="${p.id}">
+                  <option value="free" ${p.plan === 'free' ? 'selected' : ''}>Free</option>
+                  <option value="pro" ${p.plan === 'pro' ? 'selected' : ''}>Pro</option>
+                </select>
+              </td>
               <td class="px-4 py-3 text-sm text-text">${lessonsCompleted}/35</td>
-              <td class="px-4 py-3 text-sm ${avgUserScore >= 80 ? 'text-success' : avgUserScore > 0 ? 'text-warning' : 'text-text-muted'}">${avgUserScore > 0 ? avgUserScore + '%' : '—'}</td>
+              <td class="px-4 py-3 text-sm ${avgScore >= 80 ? 'text-success' : avgScore > 0 ? 'text-warning' : 'text-text-muted'}">${avgScore > 0 ? avgScore + '%' : '—'}</td>
               <td class="px-4 py-3 text-sm text-text-muted">${new Date(p.updated_at).toLocaleDateString()}</td>
-              <td class="px-4 py-3"><button class="text-xs text-primary hover:underline">Reset Password</button></td>
+              <td class="px-4 py-3 flex gap-2">
+                <button class="save-plan-btn text-xs text-success hover:underline" data-user-id="${p.id}">Save</button>
+                <button class="reset-pw-btn text-xs text-primary hover:underline" data-user-id="${p.id}">Reset PW</button>
+              </td>
             </tr>`;
           }).join('');
+
+          // Plan change handlers
+          document.querySelectorAll('.save-plan-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+              const userId = btn.getAttribute('data-user-id');
+              const select = document.querySelector(`.plan-select[data-user-id="${userId}"]`) as HTMLSelectElement;
+              if (userId && select) {
+                const { error } = await supabase.from('profiles').update({ plan: select.value }).eq('id', userId);
+                if (error) {
+                  alert('Error: ' + error.message);
+                } else {
+                  alert('Plan updated to ' + select.value + '!');
+                  loadAdminData();
+                }
+              }
+            });
+          });
+
+          // Password reset handlers
+          document.querySelectorAll('.reset-pw-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+              const userId = btn.getAttribute('data-user-id');
+              const user = profiles?.find(p => p.id === userId);
+              if (user && confirm(`Send password reset to ${user.id}?`)) {
+                alert('Password reset email sent!');
+              }
+            });
+          });
+        }
+
+        // Update subscriptions table
+        const subsBody = document.getElementById('subscriptions-table-body');
+        if (subsBody && profiles) {
+          const proProfiles = profiles.filter(p => p.plan === 'pro');
+          const monthlyUsers = proProfiles.length;
+          const revenue = monthlyUsers * 9.99;
+
+          document.getElementById('active-subs-count')!.textContent = String(monthlyUsers);
+          document.getElementById('monthly-revenue')!.textContent = `€${revenue.toFixed(2)}`;
+
+          subsBody.innerHTML = proProfiles.length > 0 ? proProfiles.map(p => `
+            <tr class="border-b border-primary/5 hover:bg-surface-light">
+              <td class="px-4 py-3 text-sm text-text">${p.display_name || 'User'}</td>
+              <td class="px-4 py-3 text-sm text-text-muted">${p.id.substring(0, 8)}...</td>
+              <td class="px-4 py-3 text-sm text-text">Pro</td>
+              <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full bg-success/10 text-success text-xs font-medium">Active</span></td>
+              <td class="px-4 py-3 text-sm text-text">€9.99</td>
+              <td class="px-4 py-3 text-sm text-text-muted">${new Date(p.updated_at).toLocaleDateString()}</td>
+              <td class="px-4 py-3">
+                <button class="cancel-sub-btn text-xs text-error hover:underline" data-user-id="${p.id}">Cancel</button>
+              </td>
+            </tr>
+          `).join('') : '<tr><td colspan="7" class="px-4 py-8 text-center text-text-muted">No active subscriptions</td></tr>';
+
+          // Cancel subscription handlers
+          document.querySelectorAll('.cancel-sub-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+              const userId = btn.getAttribute('data-user-id');
+              if (userId && confirm('Cancel this subscription? User will be downgraded to Free.')) {
+                const { error } = await supabase.from('profiles').update({ plan: 'free' }).eq('id', userId);
+                if (error) {
+                  alert('Error: ' + error.message);
+                } else {
+                  alert('Subscription cancelled.');
+                  loadAdminData();
+                }
+              }
+            });
+          });
         }
       }
+
       loadAdminData();
     }
 
@@ -503,21 +540,18 @@ const t = en;
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const tab = btn.getAttribute('data-tab');
-        // Update active tab button
         document.querySelectorAll('.tab-btn').forEach(b => {
           b.classList.remove('active', 'bg-primary', 'text-white');
           b.classList.add('text-text-muted');
         });
         btn.classList.add('active', 'bg-primary', 'text-white');
         btn.classList.remove('text-text-muted');
-        // Show/hide tab content
         document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
         const content = document.getElementById(`tab-${tab}`);
         if (content) content.classList.remove('hidden');
       });
     });
 
-    // Initialize first tab as active
     const firstTab = document.querySelector('.tab-btn');
     if (firstTab) {
       firstTab.classList.add('active', 'bg-primary', 'text-white');
@@ -545,27 +579,8 @@ const t = en;
       alert('Supabase settings saved!');
     });
 
-    document.getElementById('save-general')?.addEventListener('click', () => {
-      alert('General settings saved!');
-    });
-
-    document.getElementById('save-email')?.addEventListener('click', () => {
-      alert('Email settings saved!');
-    });
-
-    document.getElementById('save-stripe')?.addEventListener('click', () => {
-      alert('Stripe settings saved!');
-    });
-
-    // Password reset buttons
-    document.querySelectorAll('button').forEach(btn => {
-      if (btn.textContent?.includes('Reset Password')) {
-        btn.addEventListener('click', () => {
-          if (confirm('Send password reset email to this user?')) {
-            alert('Password reset email sent!');
-          }
-        });
-      }
-    });
+    document.getElementById('save-general')?.addEventListener('click', () => alert('General settings saved!'));
+    document.getElementById('save-email')?.addEventListener('click', () => alert('Email settings saved!'));
+    document.getElementById('save-stripe')?.addEventListener('click', () => alert('Stripe settings saved!'));
   </script>
 </BaseLayout>
