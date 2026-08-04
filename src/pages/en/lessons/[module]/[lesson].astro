@@ -252,8 +252,21 @@ function mdToHtml(md: string): string {
           </div>
         )}
 
+        {/* Mark as Complete Button */}
+        <div class="mt-8 flex justify-center">
+          <button
+            id="mark-complete-btn"
+            class="px-8 py-4 bg-gradient-to-r from-success to-emerald-500 text-white rounded-xl font-medium hover:opacity-90 transition-all hover:scale-105 shadow-lg shadow-success/25 flex items-center gap-3"
+          >
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span id="complete-btn-text">{t.lesson.mark_complete}</span>
+          </button>
+        </div>
+
         {/* Navigation */}
-        <div class="mt-12 flex items-center justify-between">
+        <div class="mt-8 flex items-center justify-between">
           {prevLesson ? (
             <a
               href={`/${locale}/lessons/${prevLesson.module}/${prevLesson.lesson}`}
@@ -315,26 +328,47 @@ function mdToHtml(md: string): string {
       }
     }
 
+    // Check if already completed
+    async function checkCompletion() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return;
+
+      const { data } = await supabase
+        .from('lesson_progress')
+        .select('status')
+        .eq('user_id', session.user.id)
+        .eq('module_number', moduleNum)
+        .eq('lesson_number', lessonNum)
+        .single();
+
+      if (data?.status === 'completed') {
+        const btn = document.getElementById('mark-complete-btn');
+        const btnText = document.getElementById('complete-btn-text');
+        if (btn) {
+          btn.classList.remove('from-success', 'to-emerald-500', 'shadow-success/25');
+          btn.classList.add('bg-success/20', 'text-success', 'cursor-default');
+        }
+        if (btnText) btnText.textContent = '✓ Completed';
+        saved = true;
+      }
+    }
+    checkCompletion();
+
     // Mark as in_progress when page loads
     saveLessonProgress('in_progress');
 
-    // Mark as completed when user scrolls to bottom or after 5 minutes
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting && !saved) {
-          saveLessonProgress('completed');
-        }
-      });
+    // Mark Complete button handler
+    document.getElementById('mark-complete-btn')?.addEventListener('click', async () => {
+      if (saved) return;
+      await saveLessonProgress('completed');
+      const btn = document.getElementById('mark-complete-btn');
+      const btnText = document.getElementById('complete-btn-text');
+      if (btn) {
+        btn.classList.remove('from-success', 'to-emerald-500', 'shadow-success/25');
+        btn.classList.add('bg-success/20', 'text-success', 'cursor-default');
+      }
+      if (btnText) btnText.textContent = '✓ Completed';
     });
-
-    // Observe the navigation section at the bottom
-    const navSection = document.querySelector('.mt-12.flex.items-center.justify-between');
-    if (navSection) observer.observe(navSection);
-
-    // Also save as completed after 5 minutes of reading
-    setTimeout(() => {
-      if (!saved) saveLessonProgress('completed');
-    }, 5 * 60 * 1000);
 
     // Save on page unload
     window.addEventListener('beforeunload', () => {
