@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+
 interface FooterProps {
   locale: 'en' | 'el';
   translations: {
@@ -11,6 +13,25 @@ interface FooterProps {
 }
 
 export default function Footer({ locale, translations }: FooterProps) {
+  const [siteName, setSiteName] = useState('NetworkLearn');
+  const [logoUrl, setLogoUrl] = useState('');
+
+  useEffect(() => {
+    const loadSettings = () => {
+      const settings = JSON.parse(localStorage.getItem('adminSettings') || '{}');
+      if (settings.siteName) setSiteName(settings.siteName);
+      const url = settings.logoUrl || '/images/logo.png';
+      setLogoUrl(url.includes('github') || url.includes('http') ? `${url}?v=${Date.now()}` : url);
+    };
+    loadSettings();
+    window.addEventListener('storage', loadSettings);
+    window.addEventListener('focus', loadSettings);
+    return () => {
+      window.removeEventListener('storage', loadSettings);
+      window.removeEventListener('focus', loadSettings);
+    };
+  }, []);
+
   return (
     <footer className="bg-surface-light border-t border-primary/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -18,11 +39,15 @@ export default function Footer({ locale, translations }: FooterProps) {
           {/* Brand */}
           <div className="md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-xl">
-                N
-              </div>
+              {logoUrl ? (
+                <img src={logoUrl} alt={siteName} className="w-10 h-10 rounded-xl object-cover" />
+              ) : (
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-xl">
+                  {siteName.charAt(0).toUpperCase()}
+                </div>
+              )}
               <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                NetworkLearn
+                {siteName}
               </span>
             </div>
             <p className="text-text-muted text-sm max-w-md">
