@@ -245,35 +245,106 @@ const t = el;
               const w = doc.internal.pageSize.getWidth();
               const h = doc.internal.pageSize.getHeight();
 
-              doc.setFillColor(10, 15, 30);
+              // White background
+              doc.setFillColor(255, 255, 255);
               doc.rect(0, 0, w, h, 'F');
+
+              // Top accent bar
+              doc.setFillColor(0, 212, 255);
+              doc.rect(0, 0, w, 8, 'F');
+
+              // Bottom accent bar
+              doc.setFillColor(124, 58, 237);
+              doc.rect(0, h - 8, w, 8, 'F');
+
+              // Left/Right accent lines
+              doc.setFillColor(0, 212, 255);
+              doc.rect(15, 20, 3, h - 40, 'F');
+              doc.setFillColor(124, 58, 237);
+              doc.rect(w - 18, 20, 3, h - 40, 'F');
+
+              // Inner border
+              doc.setDrawColor(226, 232, 240);
+              doc.setLineWidth(0.5);
+              doc.rect(25, 18, w - 50, h - 36);
+
+              // Logo
+              doc.setFillColor(241, 245, 249);
+              doc.circle(w / 2, 45, 15, 'F');
               doc.setDrawColor(0, 212, 255);
-              doc.setLineWidth(2);
-              doc.rect(10, 10, w - 20, h - 20);
+              doc.setLineWidth(1);
+              doc.circle(w / 2, 45, 15, 'S');
+              doc.setTextColor(0, 212, 255);
+              doc.setFontSize(20);
+              doc.text('NL', w / 2, 48, { align: 'center' });
 
-              doc.setTextColor(0, 212, 255);
-              doc.setFontSize(16);
-              doc.text('CERTIFICATE OF COMPLETION', w / 2, 45, { align: 'center' });
-              doc.setTextColor(167, 139, 250);
-              doc.setFontSize(12);
-              doc.text('CCNA Training Program', w / 2, 55, { align: 'center' });
-              doc.setTextColor(226, 232, 240);
-              doc.setFontSize(11);
-              doc.text('This certifies that', w / 2, 75, { align: 'center' });
-              doc.setTextColor(0, 212, 255);
+              // Title
+              doc.setTextColor(30, 41, 59);
               doc.setFontSize(28);
-              doc.text(userName, w / 2, 90, { align: 'center' });
-              doc.setTextColor(226, 232, 240);
-              doc.setFontSize(11);
-              doc.text('has successfully completed the CCNA Training Program', w / 2, 105, { align: 'center' });
-              doc.setFontSize(10);
-              doc.text(`Lessons: ${lessons}/35 | Score: ${score}%`, w / 2, 120, { align: 'center' });
-              doc.text(`Date: ${new Date().toLocaleDateString('el-GR')}`, w / 2, 130, { align: 'center' });
-              doc.setTextColor(148, 163, 184);
-              doc.setFontSize(8);
-              doc.text('NetworkLearn - networklearn.wasmer.app', w / 2, h - 20, { align: 'center' });
+              doc.text('CERTIFICATE', w / 2, 75, { align: 'center' });
+              doc.setFontSize(14);
+              doc.setTextColor(100, 116, 139);
+              doc.text('OF COMPLETION', w / 2, 85, { align: 'center' });
 
-              doc.save(`certificate-${userName.replace(/\s+/g, '-').toLowerCase()}.pdf`);
+              // Decorative line
+              doc.setDrawColor(0, 212, 255);
+              doc.setLineWidth(1);
+              doc.line(w / 2 - 40, 90, w / 2 + 40, 90);
+              doc.setFillColor(0, 212, 255);
+              doc.circle(w / 2, 90, 2, 'F');
+
+              // Presented to
+              doc.setTextColor(100, 116, 139);
+              doc.setFontSize(11);
+              doc.text('Αυτό απονέμεται στον/στην', w / 2, 105, { align: 'center' });
+
+              // Name
+              doc.setTextColor(30, 41, 59);
+              doc.setFontSize(32);
+              doc.text(userName, w / 2, 120, { align: 'center' });
+              const nameWidth = doc.getTextWidth(userName);
+              doc.setDrawColor(0, 212, 255);
+              doc.setLineWidth(0.5);
+              doc.line(w / 2 - nameWidth / 2, 123, w / 2 + nameWidth / 2, 123);
+
+              // Description
+              doc.setTextColor(100, 116, 139);
+              doc.setFontSize(11);
+              doc.text('για την επιτυχή ολοκλήρωση του', w / 2, 135, { align: 'center' });
+              doc.setTextColor(30, 41, 59);
+              doc.setFontSize(16);
+              doc.text('Προγράμματος Εκπαίδευσης CCNA', w / 2, 145, { align: 'center' });
+
+              // Stats
+              doc.setFillColor(241, 245, 249);
+              doc.roundedRect(w / 2 - 60, 152, 120, 20, 3, 3, 'F');
+              doc.setTextColor(100, 116, 139);
+              doc.setFontSize(10);
+              doc.text(`Μαθήματα: ${lessons}/35  |  Βαθμολογία: ${score}%`, w / 2, 164, { align: 'center' });
+
+              // Date
+              doc.setTextColor(100, 116, 139);
+              doc.setFontSize(10);
+              doc.text(`Έκδοση: ${new Date().toLocaleDateString('el-GR')}`, w / 2, 180, { align: 'center' });
+
+              // Footer
+              doc.setDrawColor(226, 232, 240);
+              doc.setLineWidth(0.3);
+              doc.line(40, h - 30, w - 40, h - 30);
+              doc.setTextColor(148, 163, 184);
+              doc.setFontSize(9);
+              doc.text('NetworkLearn', w / 2 - 30, h - 22, { align: 'center' });
+              doc.text('networklearn.wasmer.app', w / 2 + 30, h - 22, { align: 'center' });
+
+              // Corner decorations
+              doc.setFillColor(0, 212, 255);
+              doc.circle(30, 25, 3, 'F');
+              doc.circle(w - 30, 25, 3, 'F');
+              doc.setFillColor(124, 58, 237);
+              doc.circle(30, h - 25, 3, 'F');
+              doc.circle(w - 30, h - 25, 3, 'F');
+
+              doc.save(`networklearn-certificate-${userName.replace(/\s+/g, '-').toLowerCase()}.pdf`);
               alert(`Το πιστοποιητικό λήφθηκε για ${userName}!`);
             });
           });

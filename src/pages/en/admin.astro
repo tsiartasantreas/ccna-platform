@@ -518,62 +518,115 @@ const t = en;
               const { jsPDF } = await import('jspdf');
 
               const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-              const width = doc.internal.pageSize.getWidth();
-              const height = doc.internal.pageSize.getHeight();
+              const w = doc.internal.pageSize.getWidth();
+              const h = doc.internal.pageSize.getHeight();
 
-              // Background
-              doc.setFillColor(10, 15, 30);
-              doc.rect(0, 0, width, height, 'F');
+              // White background
+              doc.setFillColor(255, 255, 255);
+              doc.rect(0, 0, w, h, 'F');
 
-              // Border
-              doc.setDrawColor(0, 212, 255);
-              doc.setLineWidth(2);
-              doc.rect(10, 10, width - 20, height - 20);
+              // Top accent bar
+              doc.setFillColor(0, 212, 255);
+              doc.rect(0, 0, w, 8, 'F');
+
+              // Bottom accent bar
+              doc.setFillColor(124, 58, 237);
+              doc.rect(0, h - 8, w, 8, 'F');
+
+              // Left accent line
+              doc.setFillColor(0, 212, 255);
+              doc.rect(15, 20, 3, h - 40, 'F');
+
+              // Right accent line
+              doc.setFillColor(124, 58, 237);
+              doc.rect(w - 18, 20, 3, h - 40, 'F');
+
+              // Inner border
+              doc.setDrawColor(226, 232, 240);
               doc.setLineWidth(0.5);
-              doc.rect(15, 15, width - 30, height - 30);
+              doc.rect(25, 18, w - 50, h - 36);
+
+              // Logo area (circle placeholder)
+              doc.setFillColor(241, 245, 249);
+              doc.circle(w / 2, 45, 15, 'F');
+              doc.setDrawColor(0, 212, 255);
+              doc.setLineWidth(1);
+              doc.circle(w / 2, 45, 15, 'S');
+              doc.setTextColor(0, 212, 255);
+              doc.setFontSize(20);
+              doc.text('NL', w / 2, 48, { align: 'center' });
 
               // Title
-              doc.setTextColor(0, 212, 255);
-              doc.setFontSize(16);
-              doc.text('CERTIFICATE OF COMPLETION', width / 2, 45, { align: 'center' });
+              doc.setTextColor(30, 41, 59);
+              doc.setFontSize(28);
+              doc.text('CERTIFICATE', w / 2, 75, { align: 'center' });
+              doc.setFontSize(14);
+              doc.setTextColor(100, 116, 139);
+              doc.text('OF COMPLETION', w / 2, 85, { align: 'center' });
 
-              // Subtitle
-              doc.setTextColor(167, 139, 250);
-              doc.setFontSize(12);
-              doc.text('CCNA Training Program', width / 2, 55, { align: 'center' });
+              // Decorative line
+              doc.setDrawColor(0, 212, 255);
+              doc.setLineWidth(1);
+              doc.line(w / 2 - 40, 90, w / 2 + 40, 90);
+              doc.setFillColor(0, 212, 255);
+              doc.circle(w / 2, 90, 2, 'F');
 
-              // Body text
-              doc.setTextColor(226, 232, 240);
+              // Presented to
+              doc.setTextColor(100, 116, 139);
               doc.setFontSize(11);
-              doc.text('This certifies that', width / 2, 75, { align: 'center' });
+              doc.text('This is proudly presented to', w / 2, 105, { align: 'center' });
 
               // Name
-              doc.setTextColor(0, 212, 255);
-              doc.setFontSize(28);
-              doc.text(userName, width / 2, 90, { align: 'center' });
+              doc.setTextColor(30, 41, 59);
+              doc.setFontSize(32);
+              doc.text(userName, w / 2, 120, { align: 'center' });
 
-              // Completion text
-              doc.setTextColor(226, 232, 240);
+              // Name underline
+              const nameWidth = doc.getTextWidth(userName);
+              doc.setDrawColor(0, 212, 255);
+              doc.setLineWidth(0.5);
+              doc.line(w / 2 - nameWidth / 2, 123, w / 2 + nameWidth / 2, 123);
+
+              // Description
+              doc.setTextColor(100, 116, 139);
               doc.setFontSize(11);
-              doc.text('has successfully completed the', width / 2, 105, { align: 'center' });
-              doc.text('CCNA Training Program', width / 2, 112, { align: 'center' });
+              doc.text('for successfully completing the', w / 2, 135, { align: 'center' });
+              doc.setTextColor(30, 41, 59);
+              doc.setFontSize(16);
+              doc.text('CCNA Training Program', w / 2, 145, { align: 'center' });
 
-              // Stats
+              // Stats box
+              doc.setFillColor(241, 245, 249);
+              doc.roundedRect(w / 2 - 60, 152, 120, 20, 3, 3, 'F');
+              doc.setTextColor(100, 116, 139);
               doc.setFontSize(10);
-              doc.text(`Lessons Completed: ${lessons}/35  |  Average Score: ${score}%`, width / 2, 125, { align: 'center' });
+              doc.text(`Lessons: ${lessons}/35  |  Score: ${score}%`, w / 2, 164, { align: 'center' });
 
               // Date
               const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-              doc.text(`Date: ${date}`, width / 2, 140, { align: 'center' });
+              doc.setTextColor(100, 116, 139);
+              doc.setFontSize(10);
+              doc.text(`Issued: ${date}`, w / 2, 180, { align: 'center' });
 
               // Footer
-              doc.setTextColor(148, 163, 184);
-              doc.setFontSize(8);
-              doc.text('NetworkLearn - CCNA Training Platform', width / 2, height - 25, { align: 'center' });
-              doc.text('https://networklearn.wasmer.app', width / 2, height - 20, { align: 'center' });
+              doc.setDrawColor(226, 232, 240);
+              doc.setLineWidth(0.3);
+              doc.line(40, h - 30, w - 40, h - 30);
 
-              // Download
-              doc.save(`certificate-${userName.replace(/\s+/g, '-').toLowerCase()}.pdf`);
+              doc.setTextColor(148, 163, 184);
+              doc.setFontSize(9);
+              doc.text('NetworkLearn', w / 2 - 30, h - 22, { align: 'center' });
+              doc.text('networklearn.wasmer.app', w / 2 + 30, h - 22, { align: 'center' });
+
+              // Corner decorations
+              doc.setFillColor(0, 212, 255);
+              doc.circle(30, 25, 3, 'F');
+              doc.circle(w - 30, 25, 3, 'F');
+              doc.setFillColor(124, 58, 237);
+              doc.circle(30, h - 25, 3, 'F');
+              doc.circle(w - 30, h - 25, 3, 'F');
+
+              doc.save(`networklearn-certificate-${userName.replace(/\s+/g, '-').toLowerCase()}.pdf`);
               alert(`Certificate downloaded for ${userName}!`);
             });
           });
