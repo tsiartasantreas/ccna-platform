@@ -30,10 +30,17 @@ export default function Header({ locale, translations }: HeaderProps) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState('');
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [siteName, setSiteName] = useState('NetAcad');
+  const [logoUrl, setLogoUrl] = useState('');
 
   useEffect(() => {
     const theme = localStorage.getItem('theme') || 'dark';
     setIsDark(theme === 'dark');
+
+    // Load site settings
+    const settings = JSON.parse(localStorage.getItem('adminSettings') || '{}');
+    if (settings.siteName) setSiteName(settings.siteName);
+    if (settings.logoUrl) setLogoUrl(settings.logoUrl);
 
     // Check Supabase session
     const checkAuth = async () => {
@@ -113,11 +120,15 @@ export default function Header({ locale, translations }: HeaderProps) {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <a href={`/${locale}/`} className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-xl group-hover:scale-105 transition-transform">
-              N
-            </div>
+            {logoUrl ? (
+              <img src={logoUrl} alt={siteName} className="w-10 h-10 rounded-xl object-cover group-hover:scale-105 transition-transform" />
+            ) : (
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-xl group-hover:scale-105 transition-transform">
+                {siteName.charAt(0).toUpperCase()}
+              </div>
+            )}
             <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              NetAcad
+              {siteName}
             </span>
           </a>
 

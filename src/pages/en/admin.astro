@@ -318,12 +318,25 @@ const t = en;
               <div>
                 <label class="block text-sm font-medium text-text mb-1">Site Name</label>
                 <input type="text" id="site-name" value="NetAcad" class="w-full px-4 py-2 bg-surface border border-primary/10 rounded-lg text-text" />
+                <p class="text-xs text-text-muted mt-1">Displayed in the header and page titles</p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-text mb-1">Logo URL</label>
+                <input type="text" id="logo-url" placeholder="https://example.com/logo.png" class="w-full px-4 py-2 bg-surface border border-primary/10 rounded-lg text-text" />
+                <p class="text-xs text-text-muted mt-1">Enter a URL for your logo image (PNG/SVG recommended)</p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-text mb-1">Logo Preview</label>
+                <div class="flex items-center gap-3 p-3 bg-surface rounded-lg border border-primary/10">
+                  <div id="logo-preview" class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-xl">N</div>
+                  <span id="logo-name-preview" class="text-text font-medium">NetAcad</span>
+                </div>
               </div>
               <div>
                 <label class="block text-sm font-medium text-text mb-1">Site URL</label>
-                <input type="text" id="site-url" value="https://ccna-platform.wasmer.app" class="w-full px-4 py-2 bg-surface border border-primary/10 rounded-lg text-text" />
+                <input type="text" id="site-url" value="https://networklearn.wasmer.app" class="w-full px-4 py-2 bg-surface border border-primary/10 rounded-lg text-text" />
               </div>
-              <button id="save-general" class="px-6 py-2 bg-primary/10 text-primary rounded-lg font-medium">Save</button>
+              <button id="save-general" class="w-full px-6 py-2 bg-gradient-to-r from-primary to-accent text-white rounded-lg font-medium hover:opacity-90 transition-opacity">Save General Settings</button>
             </div>
           </div>
 
@@ -579,7 +592,43 @@ const t = en;
       alert('Supabase settings saved!');
     });
 
-    document.getElementById('save-general')?.addEventListener('click', () => alert('General settings saved!'));
+    // Load saved settings on page load
+    const savedSettings = JSON.parse(localStorage.getItem('adminSettings') || '{}');
+    const siteNameInput = document.getElementById('site-name') as HTMLInputElement;
+    const logoUrlInput = document.getElementById('logo-url') as HTMLInputElement;
+    const siteUrlInput = document.getElementById('site-url') as HTMLInputElement;
+    if (savedSettings.siteName && siteNameInput) siteNameInput.value = savedSettings.siteName;
+    if (savedSettings.logoUrl && logoUrlInput) logoUrlInput.value = savedSettings.logoUrl;
+    if (savedSettings.siteUrl && siteUrlInput) siteUrlInput.value = savedSettings.siteUrl;
+
+    // Logo preview
+    function updateLogoPreview() {
+      const preview = document.getElementById('logo-preview');
+      const namePreview = document.getElementById('logo-name-preview');
+      const logoUrl = logoUrlInput?.value;
+      const siteName = siteNameInput?.value || 'NetAcad';
+      if (preview) {
+        if (logoUrl) {
+          preview.innerHTML = `<img src="${logoUrl}" alt="Logo" class="w-10 h-10 rounded-xl object-cover" onerror="this.parentElement.innerHTML='N'" />`;
+        } else {
+          preview.innerHTML = '<span class="text-white font-bold text-xl">N</span>';
+        }
+      }
+      if (namePreview) namePreview.textContent = siteName;
+    }
+    siteNameInput?.addEventListener('input', updateLogoPreview);
+    logoUrlInput?.addEventListener('input', updateLogoPreview);
+    updateLogoPreview();
+
+    document.getElementById('save-general')?.addEventListener('click', () => {
+      const settings = {
+        siteName: siteNameInput?.value || 'NetAcad',
+        logoUrl: logoUrlInput?.value || '',
+        siteUrl: siteUrlInput?.value || '',
+      };
+      localStorage.setItem('adminSettings', JSON.stringify({ ...JSON.parse(localStorage.getItem('adminSettings') || '{}'), ...settings }));
+      alert('General settings saved! Refresh the page to see changes.');
+    });
     document.getElementById('save-email')?.addEventListener('click', () => alert('Email settings saved!'));
     document.getElementById('save-stripe')?.addEventListener('click', () => alert('Stripe settings saved!'));
   </script>
