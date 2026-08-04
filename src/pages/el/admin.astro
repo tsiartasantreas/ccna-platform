@@ -279,7 +279,13 @@ const t = el;
           });
         }
       }
+      // Load data immediately
       loadAdminData();
+
+      // Auto-refresh every 5 minutes
+      setInterval(() => {
+        loadAdminData();
+      }, 5 * 60 * 1000);
     }
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
