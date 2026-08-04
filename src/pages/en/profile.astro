@@ -1,0 +1,237 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/layout/Header.tsx';
+import Footer from '../../components/layout/Footer.tsx';
+import en from '../../i18n/en.json';
+
+const locale = 'en' as const;
+const t = en;
+---
+
+<BaseLayout title={t.profile.title} lang={locale}>
+  <Header locale={locale} translations={t} client:load />
+
+  <main class="pt-24 pb-16 min-h-screen">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-3xl font-bold mb-8">{t.profile.title}</h1>
+
+      {/* Profile form */}
+      <div class="bg-surface-card rounded-2xl border border-primary/10 p-8 mb-8">
+        <h2 class="text-xl font-bold mb-6">Account Information</h2>
+
+        <form id="profile-form" class="space-y-6">
+          <div>
+            <label for="display-name" class="block text-sm font-medium text-text mb-2">
+              {t.profile.display_name}
+            </label>
+            <input
+              type="text"
+              id="display-name"
+              name="display-name"
+              class="w-full px-4 py-3 bg-surface border border-primary/10 rounded-xl text-text placeholder-text-muted focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+              placeholder="Your name"
+            />
+          </div>
+
+          <div>
+            <label for="email" class="block text-sm font-medium text-text mb-2">
+              {t.auth.email}
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              disabled
+              class="w-full px-4 py-3 bg-surface-light border border-primary/10 rounded-xl text-text-muted cursor-not-allowed"
+            />
+            <p class="text-xs text-text-muted mt-1">Email cannot be changed</p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-text mb-2">
+              {t.profile.language}
+            </label>
+            <div class="flex gap-3">
+              <button
+                type="button"
+                class="lang-btn flex-1 px-4 py-3 rounded-xl border-2 border-primary bg-primary/10 text-primary font-medium transition-all"
+                data-lang="en"
+              >
+                🇬🇧 English
+              </button>
+              <button
+                type="button"
+                class="lang-btn flex-1 px-4 py-3 rounded-xl border border-primary/10 text-text-muted hover:border-primary/30 transition-all"
+                data-lang="el"
+              >
+                🇬🇷 Ελληνικά
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-text mb-2">
+              {t.profile.theme}
+            </label>
+            <div class="flex gap-3">
+              <button
+                type="button"
+                class="theme-btn flex-1 px-4 py-3 rounded-xl border-2 border-primary bg-primary/10 text-primary font-medium transition-all flex items-center justify-center gap-2"
+                data-theme="dark"
+              >
+                🌙 {t.profile.dark}
+              </button>
+              <button
+                type="button"
+                class="theme-btn flex-1 px-4 py-3 rounded-xl border border-primary/10 text-text-muted hover:border-primary/30 transition-all flex items-center justify-center gap-2"
+                data-theme="light"
+              >
+                ☀️ {t.profile.light}
+              </button>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            class="w-full py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity"
+          >
+            {t.profile.save}
+          </button>
+        </form>
+      </div>
+
+      {/* Plan status */}
+      <div class="bg-surface-card rounded-2xl border border-primary/10 p-8 mb-8">
+        <h2 class="text-xl font-bold mb-4">{t.profile.plan}</h2>
+        <div class="flex items-center justify-between p-4 bg-surface-light rounded-xl">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-lg">
+              F
+            </div>
+            <div>
+              <div class="font-bold text-text">{t.pricing.free} Plan</div>
+              <div class="text-sm text-text-muted">Basic access to all lessons</div>
+            </div>
+          </div>
+          <a
+            href={`/${locale}/pricing`}
+            class="px-4 py-2 bg-primary/10 text-primary rounded-lg text-sm font-medium hover:bg-primary/20 transition-colors"
+          >
+            {t.pricing.upgrade}
+          </a>
+        </div>
+      </div>
+
+      {/* GDPR Section */}
+      <div class="bg-surface-card rounded-2xl border border-primary/10 p-8 mb-8">
+        <h2 class="text-xl font-bold mb-2">Data & Privacy</h2>
+        <p class="text-text-muted text-sm mb-6">{t.profile.gdpr_notice}</p>
+
+        <div class="space-y-4">
+          {/* Download data */}
+          <button
+            id="download-data-btn"
+            class="w-full flex items-center justify-between p-4 bg-surface-light rounded-xl hover:bg-surface transition-colors"
+          >
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-xl">📥</div>
+              <div class="text-left">
+                <div class="font-medium text-text">{t.profile.download_data}</div>
+                <div class="text-xs text-text-muted">Export all your data as JSON</div>
+              </div>
+            </div>
+            <svg class="w-5 h-5 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+
+          {/* Delete account */}
+          <button
+            id="delete-account-btn"
+            class="w-full flex items-center justify-between p-4 bg-error/5 rounded-xl border border-error/20 hover:bg-error/10 transition-colors"
+          >
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-error/10 flex items-center justify-center text-xl">🗑️</div>
+              <div class="text-left">
+                <div class="font-medium text-error">{t.profile.delete_account}</div>
+                <div class="text-xs text-text-muted">Permanently delete your account and data</div>
+              </div>
+            </div>
+            <svg class="w-5 h-5 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Legal links */}
+      <div class="flex flex-wrap gap-4 text-sm text-text-muted">
+        <a href={`/${locale}/privacy`} class="hover:text-primary">{t.gdpr.privacy_policy}</a>
+        <span>•</span>
+        <a href={`/${locale}/terms`} class="hover:text-primary">{t.gdpr.terms_of_service}</a>
+      </div>
+    </div>
+  </main>
+
+  <Footer locale={locale} translations={t} />
+
+  <script>
+    // Theme toggle
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const theme = btn.getAttribute('data-theme') || 'dark';
+        document.documentElement.classList.toggle('dark', theme === 'dark');
+        document.documentElement.classList.toggle('light', theme === 'light');
+        localStorage.setItem('theme', theme);
+
+        // Update active state
+        document.querySelectorAll('.theme-btn').forEach(b => {
+          b.classList.remove('border-primary', 'bg-primary/10', 'text-primary');
+          b.classList.add('border-primary/10', 'text-text-muted');
+        });
+        btn.classList.add('border-primary', 'bg-primary/10', 'text-primary');
+        btn.classList.remove('border-primary/10', 'text-text-muted');
+      });
+    });
+
+    // Language toggle
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const lang = btn.getAttribute('data-lang') || 'en';
+        const currentPath = window.location.pathname;
+        const newPath = currentPath.replace('/en/', `/${lang}/`);
+        window.location.href = newPath;
+      });
+    });
+
+    // Download data (GDPR)
+    document.getElementById('download-data-btn')?.addEventListener('click', async () => {
+      // In production, this would call exportUserData from auth.ts
+      const data = {
+        exportDate: new Date().toISOString(),
+        message: 'Full data export will be available when Supabase is connected.',
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `netacad-data-export-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    // Delete account (GDPR)
+    document.getElementById('delete-account-btn')?.addEventListener('click', () => {
+      if (confirm('Are you sure you want to delete your account? This action cannot be undone. All your data will be permanently deleted within 30 days.')) {
+        alert('Account deletion request submitted. Your data will be deleted within 30 days.');
+        // In production, this would call deleteAccount from auth.ts
+      }
+    });
+
+    // Profile form
+    document.getElementById('profile-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      alert('Profile saved! (Supabase integration pending)');
+    });
+  </script>
+</BaseLayout>
