@@ -110,12 +110,12 @@ const t = en;
             ))}
           </ul>
 
-          <a
-            href={`/${locale}/login?mode=signup`}
-            class="block w-full text-center px-6 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-medium hover:opacity-90 transition-all shadow-lg shadow-primary/25"
+          <button
+            id="upgrade-pro-btn"
+            class="block w-full text-center px-6 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-medium hover:opacity-90 transition-all shadow-lg shadow-primary/25 cursor-pointer"
           >
             {t.pricing.upgrade} →
-          </a>
+          </button>
         </div>
       </div>
 
@@ -157,4 +157,83 @@ const t = en;
   </main>
 
   <Footer locale={locale} translations={t} />
+
+  {/* Payment Error Modal */}
+  <div id="payment-error-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div class="bg-surface-card rounded-2xl border border-primary/10 p-8 max-w-md mx-4 text-center">
+      <div class="text-6xl mb-4">⚠️</div>
+      <h2 class="text-2xl font-bold text-text mb-4">Payment Unavailable</h2>
+      <p class="text-text-muted mb-6">
+        We're experiencing issues with our payment system. Please try again later or contact our support team for assistance.
+      </p>
+      <div class="bg-surface-light rounded-xl p-4 mb-6">
+        <p class="text-sm text-text-muted mb-2">For any inquiries, contact us at:</p>
+        <a href="mailto:support@abcdigital360.com" class="text-primary font-medium hover:underline">
+          support@abcdigital360.com
+        </a>
+      </div>
+      <button
+        onclick="document.getElementById('payment-error-modal').classList.add('hidden')"
+        class="px-6 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+
+  <script>
+    import { createClient } from '@supabase/supabase-js';
+
+    const supabase = createClient(
+      'https://jhesstimsojwmkdysmpy.supabase.co',
+      'sb_publishable_bKD9biIulcfC5iNipD-8IA_3Zu4bmWD'
+    );
+
+    document.getElementById('upgrade-pro-btn')?.addEventListener('click', async () => {
+      // Check if user is logged in
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session?.user) {
+        // Redirect to signup
+        window.location.href = '/en/login?mode=signup';
+        return;
+      }
+
+      // Check if Revolut API key is configured
+      const settings = JSON.parse(localStorage.getItem('adminSettings') || '{}');
+      const revolutApiKey = settings.revolutApiKey;
+
+      if (!revolutApiKey) {
+        // Show error modal
+        document.getElementById('payment-error-modal')?.classList.remove('hidden');
+        return;
+      }
+
+      // Try to create Revolut payment
+      try {
+        const response = await fetch('https://merchant.revolut.com/api/1.0/orders', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${revolutApiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            amount: 99, // €0.99 in cents
+            currency: 'EUR',
+            description: 'NetworkLearn Pro - Monthly Subscription',
+            redirect_url: window.location.origin + '/en/dashboard',
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          window.location.href = data.checkout_url;
+        } else {
+          document.getElementById('payment-error-modal')?.classList.remove('hidden');
+        }
+      } catch (error) {
+        document.getElementById('payment-error-modal')?.classList.remove('hidden');
+      }
+    });
+  </script>
 </BaseLayout>
