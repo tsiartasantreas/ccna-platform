@@ -468,9 +468,10 @@ const t = en;
               <td class="px-4 py-3 text-sm text-text">${lessonsCompleted}/35</td>
               <td class="px-4 py-3 text-sm ${avgScore >= 80 ? 'text-success' : avgScore > 0 ? 'text-warning' : 'text-text-muted'}">${avgScore > 0 ? avgScore + '%' : '—'}</td>
               <td class="px-4 py-3 text-sm text-text-muted">${new Date(p.updated_at).toLocaleDateString()}</td>
-              <td class="px-4 py-3 flex gap-2">
+              <td class="px-4 py-3 flex gap-2 flex-wrap">
                 <button class="save-plan-btn text-xs text-success hover:underline" data-user-id="${p.id}">Save</button>
                 <button class="reset-pw-btn text-xs text-primary hover:underline" data-user-id="${p.id}">Reset PW</button>
+                <button class="cert-btn text-xs text-accent hover:underline" data-user-id="${p.id}" data-user-name="${p.display_name || 'User'}" data-user-email="${p.id}" data-lessons="${lessonsCompleted}" data-score="${avgScore}">🎓 Cert</button>
               </td>
             </tr>`;
           }).join('');
@@ -500,6 +501,80 @@ const t = en;
               if (user && confirm(`Send password reset to ${user.id}?`)) {
                 alert('Password reset email sent!');
               }
+            });
+          });
+
+          // Certificate generation handlers
+          document.querySelectorAll('.cert-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+              const userId = btn.getAttribute('data-user-id');
+              const userName = btn.getAttribute('data-user-name') || 'User';
+              const lessons = btn.getAttribute('data-lessons') || '0';
+              const score = btn.getAttribute('data-score') || '0';
+
+              if (!confirm(`Generate and download certificate for ${userName}?\nLessons: ${lessons}/35 | Avg Score: ${score}%`)) return;
+
+              // Import jsPDF dynamically
+              const { jsPDF } = await import('jspdf');
+
+              const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+              const width = doc.internal.pageSize.getWidth();
+              const height = doc.internal.pageSize.getHeight();
+
+              // Background
+              doc.setFillColor(10, 15, 30);
+              doc.rect(0, 0, width, height, 'F');
+
+              // Border
+              doc.setDrawColor(0, 212, 255);
+              doc.setLineWidth(2);
+              doc.rect(10, 10, width - 20, height - 20);
+              doc.setLineWidth(0.5);
+              doc.rect(15, 15, width - 30, height - 30);
+
+              // Title
+              doc.setTextColor(0, 212, 255);
+              doc.setFontSize(16);
+              doc.text('CERTIFICATE OF COMPLETION', width / 2, 45, { align: 'center' });
+
+              // Subtitle
+              doc.setTextColor(167, 139, 250);
+              doc.setFontSize(12);
+              doc.text('CCNA Training Program', width / 2, 55, { align: 'center' });
+
+              // Body text
+              doc.setTextColor(226, 232, 240);
+              doc.setFontSize(11);
+              doc.text('This certifies that', width / 2, 75, { align: 'center' });
+
+              // Name
+              doc.setTextColor(0, 212, 255);
+              doc.setFontSize(28);
+              doc.text(userName, width / 2, 90, { align: 'center' });
+
+              // Completion text
+              doc.setTextColor(226, 232, 240);
+              doc.setFontSize(11);
+              doc.text('has successfully completed the', width / 2, 105, { align: 'center' });
+              doc.text('CCNA Training Program', width / 2, 112, { align: 'center' });
+
+              // Stats
+              doc.setFontSize(10);
+              doc.text(`Lessons Completed: ${lessons}/35  |  Average Score: ${score}%`, width / 2, 125, { align: 'center' });
+
+              // Date
+              const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+              doc.text(`Date: ${date}`, width / 2, 140, { align: 'center' });
+
+              // Footer
+              doc.setTextColor(148, 163, 184);
+              doc.setFontSize(8);
+              doc.text('NetAcad - CCNA Training Platform', width / 2, height - 25, { align: 'center' });
+              doc.text('https://networklearn.wasmer.app', width / 2, height - 20, { align: 'center' });
+
+              // Download
+              doc.save(`certificate-${userName.replace(/\s+/g, '-').toLowerCase()}.pdf`);
+              alert(`Certificate downloaded for ${userName}!`);
             });
           });
         }

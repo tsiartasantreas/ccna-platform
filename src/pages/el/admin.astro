@@ -79,18 +79,15 @@ const t = el;
               <thead>
                 <tr class="border-b border-primary/10">
                   <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Χρήστης</th>
-                  <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Email</th>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">ID</th>
                   <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Πλάνο</th>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Μαθήματα</th>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Βαθμολογία</th>
                   <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Ενέργειες</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr class="border-b border-primary/5 hover:bg-surface-light">
-                  <td class="px-4 py-3 text-sm text-text font-medium">Andreas Tsiartas</td>
-                  <td class="px-4 py-3 text-sm text-text-muted">tsiartasantreas@gmail.com</td>
-                  <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full bg-accent/10 text-accent text-xs font-medium">Pro</span></td>
-                  <td class="px-4 py-3"><button class="text-xs text-primary hover:underline">Επαναφορά Κωδικού</button></td>
-                </tr>
+              <tbody id="users-table-body-el">
+                <tr><td colspan="6" class="px-4 py-8 text-center text-text-muted">Φόρτωση...</td></tr>
               </tbody>
             </table>
           </div>
@@ -186,6 +183,103 @@ const t = el;
     } else {
       if (accessDenied) accessDenied.classList.add('hidden');
       if (adminContent) adminContent.classList.remove('hidden');
+
+      // Set admin as pro
+      await supabase.from('profiles').update({ plan: 'pro' }).eq('id', session.user.id);
+
+      // Load real data
+      async function loadAdminData() {
+        const { data: profiles } = await supabase.from('profiles').select('*');
+        const { data: allProgress } = await supabase.from('lesson_progress').select('*');
+        const { data: allScores } = await supabase.from('quiz_scores').select('*');
+
+        const tableBody = document.getElementById('users-table-body-el');
+        if (tableBody && profiles) {
+          tableBody.innerHTML = profiles.map(p => {
+            const userProgress = allProgress?.filter(lp => lp.user_id === p.id) || [];
+            const userScores = allScores?.filter(qs => qs.user_id === p.id) || [];
+            const lessonsCompleted = userProgress.filter(lp => lp.status === 'completed').length;
+            const avgScore = userScores.length ? Math.round(userScores.reduce((s, q) => s + Number(q.score), 0) / userScores.length) : 0;
+
+            return `<tr class="border-b border-primary/5 hover:bg-surface-light">
+              <td class="px-4 py-3 text-sm text-text font-medium">${p.display_name || 'User'}</td>
+              <td class="px-4 py-3 text-sm text-text-muted">${p.id.substring(0, 8)}...</td>
+              <td class="px-4 py-3">
+                <select class="plan-select-el px-2 py-1 bg-surface border border-primary/10 rounded text-xs text-text" data-user-id="${p.id}">
+                  <option value="free" ${p.plan === 'free' ? 'selected' : ''}>Free</option>
+                  <option value="pro" ${p.plan === 'pro' ? 'selected' : ''}>Pro</option>
+                </select>
+              </td>
+              <td class="px-4 py-3 text-sm text-text">${lessonsCompleted}/35</td>
+              <td class="px-4 py-3 text-sm ${avgScore >= 80 ? 'text-success' : avgScore > 0 ? 'text-warning' : 'text-text-muted'}">${avgScore > 0 ? avgScore + '%' : '—'}</td>
+              <td class="px-4 py-3 flex gap-2 flex-wrap">
+                <button class="save-plan-btn-el text-xs text-success hover:underline" data-user-id="${p.id}">Αποθήκευση</button>
+                <button class="cert-btn-el text-xs text-accent hover:underline" data-user-id="${p.id}" data-user-name="${p.display_name || 'User'}" data-lessons="${lessonsCompleted}" data-score="${avgScore}">🎓 Πιστοπ.</button>
+              </td>
+            </tr>`;
+          }).join('');
+
+          // Plan change handlers
+          document.querySelectorAll('.save-plan-btn-el').forEach(btn => {
+            btn.addEventListener('click', async () => {
+              const userId = btn.getAttribute('data-user-id');
+              const select = document.querySelector(`.plan-select-el[data-user-id="${userId}"]`) as HTMLSelectElement;
+              if (userId && select) {
+                const { error } = await supabase.from('profiles').update({ plan: select.value }).eq('id', userId);
+                if (error) alert('Σφάλμα: ' + error.message);
+                else { alert('Το πλάνο ενημερώθηκε!'); loadAdminData(); }
+              }
+            });
+          });
+
+          // Certificate handlers
+          document.querySelectorAll('.cert-btn-el').forEach(btn => {
+            btn.addEventListener('click', async () => {
+              const userName = btn.getAttribute('data-user-name') || 'User';
+              const lessons = btn.getAttribute('data-lessons') || '0';
+              const score = btn.getAttribute('data-score') || '0';
+              if (!confirm(`Δημιουργία πιστοποιητικού για ${userName};`)) return;
+
+              const { jsPDF } = await import('jspdf');
+              const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+              const w = doc.internal.pageSize.getWidth();
+              const h = doc.internal.pageSize.getHeight();
+
+              doc.setFillColor(10, 15, 30);
+              doc.rect(0, 0, w, h, 'F');
+              doc.setDrawColor(0, 212, 255);
+              doc.setLineWidth(2);
+              doc.rect(10, 10, w - 20, h - 20);
+
+              doc.setTextColor(0, 212, 255);
+              doc.setFontSize(16);
+              doc.text('CERTIFICATE OF COMPLETION', w / 2, 45, { align: 'center' });
+              doc.setTextColor(167, 139, 250);
+              doc.setFontSize(12);
+              doc.text('CCNA Training Program', w / 2, 55, { align: 'center' });
+              doc.setTextColor(226, 232, 240);
+              doc.setFontSize(11);
+              doc.text('This certifies that', w / 2, 75, { align: 'center' });
+              doc.setTextColor(0, 212, 255);
+              doc.setFontSize(28);
+              doc.text(userName, w / 2, 90, { align: 'center' });
+              doc.setTextColor(226, 232, 240);
+              doc.setFontSize(11);
+              doc.text('has successfully completed the CCNA Training Program', w / 2, 105, { align: 'center' });
+              doc.setFontSize(10);
+              doc.text(`Lessons: ${lessons}/35 | Score: ${score}%`, w / 2, 120, { align: 'center' });
+              doc.text(`Date: ${new Date().toLocaleDateString('el-GR')}`, w / 2, 130, { align: 'center' });
+              doc.setTextColor(148, 163, 184);
+              doc.setFontSize(8);
+              doc.text('NetAcad - networklearn.wasmer.app', w / 2, h - 20, { align: 'center' });
+
+              doc.save(`certificate-${userName.replace(/\s+/g, '-').toLowerCase()}.pdf`);
+              alert(`Το πιστοποιητικό λήφθηκε για ${userName}!`);
+            });
+          });
+        }
+      }
+      loadAdminData();
     }
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
