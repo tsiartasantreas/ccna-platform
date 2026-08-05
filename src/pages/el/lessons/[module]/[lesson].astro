@@ -206,6 +206,19 @@ function mdToHtml(md: string): string {
           ) : <div />}
         </div>
 
+        {/* Quiz Prompt - after last lesson */}
+        {!nextLesson && (
+          <div class="mt-12 bg-gradient-to-r from-primary/10 to-accent/10 rounded-2xl border border-primary/20 p-8 text-center">
+            <div class="text-5xl mb-4">🎯</div>
+            <h2 class="text-2xl font-bold text-text mb-2">Ολοκληρώσατε την Ενότητα!</h2>
+            <p class="text-text-muted mb-6">Είστε έτοιμοι να δοκιμάσετε τις γνώσεις σας; Το τεστ είναι διαθέσιμο μόνο για χρήστες Pro.</p>
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+              <a href={`/${locale}/lessons/${moduleNum}/quiz`} class="px-6 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity">Ξεκινήστε το Τεστ →</a>
+              <a href={`/${locale}/curriculum`} class="px-6 py-3 border border-primary/30 text-primary rounded-xl font-medium hover:bg-primary/10 transition-all">Συνέχεια στο Πρόγραμμα</a>
+            </div>
+          </div>
+        )}
+
         {/* Completion Modal */}
         <div id="completion-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
           <div class="bg-surface-card rounded-2xl border border-primary/10 p-8 max-w-md mx-4 text-center animate-fade-in">
