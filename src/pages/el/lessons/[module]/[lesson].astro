@@ -264,7 +264,7 @@ function mdToHtml(md: string): string {
           completed_at: status === 'completed' ? new Date().toISOString() : null,
         }, { onConflict: 'user_id,module_number,lesson_number' });
         if (error) console.error('Supabase error:', error);
-        else saved = true;
+        else if (status === 'completed') saved = true;
       } catch (e) { console.error('Error saving progress:', e); }
     }
 

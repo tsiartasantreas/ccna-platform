@@ -364,7 +364,7 @@ function mdToHtml(md: string): string {
         }, { onConflict: 'user_id,module_number,lesson_number' });
 
         if (error) console.error('Supabase save error:', error);
-        else saved = true;
+        else if (status === 'completed') saved = true;
       } catch (error) {
         console.error('Error saving lesson progress:', error);
       }

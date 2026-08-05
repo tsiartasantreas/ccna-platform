@@ -183,6 +183,9 @@ const modules = [
         .select('*')
         .eq('user_id', user.id);
 
+      // Also load from localStorage
+      const localCompleted = JSON.parse(localStorage.getItem('completedLessons') || '{}');
+
       // Fetch quiz scores
       const { data: scores } = await supabase
         .from('quiz_scores')
@@ -204,14 +207,20 @@ const modules = [
       const streak = document.getElementById('current-streak');
       if (streak && points) streak.textContent = `${points.current_streak || 0} days`;
 
-      // Calculate module progress
+      // Calculate module progress (merge Supabase + localStorage)
       const moduleLessons = [8, 7, 6, 5, 5, 4];
       let totalCompleted = 0;
       let modulesCompleted = 0;
 
       for (let m = 1; m <= 6; m++) {
         const moduleProgress = progress?.filter(p => p.module_number === m) || [];
-        const completed = moduleProgress.filter(p => p.status === 'completed').length;
+        const supabaseCompleted = moduleProgress.filter(p => p.status === 'completed').length;
+        // Also count localStorage completions
+        let localCompleted = 0;
+        for (let l = 1; l <= moduleLessons[m - 1]; l++) {
+          if (localCompleted[`${m}_${l}`]) localCompleted++;
+        }
+        const completed = Math.max(supabaseCompleted, localCompleted);
         const total = moduleLessons[m - 1];
         const percent = Math.round((completed / total) * 100);
 
