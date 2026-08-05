@@ -2,7 +2,7 @@
 
 ## Development Context & Continuation Guide
 
-This document provides everything needed to continue development of the NetworkLearn CCNA training platform.
+This document provides everything needed to continue development of the NetworkLearn CCNA training platform. Last updated: August 5, 2026.
 
 ---
 
@@ -11,13 +11,16 @@ This document provides everything needed to continue development of the NetworkL
 **NetworkLearn** is an interactive, bilingual (English/Greek) CCNA 200-301 training platform with:
 - 35 lessons across 6 modules with comprehensive networking content
 - 3D animated landing page (React Three Fiber)
-- Interactive quizzes with multiple question types
+- Interactive quizzes with 12 multiple-choice questions per module
 - User authentication and progress tracking (Supabase)
-- Admin dashboard with user management and analytics
-- Certificate generation (PDF via jsPDF)
-- Revolut payment integration for Pro plan
+- Admin dashboard with real-time user management and analytics
+- Certificate generation (PDF via jsPDF with Canva template)
+- Revolut payment integration for Pro plan (€0.99/month)
 - Dark/Light mode (dark primary)
 - GDPR compliance with data export/deletion
+- Profile picture upload
+- Lesson completion tracking with in-page modals
+- Scroll-hide header with back-to-top button
 
 **Owner:** abcdigital360 — info@abcdigital360.com
 **Admin Email:** tsiartasantreas@gmail.com
@@ -48,46 +51,44 @@ This document provides everything needed to continue development of the NetworkL
 src/
 ├── pages/
 │   ├── index.astro              # Redirects to /en/
-│   ├── en/                      # English pages
+│   ├── en/                      # English pages (15 files)
 │   │   ├── index.astro          # Landing page with 3D hero
 │   │   ├── curriculum.astro     # All modules overview
 │   │   ├── pricing.astro        # Free vs Pro comparison
-│   │   ├── login.astro          # Auth (login/signup)
-│   │   ├── dashboard.astro      # User progress dashboard
-│   │   ├── profile.astro        # Settings, GDPR controls
-│   │   ├── admin.astro          # Admin dashboard (6 tabs)
-│   │   ├── reset-password.astro # Password reset page
+│   │   ├── login.astro          # Auth (login/signup with Supabase)
+│   │   ├── dashboard.astro      # User progress dashboard (real Supabase data)
+│   │   ├── profile.astro        # Settings, avatar upload, GDPR controls
+│   │   ├── admin.astro          # Admin dashboard (6 tabs, admin-only)
+│   │   ├── reset-password.astro # Password reset with validation
 │   │   ├── privacy.astro        # Privacy Policy
 │   │   ├── terms.astro          # Terms of Service
-│   │   ├── contact.astro        # Contact page
+│   │   ├── contact.astro        # Contact page with form
 │   │   └── lessons/
 │   │       └── [module]/
-│   │           ├── [lesson].astro  # Lesson content page
-│   │           └── quiz.astro      # Module quiz page
-│   ├── el/                      # Greek pages (mirrored)
-│   │   └── (same structure as en/)
+│   │           ├── [lesson].astro  # Lesson content with sidebar, completion modal
+│   │           └── quiz.astro      # Module quiz with QuizEngine
+│   ├── el/                      # Greek pages (mirrored structure)
 │   └── api/                     # API endpoints (placeholder)
 ├── components/
 │   ├── 3d/
 │   │   └── NetworkHero.tsx      # 3D animated network topology
 │   ├── layout/
-│   │   ├── Header.tsx           # Nav with scroll-hide, user menu
-│   │   └── Footer.tsx           # Footer with links
+│   │   ├── Header.tsx           # Nav with scroll-hide, user menu, avatar
+│   │   └── Footer.tsx           # Footer with site name
 │   ├── quiz/
-│   │   └── QuizEngine.tsx       # Interactive quiz with Supabase save
+│   │   └── QuizEngine.tsx       # Interactive quiz with Supabase score saving
 │   └── ui/
 │       ├── FeedbackForm.tsx     # Star rating feedback
 │       └── FeedbackDisplay.tsx  # Testimonials carousel
 ├── lib/
-│   ├── supabase.ts              # Supabase client + type interfaces
-│   ├── auth.ts                  # Auth functions (signup, login, GDPR)
+│   ├── supabase.ts              # Supabase client + TypeScript interfaces
+│   ├── auth.ts                  # Auth functions (signup, login, GDPR export/delete)
 │   ├── admin.ts                 # Admin config, demo data
 │   ├── i18n.ts                  # Translation helper
-│   ├── quiz-data.ts             # Quiz questions (older format)
-│   ├── quiz-data-full.ts        # Full quiz with scoring logic
+│   ├── quiz-data.ts             # Quiz questions (6 modules, 12 each)
 │   └── lessons/
 │       ├── index.ts             # Lesson content router
-│       ├── module1.ts           # Network Fundamentals (EN)
+│       ├── module1.ts           # Network Fundamentals (EN, 1949 lines)
 │       ├── module1-el.ts        # Network Fundamentals (EL)
 │       ├── module2.ts           # Network Access (EN)
 │       ├── module2-el.ts        # Network Access (EL)
@@ -105,29 +106,30 @@ src/
 ├── layouts/
 │   └── BaseLayout.astro         # HTML shell, theme init
 └── styles/
-    └── global.css               # Tailwind + custom styles
+    └── global.css               # Tailwind + custom styles (dark/light modes)
 
 public/
 ├── favicon.svg                  # NL logo favicon
 ├── images/
 │   ├── logo.png                 # NetworkLearn logo (200x200)
-│   ├── certificate-bg.png       # Canva certificate template
+│   ├── certificate-bg.png       # Canva certificate template background
 │   └── diagrams/                # 11 SVG diagrams
-│       ├── osi-model.svg
-│       ├── tcp-handshake.svg
-│       ├── subnetting.svg
-│       ├── vlan-topology.svg
-│       ├── stp-topology.svg
-│       ├── ospf-states.svg
-│       ├── dhcp-dora.svg
-│       ├── nat-translation.svg
-│       ├── acl-flowchart.svg
-│       ├── sdn-architecture.svg
-│       └── rest-api.svg
+│       ├── osi-model.svg        # Module 1: OSI 7-layer model
+│       ├── tcp-handshake.svg    # Module 1: TCP three-way handshake
+│       ├── subnetting.svg       # Module 1: IPv4 subnetting
+│       ├── vlan-topology.svg    # Module 2: VLAN & trunk topology
+│       ├── stp-topology.svg     # Module 2: Spanning Tree Protocol
+│       ├── ospf-states.svg      # Module 3: OSPF neighbor states
+│       ├── dhcp-dora.svg        # Module 4: DHCP DORA process
+│       ├── nat-translation.svg  # Module 4: NAT translation
+│       ├── acl-flowchart.svg    # Module 5: ACL processing logic
+│       ├── sdn-architecture.svg # Module 6: SDN architecture
+│       └── rest-api.svg         # Module 6: REST API flow
 
 supabase/
 └── migrations/
-    └── 001_initial_schema.sql   # Database schema
+    ├── 001_initial_schema.sql   # Database schema (4 tables, RLS, triggers)
+    └── 002_increment_points_rpc.sql # RPC function for points
 
 Config files:
 ├── astro.config.mjs             # Astro + React + Tailwind + i18n
@@ -148,12 +150,12 @@ Config files:
 -- Profiles (linked to auth.users)
 CREATE TABLE profiles (
   id UUID REFERENCES auth.users(id) PRIMARY KEY,
-  email TEXT,                          -- Added later via migration
-  avatar_url TEXT,                     -- Added later via migration
+  email TEXT,
+  avatar_url TEXT,
   display_name TEXT,
-  preferred_language TEXT DEFAULT 'en' CHECK (preferred_language IN ('en', 'el')),
-  theme TEXT DEFAULT 'dark' CHECK (theme IN ('dark', 'light')),
-  plan TEXT DEFAULT 'free' CHECK (plan IN ('free', 'pro')),
+  preferred_language TEXT DEFAULT 'en',
+  theme TEXT DEFAULT 'dark',
+  plan TEXT DEFAULT 'free',
   revolut_customer_id TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -165,11 +167,9 @@ CREATE TABLE lesson_progress (
   user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
   module_number INTEGER NOT NULL CHECK (module_number BETWEEN 1 AND 6),
   lesson_number INTEGER NOT NULL CHECK (lesson_number BETWEEN 1 AND 8),
-  status TEXT DEFAULT 'not_started' CHECK (status IN ('not_started', 'in_progress', 'completed')),
+  status TEXT DEFAULT 'not_started',
   completed_at TIMESTAMPTZ,
   time_spent_seconds INTEGER DEFAULT 0,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(user_id, module_number, lesson_number)
 );
 
@@ -177,7 +177,7 @@ CREATE TABLE lesson_progress (
 CREATE TABLE quiz_scores (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
-  module_number INTEGER NOT NULL CHECK (module_number BETWEEN 1 AND 6),
+  module_number INTEGER NOT NULL,
   score NUMERIC(5,2) NOT NULL,
   total_questions INTEGER NOT NULL,
   correct_answers INTEGER NOT NULL,
@@ -193,92 +193,66 @@ CREATE TABLE user_points (
   total_points INTEGER DEFAULT 0,
   current_streak INTEGER DEFAULT 0,
   longest_streak INTEGER DEFAULT 0,
-  last_activity_date DATE DEFAULT CURRENT_DATE,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+  last_activity_date DATE DEFAULT CURRENT_DATE
 );
 ```
 
-### Required Additional SQL (run after initial migration)
+### Required SQL to Run in Supabase Dashboard
 
 ```sql
--- Add email column to profiles
+-- 1. Add email column
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS email TEXT;
 
--- Add avatar_url column
+-- 2. Add avatar column
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS avatar_url TEXT;
 
--- Fix trigger to include email
+-- 3. Fix trigger function
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
   INSERT INTO public.profiles (id, email, display_name, preferred_language, theme, plan)
-  VALUES (
-    NEW.id,
-    NEW.email,
-    COALESCE(NEW.raw_user_meta_data->>'display_name', split_part(NEW.email, '@', 1)),
-    'en', 'dark', 'free'
-  );
+  VALUES (NEW.id, NEW.email, COALESCE(NEW.raw_user_meta_data->>'display_name', split_part(NEW.email, '@', 1)), 'en', 'dark', 'free');
   INSERT INTO public.user_points (user_id, total_points, current_streak, longest_streak)
   VALUES (NEW.id, 0, 0, 0);
   RETURN NEW;
 EXCEPTION WHEN OTHERS THEN
-  RAISE WARNING 'Error creating user profile: %', SQLERRM;
+  RAISE WARNING 'Error: %', SQLERRM;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Admin RLS policies (allows admin to read all data)
-CREATE POLICY "Admin can view all profiles"
-  ON profiles FOR SELECT
-  USING (auth.jwt() ->> 'email' = 'tsiartasantreas@gmail.com');
+-- 4. Admin RLS policies
+CREATE POLICY "Admin can view all profiles" ON profiles FOR SELECT USING (auth.jwt() ->> 'email' = 'tsiartasantreas@gmail.com');
+CREATE POLICY "Admin can view all lesson progress" ON lesson_progress FOR SELECT USING (auth.jwt() ->> 'email' = 'tsiartasantreas@gmail.com');
+CREATE POLICY "Admin can view all quiz scores" ON quiz_scores FOR SELECT USING (auth.jwt() ->> 'email' = 'tsiartasantreas@gmail.com');
+CREATE POLICY "Admin can view all user points" ON user_points FOR SELECT USING (auth.jwt() ->> 'email' = 'tsiartasantreas@gmail.com');
+CREATE POLICY "Admin can update any profile" ON profiles FOR UPDATE USING (auth.jwt() ->> 'email' = 'tsiartasantreas@gmail.com');
 
-CREATE POLICY "Admin can view all lesson progress"
-  ON lesson_progress FOR SELECT
-  USING (auth.jwt() ->> 'email' = 'tsiartasantreas@gmail.com');
-
-CREATE POLICY "Admin can view all quiz scores"
-  ON quiz_scores FOR SELECT
-  USING (auth.jwt() ->> 'email' = 'tsiartasantreas@gmail.com');
-
-CREATE POLICY "Admin can view all user points"
-  ON user_points FOR SELECT
-  USING (auth.jwt() ->> 'email' = 'tsiartasantreas@gmail.com');
-
-CREATE POLICY "Admin can update any profile"
-  ON profiles FOR UPDATE
-  USING (auth.jwt() ->> 'email' = 'tsiartasantreas@gmail.com');
+-- 5. Increment points RPC
+CREATE OR REPLACE FUNCTION increment_points(p_user_id UUID, p_points INTEGER)
+RETURNS VOID AS $$
+BEGIN
+  UPDATE user_points SET total_points = total_points + p_points, updated_at = NOW() WHERE user_id = p_user_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 ```
 
-### Supabase Dashboard Configuration
-
-**Authentication → URL Configuration:**
-- Site URL: `http://localhost:4321` (dev) or `https://networklearn.wasmer.app` (prod)
-- Redirect URLs: Add all of:
-  - `http://localhost:4321/en/reset-password`
-  - `http://localhost:4321/el/reset-password`
-  - `http://localhost:4321/en/dashboard`
-  - `http://localhost:4321/el/dashboard`
-  - `https://networklearn.wasmer.app/**`
-
-**Authentication → Email Templates:** Customize with NetworkLearn branding (HTML templates provided in conversation history).
-
-**Authentication → Providers:** Enable Email and optionally Google OAuth.
+### Supabase Dashboard Config
+- **Authentication → URL Configuration:**
+  - Site URL: `http://localhost:4321` (dev) / `https://networklearn.wasmer.app` (prod)
+  - Redirect URLs: Add `/en/reset-password`, `/el/reset-password`, `/en/dashboard`, `/el/dashboard`
+- **Authentication → Email Templates:** Customize with NetworkLearn branding
+- **Authentication → Providers:** Enable Email, optionally Google OAuth
 
 ---
 
 ## 5. Environment Variables
 
 ```env
-# Supabase
 PUBLIC_SUPABASE_URL=https://jhesstimsojwmkdysmpy.supabase.co
 PUBLIC_SUPABASE_ANON_KEY=<your_anon_key>
-
-# Revolut Business API
 REVOLUT_API_KEY=<your_revolut_api_key>
 REVOLUT_WEBHOOK_SECRET=<your_webhook_secret>
-
-# Environment
 NODE_ENV=development
 ```
 
@@ -295,229 +269,124 @@ NODE_ENV=development
 | 5 | Security Fundamentals | 5 | 15% |
 | 6 | Automation & Programmability | 4 | 10% |
 
-### Module 1: Network Fundamentals
-1. OSI & TCP/IP Models
-2. Network Topologies & Types
-3. Cabling & Physical Infrastructure
-4. IPv4 Addressing & Binary Math
-5. IPv4 Subnetting & VLSM
-6. IPv6 Addressing
-7. TCP, UDP, ARP, DNS, ICMP
-8. Cisco CLI Basics
-
-### Module 2: Network Access
-1. Ethernet & MAC Addresses
-2. Switch Operations
-3. VLANs & Trunking (802.1Q)
-4. EtherChannel
-5. Spanning Tree Protocol (STP)
-6. Wireless Fundamentals
-7. PoE & Wireless Security
-
-### Module 3: IP Connectivity
-1. Routing Table & Path Selection
-2. Static Routes
-3. Inter-VLAN Routing
-4. OSPF Single Area
-5. OSPF Multi-Area Concepts
-6. First Hop Redundancy (HSRP/VRRP)
-
-### Module 4: IP Services
-1. DHCP
-2. NAT & PAT
-3. NTP & Syslog
-4. SNMP & QoS
-5. SSH & Remote Access
-
-### Module 5: Security Fundamentals
-1. Security Threats Overview
-2. Access Control Lists (ACLs)
-3. Port Security & DHCP Snooping
-4. AAA & 802.1X
-5. VPN Concepts & Firewalls
-
-### Module 6: Automation & Programmability
-1. SDN Concepts
-2. REST APIs & Data Formats
-3. Configuration Management
-4. Cisco DNA Center & Programmability
+**Total: 35 lessons, 6 module quizzes (12 questions each)**
 
 ---
 
-## 7. Features Status
+## 7. Key Features & Implementation
 
-### ✅ Completed Features
+### Authentication
+- Supabase Auth with email/password and Google OAuth
+- Password validation: 8+ chars, uppercase, lowercase, number, special char
+- Password reset flow with Supabase email → `/reset-password` page
+- Admin check: `session.user.email === 'tsiartasantreas@gmail.com'`
 
-| Feature | Status | Notes |
-|---------|--------|-------|
-| Landing page with 3D hero | ✅ | React Three Fiber animated network |
-| 35 lessons (English) | ✅ | Full CCNA content with objectives, key terms |
-| 35 lessons (Greek) | ✅ | Translated content |
-| Interactive quizzes | ✅ | 12 questions per module, multiple choice |
-| User authentication | ✅ | Email/password + Google OAuth |
-| Password reset | ✅ | Supabase email with validation |
-| Dashboard | ✅ | Real-time progress from Supabase |
-| Profile management | ✅ | Avatar upload, theme, language |
-| Admin dashboard | ✅ | 6 tabs: Stats, Users, Subs, Revolut, Supabase, Settings |
-| Certificate generation | ✅ | PDF with Canva template background |
-| Dark/Light mode | ✅ | Toggle with localStorage persistence |
-| English/Greek i18n | ✅ | Full translation files |
-| GDPR compliance | ✅ | Data export, account deletion |
-| Revolut payment flow | ✅ | Error fallback when not configured |
-| Feedback system | ✅ | Star ratings on quizzes, testimonials |
-| Lesson completion tracking | ✅ | Mark as Complete button, sidebar badges |
-| Scroll-hide header | ✅ | Hides on scroll down, shows on scroll up |
-| Back-to-top button | ✅ | Appears after 500px scroll |
-| 11 SVG diagrams | ✅ | Embedded in lesson content |
-| Supabase integration | ✅ | Auth, database, RLS |
-| Wasmer deployment config | ✅ | wasmer.toml + app.yaml |
+### Lesson Completion System
+- **localStorage fallback** — works without login
+- **Supabase sync** — persists when logged in
+- **In-page modal** on "Next Lesson" button (not browser confirm)
+- **Sidebar badges** — green ✓ for completed lessons
+- **Completed badge** shown when lesson already done
 
-### 📋 Requires Manual Setup
+### Quiz Engine
+- React component with multiple choice questions
+- 12 questions per module
+- Saves scores to Supabase `quiz_scores` table
+- Updates `user_points` table
+- Shows results with correct/incorrect feedback
 
-| Task | How |
-|------|-----|
-| Run Supabase migration | Paste SQL in Supabase SQL Editor |
-| Add email/avatar columns | Run ALTER TABLE SQL |
-| Add admin RLS policies | Run admin policy SQL |
-| Configure redirect URLs | Supabase Dashboard → Auth → URL Config |
-| Customize email templates | Supabase Dashboard → Auth → Email Templates |
-| Enable Google OAuth | Supabase Dashboard → Auth → Providers |
-| Set up Revolut Business | Create account, get API keys |
-| Connect GitHub to Wasmer | Wasmer Dashboard → Git settings |
+### Admin Dashboard (6 tabs)
+1. **Statistics** — Real-time from Supabase (users, revenue, scores)
+2. **Users** — Email, plan dropdown, save/reset/certificate buttons
+3. **Subscriptions** — Pro users list, cancel option
+4. **Revolut** — API key, webhook config
+5. **Supabase** — Connection settings, DB status
+6. **Settings** — Site name, logo URL, feature flags, SMTP
 
----
+### Certificate
+- Canva template background (`certificate-bg.png`)
+- jsPDF overlays dynamic text (name, date)
+- Downloadable PDF
+- Admin can generate for any user
 
-## 8. Authentication Flow
+### 3D Landing Page
+- React Three Fiber with animated network topology
+- 8 network nodes (routers, switches, servers)
+- Data packets flowing along connections
+- Mouse parallax, auto-rotation
+- Background particles
 
-1. **Signup:** User enters email/password → Supabase creates auth user → Trigger creates profile + user_points → Email verification sent → User verifies → Redirects to dashboard
-2. **Login:** Email/password → Supabase validates → Session created → JWT stored → Profile fetched
-3. **Google OAuth:** Redirect to Google → Callback → Supabase session → Dashboard
-4. **Password Reset:** Profile page → Reset email sent → User clicks link → /reset-password page → New password → Supabase updateUser → Success
-5. **Admin Check:** Header checks `session.user.email === 'tsiartasantreas@gmail.com'` → Shows admin link
+### Scroll Behavior
+- Header hides on scroll down, shows on scroll up
+- Back-to-top button appears after 500px
+- Works on ALL pages (shared Header component)
 
 ---
 
-## 9. Quiz System
+## 8. Known Issues & TODOs
 
-- **Question types:** Multiple choice (currently), drag-drop, CLI simulation, topology debug (components exist)
-- **Scoring:** 10 points per correct answer, 5 bonus for 3+ streak
-- **Passing:** 80% to pass module quiz
-- **Storage:** Saved to `quiz_scores` table in Supabase
-- **Points:** Added to `user_points` table after each quiz
-
----
-
-## 10. Certificate System
-
-- **Template:** Canva-designed PNG stored at `public/images/certificate-bg.png`
-- **Generation:** jsPDF loads template as background, overlays dynamic text
-- **Content:** Recipient name, program name, issue date
-- **Download:** PDF saved as `NetworkLearn-Certificate-{name}.pdf`
-- **Access:** Pro users only, generated from admin panel
+| Issue | Status | Notes |
+|-------|--------|-------|
+| ~~Duplicate files~~ | ✅ Fixed | Removed quiz 2.astro, admin 2.astro |
+| ~~Git ref corruption~~ | ✅ Fixed | Removed refs/heads/main 2 |
+| ~~increment_points RPC~~ | ✅ Fixed | Created migration 002 |
+| ~~Scroll-hide header~~ | ✅ Fixed | useEffect bug fixed |
+| ~~Lesson completion~~ | ✅ Fixed | localStorage fallback added |
+| Greek content depth | ⚠️ | Modules 3-6 Greek is ~50% of English |
+| Avatar stored as base64 | ⚠️ | Consider Supabase Storage |
+| Revolut integration | ⚠️ | Placeholder — needs real API keys |
+| Google OAuth | ⚠️ | Needs Supabase provider config |
 
 ---
 
-## 11. Deployment
+## 9. Deployment
 
 ### Wasmer.io
-- `wasmer.toml` — Package config, static site serving
-- `app.yaml` — Edge deployment config
+- `wasmer.toml` — Package config, static site
+- `app.yaml` — Edge deployment
 - GitHub auto-deploy on push to `main`
 
 ### Build
 ```bash
+npm install
 npm run build    # Outputs to dist/
-npm run dev      # Local dev server at localhost:4321
+npm run dev      # Local dev at localhost:4321
 ```
 
----
-
-## 12. Known Issues & TODOs
-
-| Issue | Priority | Notes |
-|-------|----------|-------|
-| `quiz 2.astro` duplicate files | Low | Clean up unused files |
-| `admin 2.astro` duplicate | Low | Clean up |
-| Greek lesson content shorter than English | Medium | Modules 3-6 Greek content is ~50% of English |
-| Canva quota limits | Low | Diagrams generated, may need refresh |
-| Git ref corruption | Low | `refs/heads/main 2` exists, may cause issues |
-| Supabase `increment_points` RPC | Medium | Referenced in auth.ts but may not exist — create it |
-| Revolut integration | Low | Placeholder — needs real API keys |
-| Google OAuth | Medium | Needs Supabase provider configuration |
-| No server-side rendering | By design | Static site, all logic client-side |
-| Avatar stored as base64 | Medium | Consider Supabase Storage for production |
+### Git History
+12 commits on main, force-pushed once to fix ref corruption.
 
 ---
 
-## 13. Recommended Next Steps
+## 10. Key Patterns
 
-1. **Run all Supabase SQL** — migration + additional columns + admin policies
-2. **Configure Supabase Auth** — redirect URLs, email templates, Google OAuth
-3. **Test full user flow** — signup → verify → login → lessons → quiz → dashboard
-4. **Deploy to Wasmer** — connect GitHub repo for auto-deploy
-5. **Set up Revolut** — get Business API keys for payments
-6. **Clean up duplicate files** — remove `quiz 2.astro`, `admin 2.astro`
-7. **Expand Greek content** — bring Greek lessons to same depth as English
-8. **Add Supabase Storage** — for avatar images instead of base64
-9. **Create `increment_points` RPC function** — referenced but not created
-10. **Performance optimization** — lazy load 3D components, code splitting
-
----
-
-## 14. Key Patterns & Conventions
-
-### i18n Pattern
+### i18n
 - UI strings: `src/i18n/{locale}.json`
 - Lesson content: `src/lib/lessons/module{N}-{locale}.ts`
 - Routes: `/{locale}/path`
-- Helper: `src/lib/i18n.ts` with `t()` function
 
-### Supabase Pattern
-- Client: `src/lib/supabase.ts` exports `supabase` client
-- Auth: `src/lib/auth.ts` wraps Supabase auth functions
-- Components use `createClient()` directly with inline credentials
-- RLS ensures users only access their own data
+### Supabase
+- Client: `src/lib/supabase.ts`
+- Components use `createClient()` inline
+- RLS ensures users only access own data
+- Admin bypasses RLS via JWT email check
 
-### Lesson Content Pattern
-```typescript
-export const moduleNLessons: Record<number, {
-  objectives: string[];
-  keyTerms: { term: string; definition: string }[];
-  content: string;  // Markdown-formatted content
-}> = { ... };
-```
-
-### Admin Pattern
-- Admin email hardcoded in `admin.ts` and checked via `session.user.email`
-- Admin auto-upgraded to Pro on login
-- Settings stored in localStorage under `adminSettings` key
-- Header/Footer read settings via `localStorage.getItem('adminSettings')`
-
-### Theme Pattern
-- Default: dark mode
+### Theme
+- Default: dark
 - Toggle: `localStorage.setItem('theme', 'dark'|'light')`
 - CSS: `html.dark` / `html.light` classes
-- Colors: CSS custom properties in `global.css`
+
+### Admin
+- Email hardcoded: `tsiartasantreas@gmail.com`
+- Settings in localStorage under `adminSettings`
+- Header/Footer read settings dynamically
 
 ---
 
-## 15. Conversation History Summary
+## 11. Build Stats
 
-This project was built in a single extended session covering:
-1. Initial project scaffolding (Astro + React + Tailwind)
-2. CCNA curriculum research and content creation
-3. 3D landing page with React Three Fiber
-4. Supabase authentication and database setup
-5. Interactive quiz engine
-6. Admin dashboard with 6 management tabs
-7. Certificate generation with Canva template
-8. Bilingual support (English + Greek)
-9. GDPR compliance features
-10. Revolut payment integration
-11. SVG diagram generation for lessons
-12. Lesson progress tracking with sidebar badges
-13. Profile picture upload
-14. Header scroll behavior
-15. Multiple iterations of design refinement
-
-Total: ~63 git commits, 118 pages, ~11,000 lines of lesson content.
+- **105 pages** built
+- **~11,000 lines** of lesson content (EN + EL)
+- **11 SVG diagrams** embedded in lessons
+- **12 commits** on main branch
+- Build time: ~5-15 seconds
