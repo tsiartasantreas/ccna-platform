@@ -162,6 +162,14 @@ const modules = [
             🎓 Generate Certificate
           </button>
         </div>
+
+        {/* Recent Quiz Scores */}
+        <div class="bg-surface-card rounded-2xl border border-primary/10 p-6 mt-6">
+          <h3 class="text-lg font-bold text-text mb-4">📊 Recent Quiz Scores</h3>
+          <div id="recent-scores" class="space-y-3">
+            <p class="text-text-muted text-sm">No quiz attempts yet.</p>
+          </div>
+        </div>
       </div>
 
       {/* Quick Actions */}
@@ -262,27 +270,34 @@ const modules = [
         if (planAction) { planAction.textContent = 'Active'; planAction.className = 'px-4 py-2 bg-success/10 text-success rounded-lg text-sm font-medium cursor-default'; }
       }
 
-      // Fetch lesson progress from Supabase
-      const { data: progress } = await supabase
+      // Fetch lesson progress from Supabase (only this user's data)
+      const { data: progress, error: progressError } = await supabase
         .from('lesson_progress')
         .select('*')
         .eq('user_id', user.id);
 
+      if (progressError) console.error('Progress fetch error:', progressError);
+
       // Load localStorage completions (user-specific)
       const localCompletedMap = JSON.parse(localStorage.getItem(`completedLessons_${user.id}`) || '{}');
 
-      // Fetch quiz scores
-      const { data: scores } = await supabase
+      // Fetch quiz scores (only this user's scores)
+      const { data: scores, error: scoresError } = await supabase
         .from('quiz_scores')
         .select('*')
-        .eq('user_id', user.id);
+        .eq('user_id', user.id)
+        .order('completed_at', { ascending: false });
 
-      // Fetch user points
-      const { data: points } = await supabase
+      if (scoresError) console.error('Scores fetch error:', scoresError);
+
+      // Fetch user points (only this user's points)
+      const { data: points, error: pointsError } = await supabase
         .from('user_points')
         .select('*')
         .eq('user_id', user.id)
         .single();
+
+      if (pointsError) console.error('Points fetch error:', pointsError);
 
       // Update points
       const totalPoints = document.getElementById('total-points');
@@ -323,6 +338,26 @@ const modules = [
       const modulesEl = document.getElementById('modules-completed');
       if (lessonsEl) lessonsEl.textContent = `${totalCompleted}/35`;
       if (modulesEl) modulesEl.textContent = `${modulesCompleted}/6`;
+
+      // Render recent quiz scores
+      const scoresContainer = document.getElementById('recent-scores');
+      if (scoresContainer && scores && scores.length > 0) {
+        const moduleNames = ['Network Fundamentals', 'Network Access', 'IP Connectivity', 'IP Services', 'Security Fundamentals', 'Automation'];
+        scoresContainer.innerHTML = scores.slice(0, 10).map(s => {
+          const passed = Number(s.score) >= 80;
+          const date = new Date(s.completed_at).toLocaleDateString();
+          return `<div class="flex items-center justify-between p-3 bg-surface-light rounded-lg">
+            <div>
+              <div class="font-medium text-text text-sm">Module ${s.module_number}: ${moduleNames[s.module_number - 1]}</div>
+              <div class="text-xs text-text-muted">Attempt #${s.attempt_number} • ${date}</div>
+            </div>
+            <div class="text-right">
+              <div class="text-lg font-bold ${passed ? 'text-success' : 'text-warning'}">${Math.round(Number(s.score))}%</div>
+              <div class="text-xs ${passed ? 'text-success' : 'text-text-muted'}">${s.correct_answers}/${s.total_questions}</div>
+            </div>
+          </div>`;
+        }).join('');
+      }
     }
 
     loadDashboard();
