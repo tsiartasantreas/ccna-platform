@@ -427,12 +427,36 @@ const t = en;
 
     // Delete account (GDPR)
     document.getElementById('delete-account-btn')?.addEventListener('click', async () => {
-      if (confirm('Are you sure you want to delete your account? This action cannot be undone. All your data will be permanently deleted within 30 days.')) {
+      const confirmMsg = 'Are you sure you want to delete your account?\n\nThis will permanently delete:\n• All your lesson progress\n• All quiz scores\n• Your points and streak\n• Your profile data\n\nThis action CANNOT be undone.';
+      if (confirm(confirmMsg)) {
         const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          await supabase.from('profiles').update({ display_name: '[DELETED]' }).eq('id', session.user.id);
+        if (!session?.user) return;
+
+        const btn = document.getElementById('delete-account-btn');
+        if (btn) { btn.textContent = 'Deleting...'; (btn as HTMLButtonElement).disabled = true; }
+
+        try {
+          // Delete all user data from database
+          await supabase.from('lesson_progress').delete().eq('user_id', session.user.id);
+          await supabase.from('quiz_scores').delete().eq('user_id', session.user.id);
+          await supabase.from('user_points').delete().eq('user_id', session.user.id);
+          await supabase.from('admin_user_emails').delete().eq('user_id', session.user.id);
+          await supabase.from('profiles').delete().eq('id', session.user.id);
+
+          // Clear localStorage
+          localStorage.removeItem('userEmail');
+          localStorage.removeItem('userId');
+          localStorage.removeItem('userAvatar');
+          localStorage.removeItem(`completedLessons_${session.user.id}`);
+
+          // Sign out
           await supabase.auth.signOut();
+
+          alert('Your account has been deleted. All data has been permanently removed.');
           window.location.href = '/en/';
+        } catch (error: any) {
+          alert('Error deleting account: ' + (error.message || 'Please try again or contact support.'));
+          if (btn) { btn.textContent = t.profile.delete_account; (btn as HTMLButtonElement).disabled = false; }
         }
       }
     });

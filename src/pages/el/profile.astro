@@ -241,9 +241,26 @@ const t = el;
       const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `networklearn-data-${new Date().toISOString().split('T')[0]}.json`; a.click();
     });
     document.getElementById('delete-account-btn')?.addEventListener('click', async () => {
-      if (confirm('Είστε σίγουροι; Όλα τα δεδομένα θα διαγραφούν μόνιμα.')) {
+      const msg = 'Είστε σίγουροι;\n\nΘα διαγραφούν μόνιμα:\n• Όλη η πρόοδος μαθημάτων\n• Όλες οι βαθμολογίες τεστ\n• Οι πόντοι και τα σερί\n• Τα δεδομένα προφίλ\n\nΑυτή η ενέργεια ΔΕΝ μπορεί να αναιρεθεί.';
+      if (confirm(msg)) {
         const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) { await supabase.from('profiles').update({ display_name: '[DELETED]' }).eq('id', session.user.id); await supabase.auth.signOut(); window.location.href = '/el/'; }
+        if (!session?.user) return;
+        try {
+          await supabase.from('lesson_progress').delete().eq('user_id', session.user.id);
+          await supabase.from('quiz_scores').delete().eq('user_id', session.user.id);
+          await supabase.from('user_points').delete().eq('user_id', session.user.id);
+          await supabase.from('admin_user_emails').delete().eq('user_id', session.user.id);
+          await supabase.from('profiles').delete().eq('id', session.user.id);
+          localStorage.removeItem('userEmail');
+          localStorage.removeItem('userId');
+          localStorage.removeItem('userAvatar');
+          localStorage.removeItem('completedLessons_' + session.user.id);
+          await supabase.auth.signOut();
+          alert('Ο λογαριασμός σας διαγράφηκε μόνιμα.');
+          window.location.href = '/el/';
+        } catch (e) {
+          alert('Σφάλμα: ' + (e.message || 'Δοκιμάστε ξανά.'));
+        }
       }
     });
     document.getElementById('profile-form')?.addEventListener('submit', async (e) => {
