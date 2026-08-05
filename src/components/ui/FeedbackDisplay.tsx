@@ -1,4 +1,10 @@
 import { useState, useEffect } from 'react';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  'https://jhesstimsojwmkdysmpy.supabase.co',
+  'sb_publishable_bKD9biIulcfC5iNipD-8IA_3Zu4bmWD'
+);
 
 interface Feedback {
   moduleNumber: number;
@@ -13,50 +19,113 @@ interface FeedbackDisplayProps {
   locale: 'en' | 'el';
 }
 
-// Default testimonials for initial display
-const defaultTestimonials: Feedback[] = [
-  { moduleNumber: 1, moduleName: 'Network Fundamentals', rating: 5, comment: 'Excellent introduction to networking! The 3D diagrams made complex concepts easy to understand.', userName: 'John S.', createdAt: '2026-08-01' },
-  { moduleNumber: 2, moduleName: 'Network Access', rating: 5, comment: 'The VLAN and STP lessons were incredibly clear. Best CCNA resource I\'ve found.', userName: 'Maria P.', createdAt: '2026-08-02' },
-  { moduleNumber: 3, moduleName: 'IP Connectivity', rating: 4, comment: 'OSPF explained better than any textbook. The interactive quizzes really helped cement the concepts.', userName: 'Giorgos N.', createdAt: '2026-08-03' },
-  { moduleNumber: 1, moduleName: 'Network Fundamentals', rating: 5, comment: 'As a complete beginner, this platform made networking approachable. Highly recommend!', userName: 'Sarah J.', createdAt: '2026-08-02' },
-  { moduleNumber: 4, moduleName: 'IP Services', rating: 4, comment: 'NAT and DHCP sections were exactly what I needed. Clear, concise, and practical.', userName: 'Andreas T.', createdAt: '2026-08-03' },
-  { moduleNumber: 5, moduleName: 'Security Fundamentals', rating: 5, comment: 'The ACL and VPN lessons are top-notch. The security concepts are explained perfectly.', userName: 'Elena K.', createdAt: '2026-08-04' },
-];
+const moduleNames: Record<number, string> = {
+  1: 'Network Fundamentals',
+  2: 'Network Access',
+  3: 'IP Connectivity',
+  4: 'IP Services',
+  5: 'Security Fundamentals',
+  6: 'Automation & Programmability',
+};
 
 export default function FeedbackDisplay({ locale }: FeedbackDisplayProps) {
-  const [feedback, setFeedback] = useState<Feedback[]>(defaultTestimonials);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [feedback, setFeedback] = useState<Feedback[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load feedback from localStorage
-    const stored = JSON.parse(localStorage.getItem('moduleFeedback') || '[]');
-    if (stored.length > 0) {
-      setFeedback([...stored, ...defaultTestimonials]);
+    async function loadFeedback() {
+      try {
+        // Load from localStorage
+        const stored = JSON.parse(localStorage.getItem('moduleFeedback') || '[]');
+
+        // Load from Supabase (if table exists)
+        let dbFeedback: Feedback[] = [];
+        try {
+          const { data } = await supabase
+            .from('module_feedback')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(20);
+
+          if (data) {
+            dbFeedback = data.map((f: any) => ({
+              moduleNumber: f.module_number,
+              moduleName: moduleNames[f.module_number] || 'Module',
+              rating: f.rating,
+              comment: f.comment || '',
+              userName: f.display_name || 'Anonymous',
+              createdAt: f.created_at,
+            }));
+          }
+        } catch {
+          // Table might not exist yet
+        }
+
+        // Combine and deduplicate
+        const allFeedback = [...dbFeedback, ...stored];
+        setFeedback(allFeedback);
+      } catch (error) {
+        console.error('Error loading feedback:', error);
+      } finally {
+        setLoading(false);
+      }
     }
 
-    // Auto-rotate testimonials
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % feedback.length);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [feedback.length]);
+    loadFeedback();
+  }, []);
 
   const t = locale === 'el' ? {
     title: 'Τι Λένε οι Φοιτητές μας',
     subtitle: 'Αξιολογήσεις από πραγματικούς χρήστες',
     module: 'Ενότητα',
+    noReviews: 'Δεν υπάρχουν ακόμα αξιολογήσεις',
+    beFirst: 'Ολοκληρώστε ένα τεστ και αφήστε την αξιολόγησή σας για να βοηθήσετε άλλους!',
+    leaveReview: 'Αφήστε την Αξιολόγησή σας',
+    loading: 'Φόρτωση αξιολογήσεων...',
   } : {
     title: 'What Our Students Say',
     subtitle: 'Reviews from real users',
     module: 'Module',
+    noReviews: 'No reviews yet',
+    beFirst: 'Complete a quiz and leave your review to help others learn!',
+    leaveReview: 'Leave Your Review',
+    loading: 'Loading reviews...',
   };
 
-  const visibleFeedback = [
-    feedback[currentIndex % feedback.length],
-    feedback[(currentIndex + 1) % feedback.length],
-    feedback[(currentIndex + 2) % feedback.length],
-  ];
+  if (loading) {
+    return (
+      <section className="py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p className="text-text-muted">{t.loading}</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (feedback.length === 0) {
+    return (
+      <section className="py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">{t.title}</h2>
+            <p className="text-text-muted">{t.subtitle}</p>
+          </div>
+
+          <div className="bg-surface-card rounded-2xl border border-primary/10 p-12 text-center max-w-lg mx-auto">
+            <div className="text-6xl mb-4">💬</div>
+            <h3 className="text-xl font-bold text-text mb-2">{t.noReviews}</h3>
+            <p className="text-text-muted mb-6">{t.beFirst}</p>
+            <a
+              href={`/${locale}/lessons/1/quiz`}
+              className="inline-flex px-6 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity"
+            >
+              {t.leaveReview} →
+            </a>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-24">
@@ -67,11 +136,10 @@ export default function FeedbackDisplay({ locale }: FeedbackDisplayProps) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {visibleFeedback.map((item, idx) => (
+          {feedback.slice(0, 6).map((item, idx) => (
             <div
-              key={`${currentIndex}-${idx}`}
-              className="bg-surface-card rounded-2xl border border-primary/10 p-6 hover:border-primary/20 transition-all animate-fade-in"
-              style={{ animationDelay: `${idx * 100}ms` }}
+              key={idx}
+              className="bg-surface-card rounded-2xl border border-primary/10 p-6 hover:border-primary/20 transition-all"
             >
               {/* Stars */}
               <div className="flex gap-1 mb-4">
@@ -86,14 +154,16 @@ export default function FeedbackDisplay({ locale }: FeedbackDisplayProps) {
               </div>
 
               {/* Comment */}
-              <p className="text-text-muted text-sm mb-4 line-clamp-4">
-                "{item.comment}"
-              </p>
+              {item.comment && (
+                <p className="text-text-muted text-sm mb-4 line-clamp-4">
+                  "{item.comment}"
+                </p>
+              )}
 
               {/* Author */}
               <div className="flex items-center gap-3 pt-4 border-t border-primary/10">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-sm">
-                  {item.userName.charAt(0)}
+                  {item.userName.charAt(0).toUpperCase()}
                 </div>
                 <div>
                   <p className="text-sm font-medium text-text">{item.userName}</p>
@@ -101,19 +171,6 @@ export default function FeedbackDisplay({ locale }: FeedbackDisplayProps) {
                 </div>
               </div>
             </div>
-          ))}
-        </div>
-
-        {/* Navigation dots */}
-        <div className="flex justify-center gap-2 mt-8">
-          {feedback.map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => setCurrentIndex(idx)}
-              className={`w-2 h-2 rounded-full transition-all ${
-                idx === currentIndex ? 'bg-primary w-6' : 'bg-primary/30'
-              }`}
-            />
           ))}
         </div>
       </div>
