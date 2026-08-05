@@ -219,12 +219,7 @@ const t = en;
   <Footer locale={locale} translations={t} />
 
   <script>
-    import { createClient } from '@supabase/supabase-js';
-
-    const supabase = createClient(
-      'https://jhesstimsojwmkdysmpy.supabase.co',
-      'sb_publishable_bKD9biIulcfC5iNipD-8IA_3Zu4bmWD'
-    );
+    import { supabase } from '../../lib/supabase';
 
     // Load user profile and plan
     async function loadProfile() {

@@ -137,11 +137,7 @@ const t = en;
   <Footer locale={locale} translations={t} />
 
   <script>
-    import { createClient } from '@supabase/supabase-js';
-
-    const supabaseUrl = 'https://jhesstimsojwmkdysmpy.supabase.co';
-    const supabaseKey = 'sb_publishable_bKD9biIulcfC5iNipD-8IA_3Zu4bmWD';
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    import { supabase } from '../../lib/supabase';
 
     const ADMIN_EMAIL = 'tsiartasantreas@gmail.com';
 

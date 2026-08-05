@@ -97,13 +97,9 @@ const t = el;
     toggleBtn?.addEventListener('click', toggleMode);
 
     // Connect to Supabase
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
-    script.onload = async () => {
-      const supabase = (window as any).supabase.createClient(
-        'https://jhesstimsojwmkdysmpy.supabase.co',
-        'sb_publishable_bKD9biIulcfC5iNipD-8IA_3Zu4bmWD'
-      );
+    import { supabase } from '../../lib/supabase';
+    
+    const initAuth = async () => {
 
       // Check if already logged in
       const { data: { session } } = await supabase.auth.getSession();
@@ -195,6 +191,6 @@ const t = el;
         }
       });
     };
-    document.head.appendChild(script);
+    initAuth();
   </script>
 </BaseLayout>
