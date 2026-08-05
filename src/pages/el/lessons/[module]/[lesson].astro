@@ -196,17 +196,35 @@ function mdToHtml(md: string): string {
           </div>
         )}
 
-        {/* Mark Complete Button */}
-        <div class="mt-8 flex justify-center">
-          <button id="mark-complete-btn" class="px-8 py-4 bg-gradient-to-r from-success to-emerald-500 text-white rounded-xl font-medium hover:opacity-90 transition-all hover:scale-105 shadow-lg shadow-success/25 flex items-center gap-3">
-            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            <span id="complete-btn-text">{t.lesson.mark_complete}</span>
-          </button>
-        </div>
-
+        {/* Navigation */}
         <div class="mt-8 flex items-center justify-between">
           {prevLesson ? <a href={`/${locale}/lessons/${prevLesson.module}/${prevLesson.lesson}`} class="flex items-center gap-2 px-4 py-2 text-text-muted hover:text-primary transition-colors">← {t.lesson.prev_lesson}</a> : <div />}
-          {nextLesson ? <a href={`/${locale}/lessons/${nextLesson.module}/${nextLesson.lesson}`} class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity">{t.lesson.next_lesson} →</a> : <div />}
+          {nextLesson ? (
+            <button id="next-lesson-btn" data-href={`/${locale}/lessons/${nextLesson.module}/${nextLesson.lesson}`} class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity cursor-pointer">
+              {t.lesson.next_lesson} →
+            </button>
+          ) : <div />}
+        </div>
+
+        {/* Completion Modal */}
+        <div id="completion-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div class="bg-surface-card rounded-2xl border border-primary/10 p-8 max-w-md mx-4 text-center animate-fade-in">
+            <div class="text-5xl mb-4">📚</div>
+            <h2 class="text-2xl font-bold text-text mb-2">Ολοκληρώσατε το μάθημα;</h2>
+            <p class="text-text-muted mb-6">Τελειώσατε τη μελέτη αυτού του μαθήματος;</p>
+            <div class="flex gap-3 justify-center">
+              <button id="modal-yes" class="px-6 py-3 bg-gradient-to-r from-success to-emerald-500 text-white rounded-xl font-medium hover:opacity-90 transition-opacity">✓ Ναι, τελείωσα</button>
+              <button id="modal-no" class="px-6 py-3 border border-primary/30 text-primary rounded-xl font-medium hover:bg-primary/10 transition-all">Όχι ακόμα</button>
+            </div>
+          </div>
+        </div>
+
+        {/* Completed Badge */}
+        <div id="completed-badge" class="hidden mt-6 flex justify-center">
+          <div class="flex items-center gap-2 px-4 py-2 bg-success/10 text-success rounded-full text-sm font-medium">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width={2} d="M5 13l4 4L19 7" /></svg>
+            Μάθημα Ολοκληρώθηκε
+          </div>
         </div>
       </article>
     </div>
@@ -258,29 +276,41 @@ function mdToHtml(md: string): string {
       if (!session?.user) return;
       const { data } = await supabase.from('lesson_progress').select('status').eq('user_id', session.user.id).eq('module_number', moduleNum).eq('lesson_number', lessonNum).single();
       if (data?.status === 'completed') {
-        const btn = document.getElementById('mark-complete-btn');
-        const btnText = document.getElementById('complete-btn-text');
-        if (btn) { btn.classList.remove('from-success', 'to-emerald-500', 'shadow-success/25'); btn.classList.add('bg-success/20', 'text-success', 'cursor-default'); }
-        if (btnText) btnText.textContent = '✓ Ολοκληρώθηκε';
         saved = true;
+        document.getElementById('completed-badge')?.classList.remove('hidden');
       }
     }
     checkCompletion();
     saveLessonProgress('in_progress');
 
-    // Mark Complete button
-    document.getElementById('mark-complete-btn')?.addEventListener('click', async () => {
-      if (saved) return;
-      if (confirm('Σημειώσει αυτό το μάθημα ως ολοκληρωμένο;')) {
-        await saveLessonProgress('completed');
-        const btn = document.getElementById('mark-complete-btn');
-        const btnText = document.getElementById('complete-btn-text');
-        if (btn) { btn.classList.remove('from-success', 'to-emerald-500', 'shadow-success/25'); btn.classList.add('bg-success/20', 'text-success', 'cursor-default'); }
-        if (btnText) btnText.textContent = '✓ Ολοκληρώθηκε';
-        const badge = document.getElementById(`lesson-badge-${lessonNum}`);
-        if (badge) { badge.textContent = '✓'; badge.className = 'w-6 h-6 rounded flex items-center justify-center text-xs bg-success/20 text-success font-bold'; }
-      }
+    // Next Lesson - shows modal if not completed
+    const nextBtn = document.getElementById('next-lesson-btn');
+    const modal = document.getElementById('completion-modal');
+    const modalYes = document.getElementById('modal-yes');
+    const modalNo = document.getElementById('modal-no');
+
+    nextBtn?.addEventListener('click', () => {
+      if (saved) { window.location.href = nextBtn.getAttribute('data-href') || ''; }
+      else { modal?.classList.remove('hidden'); }
     });
+
+    modalYes?.addEventListener('click', async () => {
+      await saveLessonProgress('completed');
+      const badge = document.getElementById(`lesson-badge-${lessonNum}`);
+      if (badge) { badge.textContent = '✓'; badge.className = 'w-6 h-6 rounded flex items-center justify-center text-xs bg-success/20 text-success font-bold'; }
+      modal?.classList.add('hidden');
+      document.getElementById('completed-badge')?.classList.remove('hidden');
+      const href = nextBtn?.getAttribute('data-href');
+      if (href) window.location.href = href;
+    });
+
+    modalNo?.addEventListener('click', () => {
+      modal?.classList.add('hidden');
+      const href = nextBtn?.getAttribute('data-href');
+      if (href) window.location.href = href;
+    });
+
+    modal?.addEventListener('click', (e) => { if (e.target === modal) modal.classList.add('hidden'); });
 
     window.addEventListener('beforeunload', () => { if (!saved) saveLessonProgress('in_progress'); });
   </script>
