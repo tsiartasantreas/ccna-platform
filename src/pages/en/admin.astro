@@ -421,10 +421,15 @@ const t = en;
       await supabase.from('profiles').update({ plan: 'pro' }).eq('id', session.user.id);
 
       async function loadAdminData() {
-        const { data: profiles } = await supabase.from('profiles').select('*');
-        const { data: allProgress } = await supabase.from('lesson_progress').select('*');
-        const { data: allScores } = await supabase.from('quiz_scores').select('*');
-        const { data: adminEmails } = await supabase.from('admin_user_emails').select('*');
+        const { data: profiles, error: profilesError } = await supabase.from('profiles').select('*');
+        const { data: allProgress, error: progressError } = await supabase.from('lesson_progress').select('*');
+        const { data: allScores, error: scoresError } = await supabase.from('quiz_scores').select('*');
+        const { data: adminEmails, error: emailsError } = await supabase.from('admin_user_emails').select('*');
+
+        if (profilesError) console.error('Profiles error:', profilesError);
+        if (progressError) console.error('Progress error:', progressError);
+        if (scoresError) console.error('Scores error:', scoresError);
+        if (emailsError) console.error('Emails error:', emailsError);
 
         // Create email lookup map
         const emailMap: Record<string, string> = {};
