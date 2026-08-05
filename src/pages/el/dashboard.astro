@@ -91,14 +91,26 @@ const modules = [
           <h3 class="font-bold text-text mb-1">Πρόγραμμα Σπουδών</h3>
           <p class="text-sm text-text-muted">Δείτε και τα 35 μαθήματα σε 6 ενότητες</p>
         </a>
-        <a href={`/${locale}/pricing`} class="bg-gradient-to-r from-accent/10 to-primary/10 rounded-xl border border-accent/20 p-6 hover:border-accent/40 transition-colors">
+        <button id="upgrade-btn" class="bg-gradient-to-r from-accent/10 to-primary/10 rounded-xl border border-accent/20 p-6 hover:border-accent/40 transition-colors text-left cursor-pointer">
           <div class="text-2xl mb-2">⭐</div>
           <h3 class="font-bold text-text mb-1">Αναβάθμιση σε Pro</h3>
           <p class="text-sm text-text-muted">Ξεκλειδώστε τεστ και πιστοποιητικό</p>
-        </a>
+        </button>
       </div>
     </div>
   </main>
+
+  {/* Already Pro Modal */}
+  <div id="already-pro-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div class="bg-surface-card rounded-2xl border border-primary/10 p-8 max-w-md mx-4 text-center animate-fade-in">
+      <div class="text-6xl mb-4">⭐</div>
+      <h2 class="text-2xl font-bold text-text mb-2">Είστε ήδη Pro!</h2>
+      <p class="text-text-muted mb-6">Έχετε πλήρη πρόσβαση σε όλα τα τεστ, πιστοποιητικά και premium λειτουργίες.</p>
+      <button onclick="document.getElementById('already-pro-modal').classList.add('hidden')" class="px-6 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity">
+        Το κατάλαβα!
+      </button>
+    </div>
+  </div>
 
   <Footer locale={locale} translations={t} />
 
@@ -155,6 +167,18 @@ const modules = [
     }
 
     loadDashboard();
+
+    // Upgrade button handler
+    document.getElementById('upgrade-btn')?.addEventListener('click', async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) { window.location.href = '/el/login'; return; }
+      const { data: profile } = await supabase.from('profiles').select('plan').eq('id', session.user.id).single();
+      if (profile?.plan === 'pro') {
+        document.getElementById('already-pro-modal')?.classList.remove('hidden');
+      } else {
+        window.location.href = '/el/pricing';
+      }
+    });
 
     // Real-time subscriptions
     const userId = localStorage.getItem('userId');

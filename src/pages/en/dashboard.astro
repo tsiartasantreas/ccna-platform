@@ -123,14 +123,26 @@ const modules = [
           <h3 class="font-bold text-text mb-1">Browse Curriculum</h3>
           <p class="text-sm text-text-muted">View all 35 lessons across 6 modules</p>
         </a>
-        <a href={`/${locale}/pricing`} class="bg-gradient-to-r from-accent/10 to-primary/10 rounded-xl border border-accent/20 p-6 hover:border-accent/40 transition-colors">
+        <button id="upgrade-btn" class="bg-gradient-to-r from-accent/10 to-primary/10 rounded-xl border border-accent/20 p-6 hover:border-accent/40 transition-colors text-left cursor-pointer">
           <div class="text-2xl mb-2">⭐</div>
           <h3 class="font-bold text-text mb-1">Upgrade to Pro</h3>
           <p class="text-sm text-text-muted">Unlock gamified quizzes and certificates</p>
-        </a>
+        </button>
       </div>
     </div>
   </main>
+
+  {/* Already Pro Modal */}
+  <div id="already-pro-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div class="bg-surface-card rounded-2xl border border-primary/10 p-8 max-w-md mx-4 text-center animate-fade-in">
+      <div class="text-6xl mb-4">⭐</div>
+      <h2 class="text-2xl font-bold text-text mb-2">You're Already Pro!</h2>
+      <p class="text-text-muted mb-6">You have full access to all quizzes, certificates, and premium features.</p>
+      <button onclick="document.getElementById('already-pro-modal').classList.add('hidden')" class="px-6 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity">
+        Got it!
+      </button>
+    </div>
+  </div>
 
   <Footer locale={locale} translations={t} />
 
@@ -177,14 +189,14 @@ const modules = [
         if (planAction) { planAction.textContent = 'Active'; planAction.className = 'px-4 py-2 bg-success/10 text-success rounded-lg text-sm font-medium cursor-default'; }
       }
 
-      // Fetch lesson progress
+      // Fetch lesson progress from Supabase
       const { data: progress } = await supabase
         .from('lesson_progress')
         .select('*')
         .eq('user_id', user.id);
 
-      // Also load from localStorage
-      const localCompleted = JSON.parse(localStorage.getItem('completedLessons') || '{}');
+      // Load localStorage completions
+      const localCompletedMap = JSON.parse(localStorage.getItem('completedLessons') || '{}');
 
       // Fetch quiz scores
       const { data: scores } = await supabase
@@ -215,12 +227,12 @@ const modules = [
       for (let m = 1; m <= 6; m++) {
         const moduleProgress = progress?.filter(p => p.module_number === m) || [];
         const supabaseCompleted = moduleProgress.filter(p => p.status === 'completed').length;
-        // Also count localStorage completions
-        let localCompleted = 0;
+        // Count localStorage completions for this module
+        let localCount = 0;
         for (let l = 1; l <= moduleLessons[m - 1]; l++) {
-          if (localCompleted[`${m}_${l}`]) localCompleted++;
+          if (localCompletedMap[`${m}_${l}`]) localCount++;
         }
-        const completed = Math.max(supabaseCompleted, localCompleted);
+        const completed = Math.max(supabaseCompleted, localCount);
         const total = moduleLessons[m - 1];
         const percent = Math.round((completed / total) * 100);
 
@@ -241,6 +253,29 @@ const modules = [
     }
 
     loadDashboard();
+
+    // Upgrade button handler
+    document.getElementById('upgrade-btn')?.addEventListener('click', async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) {
+        window.location.href = '/en/login';
+        return;
+      }
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('plan')
+        .eq('id', session.user.id)
+        .single();
+
+      if (profile?.plan === 'pro') {
+        // Show already Pro modal
+        document.getElementById('already-pro-modal')?.classList.remove('hidden');
+      } else {
+        // Go to pricing page
+        window.location.href = '/en/pricing';
+      }
+    });
 
     // Real-time subscriptions for live updates
     const userId = localStorage.getItem('userId');
