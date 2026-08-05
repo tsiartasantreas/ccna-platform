@@ -5,6 +5,7 @@ import Footer from '../../../../components/layout/Footer.tsx';
 import QuizEngine from '../../../../components/quiz/QuizEngine.tsx';
 import FeedbackForm from '../../../../components/ui/FeedbackForm.tsx';
 import en from '../../../../i18n/en.json';
+import { allQuizzes } from '../../../../lib/quiz-questions';
 
 const locale = 'en' as const;
 const t = en;
@@ -12,88 +13,6 @@ const t = en;
 const moduleNames: Record<number, string> = {
   1: 'Network Fundamentals', 2: 'Network Access', 3: 'IP Connectivity',
   4: 'IP Services', 5: 'Security Fundamentals', 6: 'Automation & Programmability',
-};
-
-// Quiz questions per module
-const allQuizzes: Record<number, { question: string; options: string[]; correct: number; explanation: string }[]> = {
-  1: [
-    { question: 'Which OSI layer is responsible for routing packets between networks?', options: ['Layer 1 - Physical', 'Layer 2 - Data Link', 'Layer 3 - Network', 'Layer 4 - Transport'], correct: 2, explanation: 'Layer 3 (Network layer) handles logical addressing and routing.' },
-    { question: 'What is the default subnet mask for a Class C IP address?', options: ['255.0.0.0', '255.255.0.0', '255.255.255.0', '255.255.255.255'], correct: 2, explanation: 'Class C addresses use /24 (255.255.255.0) as their default subnet mask.' },
-    { question: 'Which protocol uses port 443?', options: ['HTTP', 'HTTPS', 'FTP', 'SSH'], correct: 1, explanation: 'HTTPS uses port 443 for encrypted web traffic.' },
-    { question: 'How many bits are in an IPv4 address?', options: ['32 bits', '64 bits', '128 bits', '256 bits'], correct: 0, explanation: 'IPv4 addresses are 32 bits long, written as four octets.' },
-    { question: 'What does ARP stand for?', options: ['Address Resolution Protocol', 'Automatic Routing Protocol', 'Advanced Resource Protocol', 'Address Routing Process'], correct: 0, explanation: 'ARP maps IP addresses to MAC addresses on a local network.' },
-    { question: 'Which TCP flag initiates a connection?', options: ['ACK', 'FIN', 'SYN', 'RST'], correct: 2, explanation: 'The SYN flag is used in the first step of the TCP three-way handshake.' },
-    { question: 'What is the private IP range for Class A?', options: ['10.0.0.0 - 10.255.255.255', '172.16.0.0 - 172.31.255.255', '192.168.0.0 - 192.168.255.255', '169.254.0.0 - 169.254.255.255'], correct: 0, explanation: 'The Class A private range is 10.0.0.0/8.' },
-    { question: 'Which command shows the IP configuration on a Cisco router?', options: ['show interfaces', 'show ip route', 'show running-config', 'show ip interface brief'], correct: 3, explanation: '"show ip interface brief" displays a summary of all interfaces.' },
-    { question: 'What is the purpose of DNS?', options: ['Assign IP addresses', 'Resolve domain names to IPs', 'Encrypt traffic', 'Route packets'], correct: 1, explanation: 'DNS translates domain names into IP addresses.' },
-    { question: 'How many usable hosts are in a /26 subnet?', options: ['30', '62', '126', '254'], correct: 1, explanation: 'A /26 subnet has 64 addresses minus 2 = 62 usable hosts.' },
-    { question: 'What is the loopback address in IPv4?', options: ['0.0.0.0', '127.0.0.1', '255.255.255.255', '192.168.0.1'], correct: 1, explanation: '127.0.0.1 is the IPv4 loopback address.' },
-    { question: 'Which protocol is connectionless?', options: ['TCP', 'UDP', 'Both', 'Neither'], correct: 1, explanation: 'UDP is connectionless — it sends data without establishing a connection.' },
-  ],
-  2: [
-    { question: 'What does a switch use to forward frames?', options: ['IP address', 'MAC address', 'Port number', 'Hostname'], correct: 1, explanation: 'Switches use MAC addresses to make forwarding decisions.' },
-    { question: 'What is a VLAN?', options: ['A physical device', 'A virtual broadcast domain', 'A cable type', 'A routing protocol'], correct: 1, explanation: 'A VLAN creates separate broadcast domains.' },
-    { question: 'Which protocol prevents Layer 2 loops?', options: ['OSPF', 'STP', 'ARP', 'DHCP'], correct: 1, explanation: 'STP prevents loops by blocking redundant paths.' },
-    { question: 'What is the maximum cable run for Cat 5e UTP?', options: ['50m', '100m', '200m', '500m'], correct: 1, explanation: 'Maximum UTP cable run is 100 meters.' },
-    { question: 'What does 802.1Q do?', options: ['Wireless connectivity', 'Tags frames with VLAN ID', 'Routes packets', 'Assigns IPs'], correct: 1, explanation: '802.1Q inserts a VLAN tag into Ethernet frames.' },
-    { question: 'What is the native VLAN by default?', options: ['VLAN 0', 'VLAN 1', 'VLAN 10', 'VLAN 100'], correct: 1, explanation: 'Default native VLAN is VLAN 1.' },
-    { question: 'Which PoE standard provides up to 30W?', options: ['802.3af', '802.3at', '802.3bt', '802.3ab'], correct: 1, explanation: '802.3at (PoE+) provides up to 30W per port.' },
-    { question: 'What does PortFast do?', options: ['Blocks the port', 'Immediately forwards', 'Shuts down port', 'Enables trunking'], correct: 1, explanation: 'PortFast immediately transitions a port to forwarding.' },
-    { question: 'Which wireless standard operates only on 5 GHz?', options: ['802.11b', '802.11g', '802.11a', '802.11n'], correct: 2, explanation: '802.11a operates only on 5 GHz.' },
-    { question: 'What is EtherChannel?', options: ['A wireless protocol', 'Bundling multiple links', 'A firewall', 'A routing algorithm'], correct: 1, explanation: 'EtherChannel bundles multiple physical links into one logical link.' },
-    { question: 'What security protocol is recommended for wireless?', options: ['WEP', 'WPA', 'WPA2', 'WPA3'], correct: 3, explanation: 'WPA3 is the latest and most secure wireless security protocol.' },
-    { question: 'What is BPDU Guard used for?', options: ['Preventing loops', 'Disabling ports receiving BPDUs', 'Encrypting traffic', 'Assigning VLANs'], correct: 1, explanation: 'BPDU Guard err-disables a port if it receives BPDUs.' },
-  ],
-  3: [
-    { question: 'What is the default AD of OSPF?', options: ['90', '110', '120', '170'], correct: 1, explanation: 'OSPF has a default AD of 110.' },
-    { question: 'What does a static route with AD 250 represent?', options: ['Primary route', 'Default route', 'Floating static route', 'Connected route'], correct: 2, explanation: 'A floating static route has a higher AD, serving as backup.' },
-    { question: 'Which command configures a default route?', options: ['ip route 0.0.0.0 0.0.0.0 next-hop', 'ip default-route next-hop', 'default-route next-hop', 'route default next-hop'], correct: 0, explanation: '"ip route 0.0.0.0 0.0.0.0 next-hop" configures a default route.' },
-    { question: 'What is Router-on-a-Stick?', options: ['A wireless protocol', 'Inter-VLAN routing with subinterfaces', 'A switch type', 'A routing protocol'], correct: 1, explanation: 'Router-on-a-Stick uses subinterfaces for inter-VLAN routing.' },
-    { question: 'What does OSPF use to elect a DR?', options: ['Highest IP', 'Highest router ID', 'Lowest IP', 'Lowest router ID'], correct: 1, explanation: 'OSPF elects the DR based on the highest router ID.' },
-    { question: 'What is the OSPF hello timer default?', options: ['10 sec', '30 sec', '40 sec', '120 sec'], correct: 0, explanation: 'Default OSPF hello timer is 10 seconds on multi-access networks.' },
-    { question: 'What does HSRP provide?', options: ['Load balancing', 'First hop redundancy', 'Wireless', 'Encryption'], correct: 1, explanation: 'HSRP provides first hop redundancy with automatic failover.' },
-    { question: 'Which command shows OSPF neighbors?', options: ['show ip ospf', 'show ip ospf neighbor', 'show ip route ospf', 'show ospf database'], correct: 1, explanation: '"show ip ospf neighbor" displays the OSPF neighbor table.' },
-    { question: 'What is the longest prefix match rule?', options: ['Lowest AD wins', 'Most specific match wins', 'Lowest metric wins', 'Highest priority wins'], correct: 1, explanation: 'The most specific route (longest prefix) is selected.' },
-    { question: 'What is an ABR in OSPF?', options: ['AS Border Router', 'Area Border Router', 'Active Backup Router', 'Address Broadcast Router'], correct: 1, explanation: 'An Area Border Router connects multiple OSPF areas.' },
-    { question: 'What is the OSPF dead timer default?', options: ['10 sec', '30 sec', '40 sec', '120 sec'], correct: 2, explanation: 'Default OSPF dead timer is 40 seconds (4x hello timer).' },
-    { question: 'Which command enables OSPF process 1?', options: ['ospf 1', 'router ospf 1', 'enable ospf 1', 'ip ospf 1'], correct: 1, explanation: '"router ospf 1" enables OSPF process ID 1.' },
-  ],
-  4: [
-    { question: 'What are the four DHCP messages in order?', options: ['Discover, Offer, Request, Ack', 'Request, Offer, Discover, Ack', 'Offer, Discover, Ack, Request', 'Discover, Request, Offer, Ack'], correct: 0, explanation: 'DHCP DORA: Discover, Offer, Request, Acknowledge.' },
-    { question: 'What does PAT stand for?', options: ['Port Address Translation', 'Private Address Translation', 'Protocol Address Translation', 'Public Address Translation'], correct: 0, explanation: 'PAT maps multiple private IPs to one public IP using ports.' },
-    { question: 'What is the syslog severity for Emergency?', options: ['0', '1', '7', '6'], correct: 0, explanation: 'Emergency is severity level 0 — most severe.' },
-    { question: 'Which SNMP version provides encryption?', options: ['SNMPv1', 'SNMPv2c', 'SNMPv3', 'All versions'], correct: 2, explanation: 'SNMPv3 provides authentication and encryption.' },
-    { question: 'What command configures DHCP relay?', options: ['ip dhcp relay', 'ip helper-address', 'dhcp forward', 'ip dhcp forwarder'], correct: 1, explanation: '"ip helper-address" configures DHCP relay.' },
-    { question: 'What is the difference between SSH and Telnet?', options: ['SSH is faster', 'SSH encrypts traffic', 'Telnet uses different ports', 'No difference'], correct: 1, explanation: 'SSH encrypts all traffic; Telnet sends data in clear text.' },
-    { question: 'What does NTP synchronize?', options: ['IP addresses', 'Clocks/time', 'Routing tables', 'VLAN databases'], correct: 1, explanation: 'NTP synchronizes clocks across network devices.' },
-    { question: 'What QoS marking is used at Layer 3?', options: ['CoS', 'DSCP', '802.1p', 'MPLS'], correct: 1, explanation: 'DSCP is used at Layer 3 for QoS marking.' },
-    { question: 'Which command enables SSH on a Cisco router?', options: ['ssh enable', 'crypto key generate rsa', 'ip ssh enable', 'ssh server enable'], correct: 1, explanation: '"crypto key generate rsa" generates RSA keys for SSH.' },
-    { question: 'What does NAT overload configure?', options: ['Static NAT', 'Dynamic NAT', 'PAT', 'No NAT'], correct: 2, explanation: 'NAT overload configures PAT (Port Address Translation).' },
-  ],
-  5: [
-    { question: 'What does an ACL use to match packets?', options: ['MAC addresses only', 'Access control entries', 'VLAN tags', 'Port numbers only'], correct: 1, explanation: 'ACLs use ACEs to match and filter traffic.' },
-    { question: 'What is the implicit rule at the end of every ACL?', options: ['Permit all', 'Deny all', 'Log all', 'Forward all'], correct: 1, explanation: 'Every ACL has an implicit "deny all" at the end.' },
-    { question: 'Which ACL type filters based on source IP?', options: ['Extended ACL', 'Standard ACL', 'Named ACL', 'Reflexive ACL'], correct: 1, explanation: 'Standard ACLs filter based on source IP address only.' },
-    { question: 'What does port security "shutdown" mode do?', options: ['Drops frames', 'Drops and logs', 'Shuts down the port', 'Allows all traffic'], correct: 2, explanation: 'Shutdown mode err-disables the port on violation.' },
-    { question: 'What does AAA stand for?', options: ['Authentication, Authorization, Accounting', 'Access, Authentication, Authorization', 'Authentication, Access, Accounting', 'Authorization, Access, Authentication'], correct: 0, explanation: 'AAA = Authentication, Authorization, Accounting.' },
-    { question: 'What protocol does 802.1X use?', options: ['SSH', 'HTTPS', 'RADIUS', 'SNMP'], correct: 2, explanation: '802.1X uses RADIUS for authentication.' },
-    { question: 'What is DHCP snooping?', options: ['Monitoring DHCP', 'Blocking unauthorized DHCP servers', 'Encrypting DHCP', 'Speeding up DHCP'], correct: 1, explanation: 'DHCP snooping blocks unauthorized DHCP servers.' },
-    { question: 'Which VPN type connects two sites permanently?', options: ['Remote access', 'Site-to-site', 'SSL VPN', 'Client VPN'], correct: 1, explanation: 'Site-to-site VPNs create permanent tunnels between locations.' },
-    { question: 'What does IPSec ESP provide?', options: ['Auth only', 'Encryption only', 'Auth and encryption', 'Neither'], correct: 2, explanation: 'ESP provides both authentication and encryption.' },
-    { question: 'What is a wildcard mask of 0.0.0.255?', options: ['/8', '/16', '/24', '/32'], correct: 2, explanation: 'Wildcard 0.0.0.255 matches last 8 bits = /24.' },
-  ],
-  6: [
-    { question: 'What does SDN separate?', options: ['Hardware and software', 'Control and data plane', 'LAN and WAN', 'IPv4 and IPv6'], correct: 1, explanation: 'SDN separates control plane from data plane.' },
-    { question: 'Which HTTP method creates a resource?', options: ['GET', 'POST', 'PUT', 'DELETE'], correct: 1, explanation: 'POST creates a new resource.' },
-    { question: 'What format do REST APIs commonly use?', options: ['XML only', 'JSON only', 'Both JSON and XML', 'HTML'], correct: 2, explanation: 'REST APIs support both JSON and XML.' },
-    { question: 'What is Ansible?', options: ['A programming language', 'An agentless config management tool', 'A routing protocol', 'A firewall'], correct: 1, explanation: 'Ansible is an agentless automation tool.' },
-    { question: 'What does NETCONF use for data modeling?', options: ['JSON', 'XML', 'YANG', 'HTML'], correct: 2, explanation: 'NETCONF uses YANG for data modeling.' },
-    { question: 'What HTTP status code means "Not Found"?', options: ['200', '400', '401', '404'], correct: 3, explanation: '404 means resource not found.' },
-    { question: 'What is Cisco DNA Center?', options: ['A firewall', 'An intent-based networking platform', 'A routing protocol', 'A cable type'], correct: 1, explanation: 'DNA Center is an intent-based networking platform.' },
-    { question: 'What does RESTCONF use for communication?', options: ['SSH', 'Telnet', 'HTTP/HTTPS', 'SNMP'], correct: 2, explanation: 'RESTCONF uses HTTP/HTTPS methods.' },
-    { question: 'Which tool is agent-based?', options: ['Ansible', 'Puppet', 'Both', 'Neither'], correct: 1, explanation: 'Puppet is agent-based; Ansible is agentless.' },
-    { question: 'What is YANG used for?', options: ['Routing', 'Data modeling for network config', 'Wireless security', 'Cable management'], correct: 1, explanation: 'YANG is a data modeling language for network devices.' },
-  ],
 };
 
 export function getStaticPaths() {

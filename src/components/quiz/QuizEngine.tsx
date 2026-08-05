@@ -222,51 +222,67 @@ export default function QuizEngine({ moduleNumber, moduleName, questions, locale
           </p>
         </div>
 
-        {/* Question review */}
-        <h3 className="text-xl font-bold text-text mb-6">
-          {locale === 'el' ? 'Ανασκόπηση Απαντήσεων' : 'Answer Review'}
-        </h3>
-        <div className="space-y-4">
-          {questions.map((q, idx) => {
-            const userAnswer = selectedAnswers[idx];
-            const isCorrect = userAnswer === q.correct;
-            return (
-              <div key={q.id} className={`bg-surface-card rounded-xl border p-6 ${
-                isCorrect ? 'border-success/20' : 'border-error/20'
-              }`}>
-                <div className="flex items-start gap-3 mb-4">
-                  <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                    isCorrect ? 'bg-success/20 text-success' : 'bg-error/20 text-error'
+        {/* Question review - only show details if passed */}
+        {score.passed ? (
+          <>
+            <h3 className="text-xl font-bold text-text mb-6">
+              {locale === 'el' ? 'Ανασκόπηση Απαντήσεων' : 'Answer Review'}
+            </h3>
+            <div className="space-y-4">
+              {questions.map((q, idx) => {
+                const userAnswer = selectedAnswers[idx];
+                const isCorrect = userAnswer === q.correct;
+                return (
+                  <div key={q.id} className={`bg-surface-card rounded-xl border p-6 ${
+                    isCorrect ? 'border-success/20' : 'border-error/20'
                   }`}>
-                    {isCorrect ? '✓' : '✗'}
-                  </span>
-                  <div>
-                    <p className="font-medium text-text">{q.question}</p>
-                    {userAnswer !== undefined && userAnswer !== null && (
-                      <p className="text-sm text-text-muted mt-1">
-                        {locale === 'el' ? 'Η απάντησή σας:' : 'Your answer:'}{' '}
-                        <span className={isCorrect ? 'text-success' : 'text-error'}>
-                          {q.options[userAnswer]}
-                        </span>
+                    <div className="flex items-start gap-3 mb-4">
+                      <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                        isCorrect ? 'bg-success/20 text-success' : 'bg-error/20 text-error'
+                      }`}>
+                        {isCorrect ? '✓' : '✗'}
+                      </span>
+                      <div>
+                        <p className="font-medium text-text">{q.question}</p>
+                        {userAnswer !== undefined && userAnswer !== null && (
+                          <p className="text-sm text-text-muted mt-1">
+                            {locale === 'el' ? 'Η απάντησή σας:' : 'Your answer:'}{' '}
+                            <span className={isCorrect ? 'text-success' : 'text-error'}>
+                              {q.options[userAnswer]}
+                            </span>
+                          </p>
+                        )}
+                        {!isCorrect && (
+                          <p className="text-sm text-text-muted mt-1">
+                            {locale === 'el' ? 'Σωστή απάντηση:' : 'Correct answer:'}{' '}
+                            <span className="text-success">{q.options[q.correct]}</span>
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="bg-surface-light rounded-lg p-4 ml-11">
+                      <p className="text-sm text-text-muted">
+                        <span className="font-bold text-primary">{t.explanation}:</span> {q.explanation}
                       </p>
-                    )}
-                    {!isCorrect && (
-                      <p className="text-sm text-text-muted mt-1">
-                        {locale === 'el' ? 'Σωστή απάντηση:' : 'Correct answer:'}{' '}
-                        <span className="text-success">{q.options[q.correct]}</span>
-                      </p>
-                    )}
+                    </div>
                   </div>
-                </div>
-                <div className="bg-surface-light rounded-lg p-4 ml-11">
-                  <p className="text-sm text-text-muted">
-                    <span className="font-bold text-primary">{t.explanation}:</span> {q.explanation}
-                  </p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+                );
+              })}
+            </div>
+          </>
+        ) : (
+          <div className="bg-surface-card rounded-2xl border border-warning/20 p-8 text-center">
+            <div className="text-5xl mb-4">📚</div>
+            <h3 className="text-xl font-bold text-text mb-2">
+              {locale === 'el' ? 'Χρειάζεστε περισσότερη εξάσκηση!' : 'Keep Practicing!'}
+            </h3>
+            <p className="text-text-muted mb-4">
+              {locale === 'el'
+                ? 'Περάστε με 80%+ για να δείτε τις σωστές απαντήσεις και να λάβετε το πιστοποιητικό.'
+                : 'Pass with 80%+ to see the correct answers and earn your certificate.'}
+            </p>
+          </div>
+        )}
 
         {/* Actions */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
