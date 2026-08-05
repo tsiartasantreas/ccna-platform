@@ -420,7 +420,7 @@ const t = en;
       URL.revokeObjectURL(url);
     });
 
-    // Delete account (GDPR)
+    // Delete account (GDPR) — uses server-side RPC for security
     document.getElementById('delete-account-btn')?.addEventListener('click', async () => {
       const confirmMsg = 'Are you sure you want to delete your account?\n\nThis will permanently delete:\n• All your lesson progress\n• All quiz scores\n• Your points and streak\n• Your profile data\n\nThis action CANNOT be undone.';
       if (confirm(confirmMsg)) {
@@ -431,12 +431,9 @@ const t = en;
         if (btn) { btn.textContent = 'Deleting...'; (btn as HTMLButtonElement).disabled = true; }
 
         try {
-          // Delete all user data from database
-          await supabase.from('lesson_progress').delete().eq('user_id', session.user.id);
-          await supabase.from('quiz_scores').delete().eq('user_id', session.user.id);
-          await supabase.from('user_points').delete().eq('user_id', session.user.id);
-          await supabase.from('admin_user_emails').delete().eq('user_id', session.user.id);
-          await supabase.from('profiles').delete().eq('id', session.user.id);
+          // Use server-side RPC for account deletion
+          const { error } = await supabase.rpc('delete_own_account');
+          if (error) throw error;
 
           // Clear localStorage
           localStorage.removeItem('userEmail');

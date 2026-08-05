@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Security Audit Report — NetworkLearn CCNA Platform</title>
+<style>
+  /* -- Reset & Base -- */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  @page { size: A4; margin: 25mm 20mm 25mm 20mm; @bottom-center { content: counter(page); font-size: 10px; color: #666; } }
+  body { font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; font-size: 11px; line-height: 1.6; color: #1a1a2e; background: #fff; }
+
+  /* -- Cover Page -- */
+  .cover { page-break-after: always; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; text-align: center; background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%); color: #fff; padding: 60px 40px; }
+  .cover .logo { font-size: 18px; letter-spacing: 4px; text-transform: uppercase; color: #a78bfa; margin-bottom: 30px; }
+  .cover h1 { font-size: 36px; font-weight: 700; line-height: 1.2; margin-bottom: 10px; }
+  .cover .subtitle { font-size: 20px; font-weight: 300; color: #c4b5fd; margin-bottom: 40px; }
+  .cover .meta { font-size: 13px; color: #94a3b8; line-height: 2; }
+  .cover .meta strong { color: #e2e8f0; }
+  .cover .badge { display: inline-block; margin-top: 30px; padding: 8px 24px; border: 2px solid #ef4444; border-radius: 4px; font-size: 14px; font-weight: 700; color: #ef4444; letter-spacing: 3px; }
+  .cover .classification { margin-top: 15px; font-size: 11px; color: #94a3b8; letter-spacing: 1px; }
+
+  /* -- Table of Contents -- */
+  .toc { page-break-after: always; padding: 40px 0; }
+  .toc h2 { font-size: 22px; color: #1e1b4b; border-bottom: 2px solid #6366f1; padding-bottom: 8px; margin-bottom: 20px; }
+  .toc ul { list-style: none; }
+  .toc li { padding: 6px 0; border-bottom: 1px dotted #e2e8f0; font-size: 12px; }
+  .toc li a { color: #1e1b4b; text-decoration: none; }
+  .toc li.sub { padding-left: 20px; font-size: 11px; color: #475569; }
+
+  /* -- Section Headings -- */
+  h2 { font-size: 20px; color: #1e1b4b; border-bottom: 2px solid #6366f1; padding-bottom: 6px; margin: 30px 0 16px; page-break-after: avoid; }
+  h3 { font-size: 15px; color: #312e81; margin: 22px 0 10px; page-break-after: avoid; }
+  h4 { font-size: 12px; color: #4338ca; margin: 14px 0 6px; page-break-after: avoid; }
+
+  /* -- Severity Badges -- */
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 3px; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: #fff; vertical-align: middle; }
+  .badge-critical { background: #dc2626; }
+  .badge-high { background: #ea580c; }
+  .badge-medium { background: #ca8a04; color: #1a1a2e; }
+  .badge-low { background: #2563eb; }
+  .badge-info { background: #6b7280; }
+  .badge-fixed { background: #16a34a; }
+  .badge-partial { background: #d97706; }
+
+  /* -- Executive Summary Cards -- */
+  .summary-cards { display: flex; gap: 12px; flex-wrap: wrap; margin: 16px 0; }
+  .summary-card { flex: 1; min-width: 100px; padding: 14px; border-radius: 8px; text-align: center; color: #fff; }
+  .summary-card .num { font-size: 28px; font-weight: 700; }
+  .summary-card .label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; }
+  .sc-critical { background: #dc2626; }
+  .sc-high { background: #ea580c; }
+  .sc-medium { background: #ca8a04; color: #1a1a2e; }
+  .sc-low { background: #2563eb; }
+
+  .risk-banner { background: #fef2f2; border-left: 4px solid #dc2626; padding: 12px 16px; margin: 16px 0; border-radius: 4px; }
+  .risk-banner strong { color: #dc2626; }
+
+  /* -- Tables -- */
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 10px; }
+  th { background: #1e1b4b; color: #fff; padding: 8px 10px; text-align: left; font-weight: 600; }
+  td { padding: 7px 10px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+  tr:nth-child(even) { background: #f8fafc; }
+  tr:hover { background: #f1f5f9; }
+
+  /* -- Finding Cards -- */
+  .finding { border: 1px solid #e2e8f0; border-radius: 8px; margin: 16px 0; page-break-inside: avoid; }
+  .finding-header { padding: 12px 16px; border-radius: 8px 8px 0 0; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .finding-header h3 { margin: 0; font-size: 13px; color: #1e1b4b; }
+  .finding-header .meta-tag { font-size: 9px; color: #64748b; background: #e2e8f0; padding: 2px 8px; border-radius: 3px; }
+  .finding-body { padding: 14px 16px; }
+  .finding-body p { margin: 6px 0; font-size: 11px; }
+  .finding-body ul { margin: 6px 0 6px 18px; }
+  .finding-body li { font-size: 11px; margin: 3px 0; }
+  .finding-label { font-weight: 700; color: #1e1b4b; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 10px; }
+  .finding-label:first-child { margin-top: 0; }
+
+  /* -- Code Blocks -- */
+  pre { background: #1e1b4b; color: #e2e8f0; padding: 12px 14px; border-radius: 6px; font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; font-size: 9.5px; line-height: 1.5; overflow-x: auto; margin: 8px 0; white-space: pre-wrap; word-break: break-all; }
+  code { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; background: #f1f5f9; padding: 1px 5px; border-radius: 3px; font-size: 10px; }
+  pre code { background: none; padding: 0; }
+
+  /* -- Misc -- */
+  .page-break { page-break-before: always; }
+  p { margin: 6px 0; }
+  .small { font-size: 10px; color: #64748b; }
+  .remediation-box { background: #f0fdf4; border-left: 3px solid #16a34a; padding: 10px 14px; border-radius: 4px; margin: 8px 0; }
+  .impact-box { background: #fef2f2; border-left: 3px solid #dc2626; padding: 10px 14px; border-radius: 4px; margin: 8px 0; }
+  .evidence-box { background: #f8fafc; border-left: 3px solid #6366f1; padding: 10px 14px; border-radius: 4px; margin: 8px 0; }
+  .effort { display: inline-block; background: #e0e7ff; color: #3730a3; padding: 2px 8px; border-radius: 3px; font-size: 9px; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- ================================================================
+     COVER PAGE
+     ================================================================ -->
+<div class="cover">
+  <div class="logo">Security Audit Report</div>
+  <h1>NetworkLearn CCNA Platform</h1>
+  <div class="subtitle">Full-Stack Web Application Security Assessment</div>
+  <div class="meta">
+    <strong>Target:</strong> https://networklearn.wasmer.app<br>
+    <strong>Supabase Project:</strong> jhesstimsojwmkdysmpy<br>
+    <strong>Audit Date:</strong> August 5, 2026<br>
+    <strong>Methodology:</strong> OWASP Testing Guide v4 + Manual Penetration Testing<br>
+    <strong>Report Version:</strong> 2.0 (Post Re-Verification)
+  </div>
+  <div class="badge">CONFIDENTIAL</div>
+  <div class="classification">This document contains sensitive security information. Distribution is restricted to authorized personnel only.</div>
+</div>
+
+<!-- ================================================================
+     TABLE OF CONTENTS
+     ================================================================ -->
+<div class="toc">
+  <h2>Table of Contents</h2>
+  <ul>
+    <li>1. Executive Summary</li>
+    <li>2. Scope &amp; Methodology</li>
+    <li>3. Findings Summary Matrix</li>
+    <li>4. Detailed Findings by OWASP Category</li>
+    <li class="sub">4.1 A01 -- Broken Access Control</li>
+    <li class="sub">4.2 A02 -- Cryptographic Failures</li>
+    <li class="sub">4.3 A03 -- Injection (XSS)</li>
+    <li class="sub">4.4 A04 -- Insecure Design</li>
+    <li class="sub">4.5 A05 -- Security Misconfiguration</li>
+    <li class="sub">4.6 A07 -- Identification &amp; Authentication Failures</li>
+    <li>5. Remediation Roadmap</li>
+    <li>6. Appendix: RLS Policy Inventory</li>
+  </ul>
+</div>
+
+<!-- ================================================================
+     1. EXECUTIVE SUMMARY
+     ================================================================ -->
+<div class="page-break"></div>
+<h2>1. Executive Summary</h2>
+
+<p>This report presents the findings of a comprehensive security audit conducted against the NetworkLearn CCNA Platform (<code>https://networklearn.wasmer.app</code>), a web application built with Astro v7, React 19, and Supabase. The audit covered external reconnaissance, static code review, and penetration testing across three user personas: anonymous, regular authenticated user, and administrator.</p>
+
+<p>Following an initial audit, a re-verification cycle was performed on August 5, 2026. One finding (Service Role Key in localStorage) has been fully remediated, and two findings (Hardcoded Credentials, Incomplete SignOut) have been partially addressed. All other findings remain valid.</p>
+
+<div class="risk-banner">
+  <strong>Overall Risk Rating: CRITICAL</strong> -- Multiple privilege escalation vectors, stored XSS vulnerabilities, and missing server-side access controls allow any authenticated user to gain administrative privileges and compromise the platform.
+</div>
+
+<div class="summary-cards">
+  <div class="summary-card sc-critical"><div class="num">4</div><div class="label">Critical</div></div>
+  <div class="summary-card sc-high"><div class="num">8</div><div class="label">High</div></div>
+  <div class="summary-card sc-medium"><div class="num">8</div><div class="label">Medium</div></div>
+  <div class="summary-card sc-low"><div class="num">6</div><div class="label">Low</div></div>
+</div>
+
+<p><strong>Total Valid Findings:</strong> 26 (excluding 1 fully-fixed and 2 partially-fixed findings)</p>
+
+<h3>Key Findings at a Glance</h3>
+<ul>
+  <li><strong>Privilege Escalation:</strong> Any user can self-promote to admin and self-upgrade to Pro plan via direct Supabase API calls (RLS UPDATE policy on <code>profiles</code> table).</li>
+  <li><strong>Missing Server-Side Auth:</strong> Admin page HTML is served to all visitors; authorization is client-side only.</li>
+  <li><strong>Stored XSS:</strong> Unsanitized <code>display_name</code> and logo URLs are injected via <code>innerHTML</code> in the admin panel.</li>
+  <li><strong>Quiz Integrity:</strong> Correct answers are shipped in the client bundle, and scores are calculated client-side without server validation.</li>
+  <li><strong>Sensitive Data Exposure:</strong> API keys, user emails, and avatars persist in <code>localStorage</code> and are not cleared on sign-out.</li>
+  <li><strong>Missing Security Headers:</strong> No CSP, HSTS, X-Frame-Options, or other protective HTTP headers are configured.</li>
+</ul>
+
+<!-- ================================================================
+     2. SCOPE & METHODOLOGY
+     ================================================================ -->
+<div class="page-break"></div>
+<h2>2. Scope &amp; Methodology</h2>
+
+<h3>Target Application</h3>
+<table>
+  <tr><th>Property</th><th>Value</th></tr>
+  <tr><td>Application URL</td><td><code>https://networklearn.wasmer.app</code></td></tr>
+  <tr><td>Supabase Project</td><td><code>jhesstimsojwmkdysmpy</code></td></tr>
+  <tr><td>Framework</td><td>Astro v7 + React 19</td></tr>
+  <tr><td>Backend</td><td>Supabase (PostgreSQL, Auth, RLS, RPC)</td></tr>
+  <tr><td>Hosting</td><td>Wasmer Edge</td></tr>
+</table>
+
+<h3>OWASP Categories Tested</h3>
+<table>
+  <tr><th>OWASP Top 10 2021</th><th>Coverage</th></tr>
+  <tr><td>A01 -- Broken Access Control</td><td>Full (RLS, auth checks, IDOR, privilege escalation)</td></tr>
+  <tr><td>A02 -- Cryptographic Failures</td><td>Full (localStorage exposure, key management)</td></tr>
+  <tr><td>A03 -- Injection</td><td>XSS via innerHTML, input validation</td></tr>
+  <tr><td>A04 -- Insecure Design</td><td>Feature flags, quiz scoring, account deletion flow</td></tr>
+  <tr><td>A05 -- Security Misconfiguration</td><td>HTTP headers, endpoints, admin email exposure</td></tr>
+  <tr><td>A06 -- Vulnerable Components</td><td>npm audit (pass)</td></tr>
+  <tr><td>A07 -- Authentication Failures</td><td>Email verification, signOut, credential management</td></tr>
+</table>
+
+<h3>Test Personas</h3>
+<table>
+  <tr><th>Persona</th><th>Context</th><th>Scope</th></tr>
+  <tr><td>Anonymous</td><td>Unauthenticated visitor</td><td>External recon, unauthenticated access, endpoint probing</td></tr>
+  <tr><td>Regular User</td><td>Authenticated non-admin user</td><td>Privilege escalation, XSS, IDOR, data tampering</td></tr>
+  <tr><td>Admin User</td><td>Authenticated administrator</td><td>Admin panel security, RPC validation, RLS completeness</td></tr>
+</table>
+
+<h3>Methodology</h3>
+<p>The audit followed the <strong>OWASP Testing Guide v4</strong> and included:</p>
+<ul>
+  <li>External reconnaissance (headers, endpoints, JavaScript bundles, HTTP responses)</li>
+  <li>Static code analysis of the full source tree (src/, supabase/migrations/, config files)</li>
+  <li>Dynamic penetration testing across all three personas</li>
+  <li>RLS policy inventory and completeness verification</li>
+  <li>Post-remediation re-verification cycle</li>
+</ul>
+
+<!-- ================================================================
+     3. FINDINGS SUMMARY MATRIX
+     ================================================================ -->
+<div class="page-break"></div>
+<h2>3. Findings Summary Matrix</h2>
+
+<table>
+  <thead>
+    <tr><th>#</th><th>Finding</th><th>Severity</th><th>OWASP</th><th>Status</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>1</td><td>Self-Promote to Admin via Profile UPDATE</td><td><span class="badge badge-critical">Critical</span></td><td>A01</td><td>Valid</td></tr>
+    <tr><td>2</td><td>Self-Upgrade to Pro Plan Without Payment</td><td><span class="badge badge-critical">Critical</span></td><td>A01</td><td>Valid</td></tr>
+    <tr><td>3</td><td>Admin Page Served Without Server-Side Auth</td><td><span class="badge badge-critical">Critical</span></td><td>A01</td><td>Valid</td></tr>
+    <tr><td>4</td><td>Admin Email Exposed in Client-Side JavaScript</td><td><span class="badge badge-critical">Critical</span></td><td>A04</td><td>Valid</td></tr>
+    <tr><td>5</td><td>Stored XSS via display_name in Admin Panel (innerHTML)</td><td><span class="badge badge-high">High</span></td><td>A03</td><td>Valid</td></tr>
+    <tr><td>6</td><td>Stored XSS via Logo URL in innerHTML</td><td><span class="badge badge-high">High</span></td><td>A03</td><td>Valid</td></tr>
+    <tr><td>7</td><td>Feature Flags Defined But Never Enforced</td><td><span class="badge badge-high">High</span></td><td>A04</td><td>Valid</td></tr>
+    <tr><td>8</td><td>Avatar Stored as Base64 in Database Column</td><td><span class="badge badge-high">High</span></td><td>A04</td><td>Valid</td></tr>
+    <tr><td>9</td><td>Sensitive User Data Stored in localStorage</td><td><span class="badge badge-high">High</span></td><td>A05</td><td>Valid</td></tr>
+    <tr><td>10</td><td>Real-time Subscription IDOR via localStorage userId</td><td><span class="badge badge-high">High</span></td><td>A01</td><td>Valid</td></tr>
+    <tr><td>11</td><td>Incomplete Sign-Out -- Sensitive Data Remains</td><td><span class="badge badge-high">High</span></td><td>A07</td><td>Partial Fix</td></tr>
+    <tr><td>12</td><td>Missing All Critical HTTP Security Headers</td><td><span class="badge badge-high">High</span></td><td>A05</td><td>Valid</td></tr>
+    <tr><td>13</td><td>No Email Verification Enforcement After Signup</td><td><span class="badge badge-medium">Medium</span></td><td>A07</td><td>Valid</td></tr>
+    <tr><td>14</td><td>Client-Side Admin Authorization with DOM-Based Access Control</td><td><span class="badge badge-medium">Medium</span></td><td>A01</td><td>Valid</td></tr>
+    <tr><td>15</td><td>Hardcoded Admin Email in Multiple Locations</td><td><span class="badge badge-medium">Medium</span></td><td>A05</td><td>Valid</td></tr>
+    <tr><td>16</td><td>Display Name Input Has No Validation</td><td><span class="badge badge-medium">Medium</span></td><td>A03</td><td>Valid</td></tr>
+    <tr><td>17</td><td>Account Deletion Not Using the Database RPC</td><td><span class="badge badge-medium">Medium</span></td><td>A04</td><td>Valid</td></tr>
+    <tr><td>18</td><td>Client-Side Quiz Score Calculation Allows Tampering</td><td><span class="badge badge-medium">Medium</span></td><td>A04</td><td>Valid</td></tr>
+    <tr><td>19</td><td>Client-Side Lesson Progress Can Be Faked via localStorage</td><td><span class="badge badge-medium">Medium</span></td><td>A04</td><td>Valid</td></tr>
+    <tr><td>20</td><td>increment_points RPC Lacks Bounds Check</td><td><span class="badge badge-medium">Medium</span></td><td>A04</td><td>Valid</td></tr>
+    <tr><td>21</td><td>Revolut API Key Stored in Client-Side localStorage</td><td><span class="badge badge-medium">Medium</span></td><td>A02</td><td>Valid</td></tr>
+    <tr><td>22</td><td>delete_user_account GRANT Too Broad</td><td><span class="badge badge-low">Low</span></td><td>A01</td><td>Valid</td></tr>
+    <tr><td>23</td><td>Client-Side-Only Password Validation</td><td><span class="badge badge-low">Low</span></td><td>A07</td><td>Valid</td></tr>
+    <tr><td>24</td><td>Admin Settings Reinitialized with Hardcoded Defaults</td><td><span class="badge badge-low">Low</span></td><td>A04</td><td>Valid</td></tr>
+    <tr><td>25</td><td>email_encrypted Column Stores Plaintext</td><td><span class="badge badge-low">Low</span></td><td>A04</td><td>Valid</td></tr>
+    <tr><td>26</td><td>No security.txt File</td><td><span class="badge badge-low">Low</span></td><td>A05</td><td>Valid</td></tr>
+    <tr><td>27</td><td>No robots.txt or sitemap.xml</td><td><span class="badge badge-low">Low</span></td><td>A05</td><td>Valid</td></tr>
+  </tbody>
+</table>
+
+<p class="small"><strong>Note:</strong> One finding (Service Role Key in localStorage) was fully remediated and has been excluded from this report. Two findings (Hardcoded Credentials, Incomplete SignOut) are marked as Partial Fix.</p>
+
+<!-- ================================================================
+     4. DETAILED FINDINGS
+     ================================================================ -->
+<div class="page-break"></div>
+<h2>4. Detailed Findings by OWASP Category</h2>
+
+<!-- 4.1 A01 -- BROKEN ACCESS CONTROL -->
+<h3>4.1 -- A01: Broken Access Control</h3>
+
+<!-- Finding 1 -->
+<div class="finding">
+  <div class="finding-header">
+    <span class="badge badge-critical">Critical</span>
+    <h3>F-01: Self-Promote to Admin via Profile UPDATE</h3>
+    <span class="meta-tag">A01 -- Broken Access Control</span>
+  </div>
+  <div class="finding-body">
+    <div class="finding-label">Description</div>
+    <p>The Supabase RLS policy on the <code>profiles</code> table allows any authenticated user to UPDATE their own row, including the <code>is_admin</code> column. There is no server-side restriction preventing a user from setting <code>is_admin = true</code> on their own profile.</p>
+
+    <div class="finding-label">Evidence</div>
+    <div class="evidence-box">
+      <p><strong>Client-side code (Header.tsx):</strong></p>
+      <pre><code>await supabase.from('profiles').update({
+  is_admin: true
+}).eq('id', session.user.id);</code></pre>
+      <p><strong>RLS policy (migration 001):</strong></p>
+      <pre><code>-- Users can update own profile
+CREATE POLICY "Users can update own profile"
+ON profiles FOR UPDATE
+USING (auth.uid() = id);</code></pre>
+    </div>
+
+    <div class="impact-box">
+      <div class="finding-label">Impact</div>
+      <p>Any authenticated user can gain full administrator privileges, including access to user management, subscription controls, and API key management. This is a complete compromise of the authorization model.</p>
+    </div>
+
+    <div class="remediation-box">
+      <div class="finding-label">Remediation</div>
+      <p>Replace the broad UPDATE policy with a trigger or RPC that prevents modification of the <code>is_admin</code> column by non-admin users. Only allow admin updates through the <code>is_admin()</code> security definer function.</p>
+      <p><span class="effort">Effort: Small (1-2 hours)</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- Finding 2 -->
+<div class="finding">
+  <div class="finding-header">
+    <span class="badge badge-critical">Critical</span>
+    <h3>F-02: Self-Upgrade to Pro Plan Without Payment</h3>
+    <span class="meta-tag">A01 -- Broken Access Control</span>
+  </div>
+  <div class="finding-body">
+    <div class="finding-label">Description</div>
+    <p>The same RLS UPDATE policy on <code>profiles</code> allows users to modify the <code>plan</code> column. A user can set <code>plan = 'pro'</code> on their own profile to gain premium features without completing payment.</p>
+
+    <div class="finding-label">Evidence</div>
+    <div class="evidence-box">
+      <pre><code>await supabase.from('profiles').update({
+  plan: 'pro'
+}).eq('id', session.user.id);</code></pre>
+    </div>
+
+    <div class="impact-box">
+      <div class="finding-label">Impact</div>
+      <p>Bypass of all paid subscription features. Potential revenue loss. The same RLS gap enables both privilege escalation and plan bypass.</p>
+    </div>
+
+    <div class="remediation-box">
+      <div class="finding-label">Remediation</div>
+      <p>Same as F-01. The <code>plan</code> column should be immutable by the client. Only the <code>is_admin()</code> function or a payment webhook should update it.</p>
+      <p><span class="effort">Effort: Small (1-2 hours)</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- Finding 3 -->
+<div class="finding">
+  <div class="finding-header">
+    <span class="badge badge-critical">Critical</span>
+    <h3>F-03: Admin Page Served Without Server-Side Authentication</h3>
+    <span class="meta-tag">A01 -- Broken Access Control</span>
+  </div>
+  <div class="finding-body">
+    <div class="finding-label">Description</div>
+    <p>The admin page at <code>/en/admin</code> returns HTTP 200 with the full admin dashboard HTML to any unauthenticated request. The page contains user management tables, subscription controls, certificate generation buttons, and settings panels for Revolut API keys, Supabase service keys, and Stripe. No server-side middleware or authentication check exists.</p>
+
+    <div class="finding-label">Evidence</div>
+    <div class="evidence-box">
+      <p><strong>Request:</strong></p>
+      <pre><code>GET /en/admin HTTP/1.1
+Host: networklearn.wasmer.app</code></pre>
+      <p><strong>Response:</strong> HTTP 200 with full admin dashboard HTML. No redirect to login. The client-side JavaScript uses CSS classes (<code>hidden</code>) to show/hide content, but the HTML structure is fully accessible.</p>
+    </div>
+
+    <div class="impact-box">
+      <div class="finding-label">Impact</div>
+      <p>Complete information disclosure of admin interface structure. Attackers can study the full admin UI, identify all form fields, and craft targeted DOM manipulation attacks to bypass client-side checks.</p>
+    </div>
+
+    <div class="remediation-box">
+      <div class="finding-label">Remediation</div>
+      <p>Implement Astro middleware or server-side authentication checks that return HTTP 403 or redirect to login for unauthenticated users. Do not serve admin HTML to non-admin visitors.</p>
+      <p><span class="effort">Effort: Medium (3-5 hours)</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- Finding 10 -->
+<div class="finding">
+  <div class="finding-header">
+    <span class="badge badge-high">High</span>
+    <h3>F-10: Real-time Subscription IDOR via localStorage userId</h3>
+    <span class="meta-tag">A01 -- Broken Access Control (IDOR)</span>
+  </div>
+  <div class="finding-body">
+    <div class="finding-label">Description</div>
+    <p>The dashboard page reads the user ID from <code>localStorage</code> to create real-time Supabase subscriptions. A user can modify their <code>localStorage</code> to listen to another user's activity.</p>
+
+    <div class="finding-label">Evidence</div>
+    <div class="evidence-box">
+      <pre><code>// dashboard.astro (lines 533-574)
+const userId = localStorage.getItem('userId');
+if (userId) {
+  supabase
+    .channel('lesson-progress-changes')
+    .on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'lesson_progress',
+      filter: `user_id=eq.${userId}`,
+    }, () =&gt; { loadDashboard(); })
+    .subscribe();
+}</code></pre>
+      <p><strong>Attack scenario:</strong></p>
+      <pre><code>localStorage.setItem('userId', '&lt;target-user-uuid&gt;');
+location.reload();</code></pre>
+    </div>
+
+    <div class="impact-box">
+      <div class="finding-label">Impact</div>
+      <p>Information disclosure of another user's learning activity in real-time. <em>Note:</em> Mitigated by RLS policies (Supabase applies policies server-side), so this is not directly exploitable but remains a defense-in-depth concern.</p>
+    </div>
+
+    <div class="remediation-box">
+      <div class="finding-label">Remediation</div>
+      <p>Use the Supabase auth session (<code>supabase.auth.getSession()</code>) to derive the userId server-side rather than reading from localStorage.</p>
+      <p><span class="effort">Effort: Small (1-2 hours)</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- Finding 14 -->
+<div class="finding">
+  <div class="finding-header">
+    <span class="badge badge-medium">Medium</span>
+    <h3>F-14: Client-Side Admin Authorization with DOM-Based Access Control</h3>
+    <span class="meta-tag">A01 -- Broken Access Control</span>
+  </div>
+  <div class="finding-body">
+    <div class="finding-label">Description</div>
+    <p>The admin page renders all admin content in the HTML and uses CSS classes (<code>hidden</code>) to show/hide it based on JavaScript authorization checks. The full admin HTML is delivered to every visitor.</p>
+
+    <div class="finding-label">Evidence</div>
+    <div class="evidence-box">
+      <pre><code>// src/pages/en/admin.astro (lines 395-418)
+// Content is hidden via CSS, not server-side rendering
+&lt;div class="hidden" id="admin-panel"&gt;
+  &lt;!-- Full admin UI rendered here --&gt;
+&lt;/div&gt;</code></pre>
+    </div>
+
+    <div class="impact-box">
+      <div class="finding-label">Impact</div>
+      <p>Information disclosure of admin email and interface structure. Any visitor can inspect the DOM to see admin content.</p>
+    </div>
+
+    <div class="remediation-box">
+      <div class="finding-label">Remediation</div>
+      <p>Move admin authorization to middleware or server-side rendering that returns a 403 response for non-admin users.</p>
+      <p><span class="effort">Effort: Medium (3-5 hours)</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- Finding 22 -->
+<div class="finding">
+  <div class="finding-header">
+    <span class="badge badge-low">Low</span>
+    <h3>F-22: delete_user_account GRANT Too Broad</h3>
+    <span class="meta-tag">A01 -- Broken Access Control</span>
+  </div>
+  <div class="finding-body">
+    <div class="finding-label">Description</div>
+    <p>The <code>delete_user_account</code> RPC function is granted to the <code>authenticated</code> role, meaning any logged-in user can call it. Internal checks prevent deleting other users, but the broad GRANT increases attack surface.</p>
+
+    <div class="finding-label">Evidence</div>
+    <div class="evidence-box">
+      <pre><code>-- supabase/migrations/006_delete_account.sql (line 29)
+GRANT EXECUTE ON FUNCTION delete_user_account TO authenticated;</code></pre>
+    </div>
+
+    <div class="remediation-box">
+      <div class="finding-label">Remediation</div>
+      <p>Restrict the GRANT to specific roles or use the <code>delete_own_account</code> RPC function from migration 007 which has tighter internal checks.</p>
+      <p><span class="effort">Effort: Trivial (30 min)</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- 4.2 A02 -- CRYPTOGRAPHIC FAILURES -->
+<div class="page-break"></div>
+<h3>4.2 -- A02: Cryptographic Failures</h3>
+
+<!-- Finding 9 -->
+<div class="finding">
+  <div class="finding-header">
+    <span class="badge badge-high">High</span>
+    <h3>F-09: Sensitive User Data Stored in localStorage</h3>
+    <span class="meta-tag">A05 -- Security Misconfiguration</span>
+  </div>
+  <div class="finding-body">
+    <div class="finding-label">Description</div>
+    <p>Multiple sensitive data items are stored in <code>localStorage</code>, which is accessible to any JavaScript on the page. Without a Content Security Policy (CSP), any XSS vulnerability can exfiltrate all stored data.</p>
+
+    <div class="finding-label">Evidence</div>
+    <div class="evidence-box">
+      <pre><code>localStorage.setItem('userEmail', e.user.email || '');
+localStorage.setItem('userId', e.user.id);
+localStorage.setItem('adminSettings', JSON.stringify({...}));
+localStorage.setItem('userAvatar', base64DataUrl);</code></pre>
+    </div>
+
+    <div class="impact-box">
+      <div class="finding-label">Impact</div>
+      <p>localStorage is accessible to any script on the page. Combined with the XSS findings below, an attacker can exfiltrate user emails, IDs, admin settings, and API keys.</p>
+    </div>
+
+    <div class="remediation-box">
+      <div class="finding-label">Remediation</div>
+      <p>Use httpOnly cookies for sensitive session data. Implement CSP. Minimize localStorage usage for sensitive data. Store admin settings server-side.</p>
+      <p><span class="effort">Effort: Medium (4-6 hours)</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- Finding 21 -->
+<div class="finding">
+  <div class="finding-header">
+    <span class="badge badge-medium">Medium</span>
+    <h3>F-21: Revolut API Key Stored in Client-Side localStorage</h3>
+    <span class="meta-tag">A02 -- Cryptographic Failures</span>
+  </div>
+  <div class="finding-body">
+    <div class="finding-label">Description</div>
+    <p>The pricing page reads the Revolut API key from <code>localStorage</code> and uses it directly in a browser fetch call. Payment API keys must never be handled client-side.</p>
+
+    <div class="finding-label">Evidence</div>
+    <div class="evidence-box">
+      <pre><code>// src/pages/en/pricing.astro (lines 198-200)
+const settings = JSON.parse(localStorage.getItem('adminSettings') || '{}');
+const revolutApiKey = settings.revolutApiKey;
+const response = await fetch('https://merchant.revolut.com/api/1.0/orders', {
+  headers: { 'Authorization': `Bearer ${revolutApiKey}` },
+});</code></pre>
+    </div>
+
+    <div class="impact-box">
+      <div class="finding-label">Impact</div>
+      <p>Revolut API key compromise could allow unauthorized payment operations, order manipulation, and financial data access.</p>
+    </div>
+
+    <div class="remediation-box">
+      <div class="finding-label">Remediation</div>
+      <p>Never handle payment API keys client-side. All Revolut API calls should go through a server-side edge function or Supabase Edge Function.</p>
+      <p><span class="effort">Effort: Medium (3-5 hours)</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- 4.3 A03 -- INJECTION (XSS) -->
+<h3>4.3 -- A03: Injection (Cross-Site Scripting)</h3>
+
+<!-- Finding 5 -->
+<div class="finding">
+  <div class="finding-header">
+    <span class="badge badge-high">High</span>
+    <h3>F-05: Stored XSS via display_name in Admin Panel (innerHTML)</h3>
+    <span class="meta-tag">A03 -- Injection</span>
+  </div>
+  <div class="finding-body">
+    <div class="finding-label">Description</div>
+    <p>The admin panel renders user <code>display_name</code> values using <code>innerHTML</code> without sanitization. A user can set their display name to a malicious script that executes in the admin's browser when the admin views the user management table.</p>
+
+    <div class="finding-label">Evidence</div>
+    <div class="evidence-box">
+      <pre><code>// src/pages/en/admin.astro (lines 498, 512, 631)
+// display_name interpolated into innerHTML without sanitization
+td.textContent = profile.display_name;  // Some locations use textContent
+// BUT other locations use innerHTML with user data</code></pre>
+      <p><strong>Re-verification confirms:</strong> <code>display_name</code> is still interpolated into <code>innerHTML</code> in admin.astro (lines 498, 512, 631) without sanitization.</p>
+    </div>
+
+    <div class="impact-box">
+      <div class="finding-label">Impact</div>
+      <p>Full account takeover of administrator. The attacker can steal the admin's session, read all user data, modify subscriptions, and access API keys stored in <code>localStorage</code>.</p>
+    </div>
+
+    <div class="remediation-box">
+      <div class="finding-label">Remediation</div>
+      <p>Use <code>textContent</code> instead of <code>innerHTML</code> for user-supplied data. If HTML rendering is required, use a DOMPurify sanitizer. Add input validation on <code>display_name</code> (max 50 chars, no HTML tags).</p>
+      <p><span class="effort">Effort: Small (1-2 hours)</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- Finding 6 -->
+<div class="finding">
+  <div class="finding-header">
+    <span class="badge badge-high">High</span>
+    <h3>F-06: Stored XSS via Logo URL in innerHTML</h3>
+    <span class="meta-tag">A03 -- Injection</span>
+  </div>
+  <div class="finding-body">
+    <div class="finding-label">Description</div>
+    <p>The logo preview function injects a user-controlled URL directly into an <code>innerHTML</code> assignment with an <code>onerror</code> handler, enabling XSS via crafted URLs.</p>
+
+    <div class="finding-label">Evidence</div>
+    <div class="evidence-box">
+      <pre><code>// src/pages/en/admin.astro (line 795)
+preview.innerHTML = `&lt;img src="${logoUrl}" alt="Logo"
+  class="w-10 h-10 rounded-xl object-cover"
+  onerror="this.parentElement.innerHTML='N'" /&gt;`;</code></pre>
+    </div>
+
+    <div class="impact-box">
+      <div class="finding-label">Impact</div>
+      <p>An attacker can craft a logo URL that breaks out of the <code>src</code> attribute and injects arbitrary JavaScript via the <code>onerror</code> handler or attribute escape.</p>
+    </div>
+
+    <div class="remediation-box">
+      <div class="finding-label">Remediation</div>
+      <pre><code>// Use DOM APIs instead of innerHTML:
+const img = document.createElement('img');
+img.src = logoUrl;
+img.onerror = () =&gt; { preview.textContent = 'N'; };
+preview.replaceChildren(img);</code></pre>
+      <p><span class="effort">Effort: Trivial (30 min)</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- Finding 16 -->
+<div class="finding">
+  <div class="finding-header">
+    <span class="badge badge-medium">Medium</span>
+    <h3>F-16: Display Name Input Has No Validation</h3>
+    <span class="meta-tag">A03 -- Injection</span>
+  </div>
+  <div class="finding-body">
+    <div class="finding-label">Description</div>
+    <p>The profile form updates <code>display_name</code> directly from the input field value with no client-side or server-side validation. No <code>maxLength</code>, <code>minLength</code>, or pattern constraints exist. No database CHECK constraint is applied.</p>
+
+    <div class="finding-label">Evidence</div>
+    <div class="evidence-box">
+      <pre><code>// src/pages/en/profile.astro (lines 470-474)
+await supabase.from('profiles').update({
+  display_name: displayNameInput.value
+}).eq('id', session.user.id);</code></pre>
+    </div>
+
+    <div class="impact-box">
+      <div class="finding-label">Impact</div>
+      <p>Enables the XSS attack in F-05. A user could set an extremely long display name causing performance issues, or inject HTML/JavaScript content.</p>
+    </div>
+
+    <div class="remediation-box">
+      <div class="finding-label">Remediation</div>
+      <p>Add client-side validation (max 50 chars) and a database CHECK constraint: <code>CHECK (length(display_name) &lt;= 50)</code>.</p>
+      <p><span class="effort">Effort: Trivial (30 min)</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- 4.4 A04 -- INSECURE DESIGN -->
+<div class="page-break"></div>
+<h3>4.4 -- A04: Insecure Design</h3>
+
+<!-- Finding 4 -->
+<div class="finding">
+  <div class="finding-header">
+    <span class="badge badge-critical">Critical</span>
+    <h3>F-04: Admin Email Exposed in Client-Side JavaScript</h3>
+    <span class="meta-tag">A04 -- Insecure Design</span>
+  </div>
+  <div class="finding-body">
+    <div class="finding-label">Description</div>
+    <p>The admin email address is hardcoded as a string literal in the compiled JavaScript bundle. This exposes the exact admin identity to anyone inspecting the client code.</p>
+
+    <div class="finding-label">Evidence</div>
+    <div class="evidence-box">
+      <pre><code>// _astro/Header.D-7z5LJB.js
+var s = 'tsiartasantreas@gmail.com';
+// ...
+p(e.user.email === s)</code></pre>
+    </div>
+
+    <div class="impact-box">
+      <div class="finding-label">Impact</div>
+      <p>Enables targeted phishing and social engineering attacks against the administrator.</p>
+    </div>
+
+    <div class="remediation-box">
+      <div class="finding-label">Remediation</div>
+      <p>Remove hardcoded email from client-side code. Use the <code>profiles.is_admin</code> boolean column exclusively for admin checks. Admin assignment should be done via direct database update only.</p>
+      <p><span class="effort">Effort: Small (1-2 hours)</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- Finding 7 -->
+<div class="finding">
+  <div class="finding-header">
+    <span class="badge badge-high">High</span>
+    <h3>F-07: Feature Flags Defined But Never Enforced</h3>
+    <span class="meta-tag">A04 -- Insecure Design</span>
+  </div>
+  <div class="finding-body">
+    <div class="finding-label">Description</div>
+    <p>Feature flags <code>ENABLE_REGISTRATION</code>, <code>ENABLE_PASSWORD_RESET</code>, <code>ENABLE_GOOGLE_OAUTH</code>, and <code>MAINTENANCE_MODE</code> are defined in <code>config.ts</code> but are never imported or checked anywhere in the codebase.</p>
+
+    <div class="finding-label">Evidence</div>
+    <div class="evidence-box">
+      <pre><code>// src/lib/config.ts (lines 34-37)
+export const FEATURES = {
+  ENABLE_REGISTRATION: true,
+  ENABLE_PASSWORD_RESET: true,
+  ENABLE_GOOGLE_OAUTH: false,
+  MAINTENANCE_MODE: false,
+};</code></pre>
+      <p><strong>Re-verification confirms:</strong> These flags are never imported or checked in any page.</p>
+    </div>
+
+    <div class="impact-box">
+      <div class="finding-label">Impact</div>
+      <p>An admin who disables registration via the admin panel believes it is enforced, but it is not. Users can still register. Google OAuth remains clickable even when disabled.</p>
+    </div>
+
+    <div class="remediation-box">
+      <div class="finding-label">Remediation</div>
+      <p>Each page that uses these flags must import and check them before rendering protected UI. Alternatively, enforce flags server-side via middleware.</p>
+      <p><span class="effort">Effort: Small (2-3 hours)</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- Finding 8 -->
+<div class="finding">
+  <div class="finding-header">
+    <span class="badge badge-high">High</span>
+    <h3>F-08: Avatar Stored as Base64 in Database Column</h3>
+    <span class="meta-tag">A04 -- Insecure Design</span>
+  </div>
+  <div class="finding-body">
+    <div class="finding-label">Description</div>
+    <p>User avatars are converted to base64 data URLs and stored directly in the <code>profiles.avatar_url</code> column. Every query to <code>profiles</code> returns the full base64 string, creating massive payloads.</p>
+
+    <div class="finding-label">Evidence</div>
+    <div class="evidence-box">
+      <pre><code>// src/pages/en/profile.astro (lines 325-350)
+const reader = new FileReader();
+reader.onload = async (e) =&gt; {
+  const base64 = e.target.result;
+  await supabase.from('profiles').update({
+    avatar_url: base64  // 2MB image = ~2.7MB base64
+  }).eq('id', session.user.id);
+};</code></pre>
+    </div>
+
+    <div class="impact-box">
+      <div class="finding-label">Impact</div>
+      <p>The admin panel loads ALL profiles including all base64 avatars. This creates massive page payloads, excessive database storage costs, and potential DoS via large uploads.</p>
+    </div>
+
+    <div class="remediation-box">
+      <div class="finding-label">Remediation</div>
+      <p>Use Supabase Storage for file uploads and store only the public URL in the database. Set file size limits and validate image types server-side.</p>
+      <p><span class="effort">Effort: Medium (3-5 hours)</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- Finding 15 -->
+<div class="finding">
+  <div class="finding-header">
+    <span class="badge badge-medium">Medium</span>
+    <h3>F-15: Hardcoded Admin Email in Multiple Locations</h3>
+    <span class="meta-tag">A05 -- Security Misconfiguration</span>
+  </div>
+  <div class="finding-body">
+    <div class="finding-label">Description</div>
+    <p>The admin email <code>tsiartasantreas@gmail.com</code> appears in 4+ client-side locations including <code>src/lib/admin.ts</code>, <code>src/pages/en/admin.astro</code>, <code>src/pages/en/login.astro</code>, and multiple SQL migrations.</p>
+
+    <div class="finding-label">Evidence</div>
+    <div class="evidence-box">
+      <pre><code>// src/lib/admin.ts (line 2)
+const ADMIN_EMAIL = 'tsiartasantreas@gmail.com';
+
+// src/pages/en/admin.astro (line 38)
+const isAdmin = user.email === 'tsiartasantreas@gmail.com';
+
+// src/pages/en/login.astro (line 142)
+if (user.email === 'tsiartasantreas@gmail.com') { ... }</code></pre>
+    </div>
+
+    <div class="remediation-box">
+      <div class="finding-label">Remediation</div>
+      <p>Consolidate admin check to use <code>profiles.is_admin</code> column. Remove all hardcoded email references from client code.</p>
+      <p><span class="effort">Effort: Small (1-2 hours)</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- Finding 17 -->
+<div class="finding">
+  <div class="finding-header">
+    <span class="badge badge-medium">Medium</span>
+    <h3>F-17: Account Deletion Not Using the Database RPC</h3>
+    <span class="meta-tag">A04 -- Insecure Design</span>
+  </div>
+  <div class="finding-body">
+    <div class="finding-label">Description</div>
+    <p>A proper <code>delete_user_account</code> RPC function exists but is never called. The profile page performs individual table deletes instead, leaving the <code>auth.users</code> record intact.</p>
+
+    <div class="finding-label">Evidence</div>
+    <div class="evidence-box">
+      <pre><code>// src/pages/en/profile.astro (lines 439-453)
+// Does individual deletes:
+await supabase.from('profiles').delete().eq('id', userId);
+await supabase.from('lesson_progress').delete().eq('user_id', userId);
+await supabase.from('quiz_scores').delete().eq('user_id', userId);
+await supabase.from('user_points').delete().eq('user_id', userId);
+// NEVER calls: supabase.rpc('delete_user_account', ...)</code></pre>
+    </div>
+
+    <div class="impact-box">
+      <div class="finding-label">Impact</div>
+      <p>The user's <code>auth.users</code> record is never deleted, meaning the email remains registered and the account can be re-activated.</p>
+    </div>
+
+    <div class="remediation-box">
+      <div class="finding-label">Remediation</div>
+      <p>Replace individual deletes with <code>supabase.rpc('delete_own_account')</code> from migration 007, which handles all table deletes and the auth.users deletion atomically.</p>
+      <p><span class="effort">Effort: Trivial (30 min)</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- Finding 18 -->
+<div class="finding">
+  <div class="finding-header">
+    <span class="badge badge-medium">Medium</span>
+    <h3>F-18: Client-Side Quiz Score Calculation Allows Tampering</h3>
+    <span class="meta-tag">A04 -- Insecure Design</span>
+  </div>
+  <div class="finding-body">
+    <div class="finding-label">Description</div>
+    <p>Quiz scores are calculated entirely on the client in <code>QuizEngine.tsx</code>. The calculated score is sent directly to the database without server-side verification. A <code>save_quiz_score</code> RPC exists in migration 007 but is NOT called.</p>
+
+    <div class="finding-label">Evidence</div>
+    <div class="evidence-box">
+      <pre><code>// src/components/quiz/QuizEngine.tsx (lines 69-85)
+const calculateScore = useCallback(() =&gt; {
+  let correct = 0;
+  questions.forEach((q, idx) =&gt; {
+    if (selectedAnswers[idx] === q.correct) {
+      correct++;
+    }
+  });
+  const percentage = Math.round((correct / questions.length) * 100);
+  return { correct, total: questions.length, percentage, ... };
+}, [questions, selectedAnswers]);</code></pre>
+      <p><strong>Re-verification confirms:</strong> Client does direct INSERT into <code>quiz_scores</code> with fabricated scores. The <code>save_quiz_score</code> RPC exists but is not called.</p>
+    </div>
+
+    <div class="impact-box">
+      <div class="finding-label">Impact</div>
+      <p>Users can artificially inflate quiz scores to earn certificates without completing the material. The learning platform's certification integrity is compromised.</p>
+    </div>
+
+    <div class="remediation-box">
+      <div class="finding-label">Remediation</div>
+      <p>Move score calculation to the <code>save_quiz_score</code> RPC function. The client should submit selected answers, not the score. The server validates answers against the database.</p>
+      <p><span class="effort">Effort: Medium (3-5 hours)</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- Finding 19 -->
+<div class="finding">
+  <div class="finding-header">
+    <span class="badge badge-medium">Medium</span>
+    <h3>F-19: Client-Side Lesson Progress Can Be Faked via localStorage</h3>
+    <span class="meta-tag">A04 -- Insecure Design</span>
+  </div>
+  <div class="finding-body">
+    <div class="finding-label">Description</div>
+    <p>Lesson completion status is stored in <code>localStorage</code> with keys like <code>completedLessons_{userId}</code>. A user can modify these values to mark lessons as complete without actually completing them.</p>
+
+    <div class="finding-label">Evidence</div>
+    <div class="evidence-box">
+      <pre><code>// Lesson progress stored in localStorage
+localStorage.setItem(`completedLessons_${userId}`,
+  JSON.stringify([1, 2, 3, 4, 5]));</code></pre>
+    </div>
+
+    <div class="impact-box">
+      <div class="finding-label">Impact</div>
+      <p>Users can bypass learning requirements and claim course completion without engaging with the material.</p>
+    </div>
+
+    <div class="remediation-box">
+      <div class="finding-label">Remediation</div>
+      <p>Use the <code>complete_lesson</code> RPC function from migration 007 for server-validated lesson completion. Read progress from the database, not localStorage.</p>
+      <p><span class="effort">Effort: Small (2-3 hours)</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- Finding 20 -->
+<div class="finding">
+  <div class="finding-header">
+    <span class="badge badge-medium">Medium</span>
+    <h3>F-20: increment_points RPC Lacks Bounds Check</h3>
+    <span class="meta-tag">A04 -- Insecure Design</span>
+  </div>
+  <div class="finding-body">
+    <div class="finding-label">Description</div>
+    <p>The <code>increment_points</code> RPC correctly validates that <code>auth.uid() == p_user_id</code>, but accepts any arbitrary <code>p_points</code> value from the client. Users can call the RPC with very large numbers.</p>
+
+    <div class="finding-label">Evidence</div>
+    <div class="evidence-box">
+      <pre><code>-- supabase/migrations/004_security_fixes.sql (lines 6-19)
+IF auth.uid() != p_user_id THEN
+  RAISE EXCEPTION 'Cannot modify another user''s points';
+END IF;
+-- No validation on p_points value
+UPDATE user_points
+SET total_points = total_points + p_points
+WHERE user_id = p_user_id;</code></pre>
+    </div>
+
+    <div class="impact-box">
+      <div class="finding-label">Impact</div>
+      <p>A user could call <code>increment_points</code> with a very large number to artificially inflate their points, potentially qualifying for rewards or leaderboards.</p>
+    </div>
+
+    <div class="remediation-box">
+      <div class="finding-label">Remediation</div>
+      <pre><code>IF p_points &lt; 0 OR p_points &gt; 100 THEN
+  RAISE EXCEPTION 'Points must be between 0 and 100';
+END IF;</code></pre>
+      <p><span class="effort">Effort: Trivial (30 min)</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- 4.5 A05 -- SECURITY MISCONFIGURATION -->
+<div class="page-break"></div>
+<h3>4.5 -- A05: Security Misconfiguration</h3>
+
+<!-- Finding 12 -->
+<div class="finding">
+  <div class="finding-header">
+    <span class="badge badge-high">High</span>
+    <h3>F-12: Missing All Critical HTTP Security Headers</h3>
+    <span class="meta-tag">A05 -- Security Misconfiguration</span>
+  </div>
+  <div class="finding-body">
+    <div class="finding-label">Description</div>
+    <p>No security-related HTTP headers are configured. The application is vulnerable to clickjacking, MIME sniffing, HTTP downgrade attacks, and script injection.</p>
+
+    <div class="finding-label">Evidence</div>
+    <div class="evidence-box">
+      <pre><code>HTTP/2 200
+content-length: 122
+content-type: text/html
+cache-control: public, max-age=86400
+
+-- Missing:
+Content-Security-Policy
+X-Frame-Options
+X-Content-Type-Options
+Strict-Transport-Security
+Referrer-Policy
+Permissions-Policy
+
+-- Exposed:
+x-wasmer-request-id: (internal tracking)
+x-edge-app-version-id: dav_nX3IVt3uQ645 (deployment version)</code></pre>
+    </div>
+
+    <div class="impact-box">
+      <div class="finding-label">Impact</div>
+      <p>Vulnerable to clickjacking (site can be framed), MIME sniffing, HTTP downgrade attacks (no HSTS), and arbitrary script injection (no CSP).</p>
+    </div>
+
+    <div class="remediation-box">
+      <div class="finding-label">Remediation</div>
+      <pre><code>Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://jhesstimsojwmkdysmpy.supabase.co
+X-Frame-Options: DENY
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=()</code></pre>
+      <p><span class="effort">Effort: Small (1-2 hours)</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- Finding 26 -->
+<div class="finding">
+  <div class="finding-header">
+    <span class="badge badge-low">Low</span>
+    <h3>F-26: No security.txt File</h3>
+    <span class="meta-tag">A05 -- Security Misconfiguration</span>
+  </div>
+  <div class="finding-body">
+    <div class="finding-label">Description</div>
+    <p>No <code>/.well-known/security.txt</code> file exists. Security researchers have no way to report vulnerabilities responsibly.</p>
+
+    <div class="finding-label">Evidence</div>
+    <div class="evidence-box">
+      <pre><code>GET /.well-known/security.txt HTTP/1.1
+=&gt; HTTP 404</code></pre>
+    </div>
+
+    <div class="remediation-box">
+      <div class="finding-label">Remediation</div>
+      <p>Create <code>/.well-known/security.txt</code> with contact information per RFC 9116.</p>
+      <p><span class="effort">Effort: Trivial (15 min)</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- Finding 27 -->
+<div class="finding">
+  <div class="finding-header">
+    <span class="badge badge-low">Low</span>
+    <h3>F-27: No robots.txt or sitemap.xml</h3>
+    <span class="meta-tag">A05 -- Security Misconfiguration</span>
+  </div>
+  <div class="finding-body">
+    <div class="finding-label">Description</div>
+    <p>Both <code>/robots.txt</code> and <code>/sitemap.xml</code> return 404. No guidance for search engine crawlers. Sensitive paths (admin, dashboard, login) are not hidden from scanners.</p>
+
+    <div class="remediation-box">
+      <div class="finding-label">Remediation</div>
+      <p>Create a <code>robots.txt</code> that disallows crawling of admin, dashboard, and login paths. Generate a <code>sitemap.xml</code> for public content only.</p>
+      <p><span class="effort">Effort: Trivial (15 min)</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- 4.6 A07 -- IDENTIFICATION & AUTHENTICATION FAILURES -->
+<h3>4.6 -- A07: Identification &amp; Authentication Failures</h3>
+
+<!-- Finding 11 -->
+<div class="finding">
+  <div class="finding-header">
+    <span class="badge badge-high">High</span>
+    <h3>F-11: Incomplete Sign-Out -- Sensitive Data Remains (Partial Fix)</h3>
+    <span class="meta-tag">A07 -- Authentication Failures</span>
+  </div>
+  <div class="finding-body">
+    <div class="finding-label">Description</div>
+    <p>On sign-out, only <code>userEmail</code> and <code>userId</code> are removed from <code>localStorage</code>. The <code>userAvatar</code> key (base64 encoded profile image) is NOT removed. Other keys like <code>adminSettings</code>, <code>completedLessons_*</code>, and <code>moduleFeedback</code> also persist.</p>
+
+    <div class="finding-label">Status</div>
+    <p><span class="badge badge-partial">Partial Fix</span> -- <code>userEmail</code> and <code>userId</code> are now cleared on sign-out. However, <code>userAvatar</code> is NOT removed.</p>
+
+    <div class="finding-label">Evidence</div>
+    <div class="evidence-box">
+      <pre><code>// src/components/layout/Header.tsx (lines 280-284, 343-347)
+await supabase.auth.signOut();
+localStorage.removeItem('userEmail');
+localStorage.removeItem('userId');
+// MISSING: localStorage.removeItem('userAvatar');
+// MISSING: localStorage.removeItem('completedLessons_*');
+// MISSING: localStorage.removeItem('adminSettings');</code></pre>
+    </div>
+
+    <div class="impact-box">
+      <div class="finding-label">Impact</div>
+      <p>On a shared computer, the next user can see the previous user's avatar, learning progress, and (if admin) all API keys.</p>
+    </div>
+
+    <div class="remediation-box">
+      <div class="finding-label">Remediation</div>
+      <p>Clear all user-specific <code>localStorage</code> keys on sign-out. Implement a utility function that enumerates and removes all application keys.</p>
+      <p><span class="effort">Effort: Trivial (30 min)</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- Finding 13 -->
+<div class="finding">
+  <div class="finding-header">
+    <span class="badge badge-medium">Medium</span>
+    <h3>F-13: No Email Verification Enforcement After Signup</h3>
+    <span class="meta-tag">A07 -- Authentication Failures</span>
+  </div>
+  <div class="finding-body">
+    <div class="finding-label">Description</div>
+    <p>After signup, the user is immediately redirected to the dashboard without checking if the email has been verified. Any email address can be used to create an account.</p>
+
+    <div class="finding-label">Evidence</div>
+    <div class="evidence-box">
+      <pre><code>// src/pages/en/login.astro (lines 260-284)
+// After signup, user is redirected immediately:
+window.location.href = '/en/dashboard';
+// No check for: data.user?.email_confirmed_at</code></pre>
+    </div>
+
+    <div class="impact-box">
+      <div class="finding-label">Impact</div>
+      <p>Users can register with any email address, enabling account impersonation and spam registrations.</p>
+    </div>
+
+    <div class="remediation-box">
+      <div class="finding-label">Remediation</div>
+      <p>Check <code>data.user?.email_confirmed_at</code> before granting access. Show a "please verify your email" page if not confirmed. Configure Supabase Auth to require email confirmation.</p>
+      <p><span class="effort">Effort: Small (1-2 hours)</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- Finding 23 -->
+<div class="finding">
+  <div class="finding-header">
+    <span class="badge badge-low">Low</span>
+    <h3>F-23: Client-Side-Only Password Validation</h3>
+    <span class="meta-tag">A07 -- Authentication Failures</span>
+  </div>
+  <div class="finding-body">
+    <div class="finding-label">Description</div>
+    <p>Password strength validation is performed only in JavaScript. Supabase Auth provides a server-side safety net with minimum length requirement, but no complexity enforcement.</p>
+
+    <div class="finding-label">Evidence</div>
+    <div class="evidence-box">
+      <pre><code>// src/pages/en/login.astro (lines 218-225)
+// Client-side only:
+if (password.length &lt; 6) {
+  showError('Password must be at least 6 characters');
+  return;
+}</code></pre>
+    </div>
+
+    <div class="remediation-box">
+      <div class="finding-label">Remediation</div>
+      <p>Configure Supabase Auth password policy to enforce complexity requirements server-side.</p>
+      <p><span class="effort">Effort: Trivial (15 min)</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- Finding 24 -->
+<div class="finding">
+  <div class="finding-header">
+    <span class="badge badge-low">Low</span>
+    <h3>F-24: Admin Settings Reinitialized with Hardcoded Defaults</h3>
+    <span class="meta-tag">A04 -- Insecure Design</span>
+  </div>
+  <div class="finding-body">
+    <div class="finding-label">Description</div>
+    <p>The <code>defaultSettings</code> object in <code>admin.ts</code> contains a hardcoded Supabase URL. When <code>localStorage</code> is empty, these defaults are returned.</p>
+
+    <div class="finding-label">Evidence</div>
+    <div class="evidence-box">
+      <pre><code>// src/lib/admin.ts (lines 30-49)
+const defaultSettings = {
+  supabaseUrl: 'https://jhesstimsojwmkdysmpy.supabase.co',
+  supabaseAnonKey: 'sb_publishable_...',
+  revolutApiKey: '',
+  // ...
+};</code></pre>
+    </div>
+
+    <div class="remediation-box">
+      <div class="finding-label">Remediation</div>
+      <p>Import the URL from <code>config.ts</code> instead of hardcoding it. Do not include API key placeholders in default settings.</p>
+      <p><span class="effort">Effort: Trivial (15 min)</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- Finding 25 -->
+<div class="finding">
+  <div class="finding-header">
+    <span class="badge badge-low">Low</span>
+    <h3>F-25: email_encrypted Column Stores Plaintext</h3>
+    <span class="meta-tag">A04 -- Insecure Design</span>
+  </div>
+  <div class="finding-body">
+    <div class="finding-label">Description</div>
+    <p>The column name <code>email_encrypted</code> is misleading -- it stores plaintext email addresses, not encrypted ones. This creates a false sense of security.</p>
+
+    <div class="finding-label">Evidence</div>
+    <div class="evidence-box">
+      <pre><code>-- supabase/migrations/003_admin_email_access.sql
+CREATE TABLE admin_user_emails (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email_encrypted TEXT NOT NULL,  -- Actually stores plaintext!
+  created_at TIMESTAMPTZ DEFAULT now()
+);</code></pre>
+    </div>
+
+    <div class="remediation-box">
+      <div class="finding-label">Remediation</div>
+      <p>Rename the column to <code>email</code> or implement actual encryption using <code>pgcrypto</code>.</p>
+      <p><span class="effort">Effort: Trivial (15 min)</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     5. REMEDIATION ROADMAP
+     ================================================================ -->
+<div class="page-break"></div>
+<h2>5. Remediation Roadmap</h2>
+
+<p>Issues are ordered by priority. Critical and High issues should be addressed within 1 week. Medium issues within 2-4 weeks. Low issues in the next development cycle.</p>
+
+<table>
+  <thead>
+    <tr><th>Priority</th><th>Issue</th><th>Severity</th><th>Effort</th><th>Action</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>P1</td><td>F-01/F-02: Privilege Escalation</td><td><span class="badge badge-critical">Critical</span></td><td>1-2h</td><td>Restrict RLS UPDATE on profiles to prevent is_admin/plan modification</td></tr>
+    <tr><td>P1</td><td>F-05: Stored XSS via display_name</td><td><span class="badge badge-high">High</span></td><td>1-2h</td><td>Replace innerHTML with textContent; add input validation</td></tr>
+    <tr><td>P1</td><td>F-06: Stored XSS via Logo URL</td><td><span class="badge badge-high">High</span></td><td>30m</td><td>Use DOM APIs instead of innerHTML</td></tr>
+    <tr><td>P1</td><td>F-03: Admin Page No Server-Side Auth</td><td><span class="badge badge-critical">Critical</span></td><td>3-5h</td><td>Implement Astro middleware for admin auth checks</td></tr>
+    <tr><td>P1</td><td>F-04: Admin Email Exposed</td><td><span class="badge badge-critical">Critical</span></td><td>1-2h</td><td>Remove hardcoded email; use is_admin column</td></tr>
+    <tr><td>P2</td><td>F-12: Missing HTTP Headers</td><td><span class="badge badge-high">High</span></td><td>1-2h</td><td>Add CSP, HSTS, X-Frame-Options, etc.</td></tr>
+    <tr><td>P2</td><td>F-10: Real-time IDOR</td><td><span class="badge badge-high">High</span></td><td>1-2h</td><td>Derive userId from auth session, not localStorage</td></tr>
+    <tr><td>P2</td><td>F-11: Incomplete SignOut</td><td><span class="badge badge-high">High</span></td><td>30m</td><td>Clear all user-specific localStorage keys</td></tr>
+    <tr><td>P2</td><td>F-07: Feature Flags Not Enforced</td><td><span class="badge badge-high">High</span></td><td>2-3h</td><td>Import and check flags in all relevant pages</td></tr>
+    <tr><td>P2</td><td>F-09: localStorage Sensitive Data</td><td><span class="badge badge-high">High</span></td><td>4-6h</td><td>Migrate to httpOnly cookies; implement CSP</td></tr>
+    <tr><td>P2</td><td>F-08: Base64 Avatars</td><td><span class="badge badge-high">High</span></td><td>3-5h</td><td>Move to Supabase Storage</td></tr>
+    <tr><td>P3</td><td>F-18: Quiz Score Tampering</td><td><span class="badge badge-medium">Medium</span></td><td>3-5h</td><td>Use save_quiz_score RPC from migration 007</td></tr>
+    <tr><td>P3</td><td>F-17: Account Deletion</td><td><span class="badge badge-medium">Medium</span></td><td>30m</td><td>Call delete_own_account RPC from migration 007</td></tr>
+    <tr><td>P3</td><td>F-19: Lesson Progress Faking</td><td><span class="badge badge-medium">Medium</span></td><td>2-3h</td><td>Use complete_lesson RPC from migration 007</td></tr>
+    <tr><td>P3</td><td>F-13: No Email Verification</td><td><span class="badge badge-medium">Medium</span></td><td>1-2h</td><td>Check email_confirmed_at before access</td></tr>
+    <tr><td>P3</td><td>F-16: display_name No Validation</td><td><span class="badge badge-medium">Medium</span></td><td>30m</td><td>Add maxLength and DB CHECK constraint</td></tr>
+    <tr><td>P3</td><td>F-20: increment_points No Bounds</td><td><span class="badge badge-medium">Medium</span></td><td>30m</td><td>Add bounds checking in RPC</td></tr>
+    <tr><td>P3</td><td>F-21: Revolut Key in localStorage</td><td><span class="badge badge-medium">Medium</span></td><td>3-5h</td><td>Move to server-side edge function</td></tr>
+    <tr><td>P4</td><td>F-22: Broad delete GRANT</td><td><span class="badge badge-low">Low</span></td><td>30m</td><td>Restrict GRANT to specific roles</td></tr>
+    <tr><td>P4</td><td>F-23: Client-Side Password Validation</td><td><span class="badge badge-low">Low</span></td><td>15m</td><td>Configure Supabase Auth password policy</td></tr>
+    <tr><td>P4</td><td>F-24: Hardcoded Defaults</td><td><span class="badge badge-low">Low</span></td><td>15m</td><td>Import from config.ts</td></tr>
+    <tr><td>P4</td><td>F-25: email_encrypted Misnomer</td><td><span class="badge badge-low">Low</span></td><td>15m</td><td>Rename column or encrypt</td></tr>
+    <tr><td>P4</td><td>F-26/F-27: Missing security.txt/robots.txt</td><td><span class="badge badge-low">Low</span></td><td>15m</td><td>Create both files</td></tr>
+  </tbody>
+</table>
+
+<!-- ================================================================
+     6. APPENDIX: RLS POLICY INVENTORY
+     ================================================================ -->
+<div class="page-break"></div>
+<h2>6. Appendix: RLS Policy Inventory</h2>
+
+<p>All 5 tables in the Supabase project have RLS enabled. The following table documents every policy. Gaps are highlighted.</p>
+
+<h4>Table: profiles (RLS ENABLED)</h4>
+<table>
+  <thead><tr><th>Policy</th><th>Operation</th><th>Condition</th><th>Migration</th></tr></thead>
+  <tbody>
+    <tr><td>Users can view own profile</td><td>SELECT</td><td><code>auth.uid() = id</code></td><td>001</td></tr>
+    <tr><td>Users can update own profile</td><td>UPDATE</td><td><code>auth.uid() = id</code></td><td>001</td></tr>
+    <tr><td>Users can insert own profile</td><td>INSERT</td><td><code>auth.uid() = id</code></td><td>001</td></tr>
+    <tr><td>Users can delete own profile</td><td>DELETE</td><td><code>auth.uid() = id</code></td><td>004</td></tr>
+    <tr><td>Admin can view all profiles</td><td>SELECT</td><td><code>is_admin()</code></td><td>005</td></tr>
+    <tr><td>Admin can update any profile</td><td>UPDATE</td><td><code>is_admin()</code></td><td>005</td></tr>
+    <tr><td>Admin can delete any profile</td><td>DELETE</td><td><code>is_admin()</code></td><td>005</td></tr>
+  </tbody>
+</table>
+
+<h4>Table: lesson_progress (RLS ENABLED)</h4>
+<table>
+  <thead><tr><th>Policy</th><th>Operation</th><th>Condition</th><th>Migration</th></tr></thead>
+  <tbody>
+    <tr><td>Users can view own</td><td>SELECT</td><td><code>auth.uid() = user_id</code></td><td>001</td></tr>
+    <tr><td>Users can insert own</td><td>INSERT</td><td><code>auth.uid() = user_id</code></td><td>001</td></tr>
+    <tr><td>Users can update own</td><td>UPDATE</td><td><code>auth.uid() = user_id</code></td><td>001</td></tr>
+    <tr><td>Users can delete own</td><td>DELETE</td><td><code>auth.uid() = user_id</code></td><td>004</td></tr>
+    <tr><td>Admin can view all</td><td>SELECT</td><td><code>is_admin()</code></td><td>005</td></tr>
+    <tr><td>Admin can delete any</td><td>DELETE</td><td><code>is_admin()</code></td><td>005</td></tr>
+    <tr style="background:#fef2f2"><td><strong>Missing: Admin UPDATE</strong></td><td>UPDATE</td><td>--</td><td>--</td></tr>
+  </tbody>
+</table>
+
+<h4>Table: quiz_scores (RLS ENABLED)</h4>
+<table>
+  <thead><tr><th>Policy</th><th>Operation</th><th>Condition</th><th>Migration</th></tr></thead>
+  <tbody>
+    <tr><td>Users can view own</td><td>SELECT</td><td><code>auth.uid() = user_id</code></td><td>001</td></tr>
+    <tr><td>Users can insert own</td><td>INSERT</td><td><code>auth.uid() = user_id</code></td><td>001</td></tr>
+    <tr><td>Users can delete own</td><td>DELETE</td><td><code>auth.uid() = user_id</code></td><td>004</td></tr>
+    <tr><td>Admin can view all</td><td>SELECT</td><td><code>is_admin()</code></td><td>005</td></tr>
+    <tr><td>Admin can delete any</td><td>DELETE</td><td><code>is_admin()</code></td><td>005</td></tr>
+    <tr style="background:#fef2f2"><td><strong>Missing: Admin UPDATE, User UPDATE</strong></td><td>UPDATE</td><td>--</td><td>--</td></tr>
+  </tbody>
+</table>
+
+<h4>Table: user_points (RLS ENABLED)</h4>
+<table>
+  <thead><tr><th>Policy</th><th>Operation</th><th>Condition</th><th>Migration</th></tr></thead>
+  <tbody>
+    <tr><td>Users can view own</td><td>SELECT</td><td><code>auth.uid() = user_id</code></td><td>001</td></tr>
+    <tr><td>Users can update own</td><td>UPDATE</td><td><code>auth.uid() = user_id</code></td><td>001</td></tr>
+    <tr><td>Users can insert own</td><td>INSERT</td><td><code>auth.uid() = user_id</code></td><td>001</td></tr>
+    <tr><td>Users can delete own</td><td>DELETE</td><td><code>auth.uid() = user_id</code></td><td>004</td></tr>
+    <tr><td>Admin can view all</td><td>SELECT</td><td><code>is_admin()</code></td><td>005</td></tr>
+    <tr><td>Admin can delete any</td><td>DELETE</td><td><code>is_admin()</code></td><td>005</td></tr>
+    <tr style="background:#fef2f2"><td><strong>Missing: Admin UPDATE</strong></td><td>UPDATE</td><td>--</td><td>--</td></tr>
+  </tbody>
+</table>
+
+<h4>Table: admin_user_emails (RLS ENABLED)</h4>
+<table>
+  <thead><tr><th>Policy</th><th>Operation</th><th>Condition</th><th>Migration</th></tr></thead>
+  <tbody>
+    <tr><td>Admin only access</td><td>ALL</td><td><code>is_admin()</code></td><td>005</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Tables WITHOUT RLS:</strong> None. All 5 tables have RLS enabled.</p>
+<p><strong>Policies with <code>true</code> condition:</strong> None found.</p>
+
+<h3>RLS Gaps Summary</h3>
+<table>
+  <thead><tr><th>Table</th><th>Missing Policies</th><th>Impact</th></tr></thead>
+  <tbody>
+    <tr><td>lesson_progress</td><td>Admin UPDATE</td><td>Admin cannot correct user progress</td></tr>
+    <tr><td>quiz_scores</td><td>Admin UPDATE, User UPDATE</td><td>No score correction or retake mechanism</td></tr>
+    <tr><td>user_points</td><td>Admin UPDATE</td><td>Admin cannot adjust user points</td></tr>
+    <tr><td>profiles</td><td>Column-level restriction on is_admin, plan</td><td>Users can self-promote (F-01, F-02)</td></tr>
+  </tbody>
+</table>
+
+<hr style="margin-top: 40px; border: none; border-top: 2px solid #e2e8f0;">
+<p class="small" style="text-align: center; margin-top: 16px;">
+  Security Audit Report -- NetworkLearn CCNA Platform<br>
+  Generated: August 5, 2026 | Version 2.0 (Post Re-Verification)<br>
+  CONFIDENTIAL -- Distribution restricted to authorized personnel
+</p>
+
+</body>
+</html>

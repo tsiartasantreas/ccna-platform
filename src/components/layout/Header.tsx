@@ -281,6 +281,7 @@ export default function Header({ locale, translations }: HeaderProps) {
                           await supabase.auth.signOut();
                           localStorage.removeItem('userEmail');
                           localStorage.removeItem('userId');
+                          localStorage.removeItem('userAvatar');
                           window.location.href = `/${locale}/`;
                         }}
                         className="block w-full text-left px-4 py-2 text-sm text-error hover:bg-surface-light transition-colors"
@@ -344,6 +345,7 @@ export default function Header({ locale, translations }: HeaderProps) {
                   await supabase.auth.signOut();
                   localStorage.removeItem('userEmail');
                   localStorage.removeItem('userId');
+                  localStorage.removeItem('userAvatar');
                   window.location.href = `/${locale}/`;
                 }}
                 className="block w-full text-left px-4 py-3 rounded-lg text-text-muted hover:text-primary hover:bg-surface transition-all"

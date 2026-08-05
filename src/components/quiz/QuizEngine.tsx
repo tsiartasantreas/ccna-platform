@@ -88,52 +88,25 @@ export default function QuizEngine({ moduleNumber, moduleName, questions, locale
     setShowResults(true);
     setCurrentQuestion(0);
 
-    // Save quiz score to Supabase
+    // Save quiz score via server-side RPC (prevents client tampering)
     try {
       setSaving(true);
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         const score = calculateScore();
 
-        // Get attempt number
-        const { count } = await supabase
-          .from('quiz_scores')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', session.user.id)
-          .eq('module_number', moduleNumber);
-
-        // Save quiz score
-        await supabase.from('quiz_scores').insert({
-          user_id: session.user.id,
-          module_number: moduleNumber,
-          score: score.percentage,
-          total_questions: score.total,
-          correct_answers: score.correct,
-          time_taken_seconds: 0,
-          attempt_number: (count || 0) + 1,
+        // Use server-side RPC for validation and saving
+        const { data, error } = await supabase.rpc('save_quiz_score', {
+          p_user_id: session.user.id,
+          p_module_number: moduleNumber,
+          p_score: score.percentage,
+          p_total_questions: score.total,
+          p_correct_answers: score.correct,
+          p_time_taken: 0,
         });
 
-        // Update user points
-        const { data: points } = await supabase
-          .from('user_points')
-          .select('total_points, current_streak, longest_streak, last_activity_date')
-          .eq('user_id', session.user.id)
-          .single();
-
-        if (points) {
-          const today = new Date().toISOString().split('T')[0];
-          const isNewDay = points.last_activity_date !== today;
-          const newStreak = score.passed ? (isNewDay ? (points.current_streak || 0) + 1 : points.current_streak) : 0;
-
-          await supabase
-            .from('user_points')
-            .update({
-              total_points: (points.total_points || 0) + score.points,
-              current_streak: newStreak,
-              longest_streak: Math.max(points.longest_streak || 0, newStreak),
-              last_activity_date: today,
-            })
-            .eq('user_id', session.user.id);
+        if (error) {
+          console.error('Error saving quiz score:', error);
         }
       }
     } catch (error) {

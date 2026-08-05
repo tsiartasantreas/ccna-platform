@@ -395,6 +395,14 @@ const t = en;
   <script>
     import { supabase } from '../../lib/supabase';
 
+    // XSS sanitization function
+    function sanitize(str: string | null | undefined): string {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
     const { data: { session } } = await supabase.auth.getSession();
     const accessDenied = document.getElementById('access-denied');
     const adminContent = document.getElementById('admin-content');
@@ -495,8 +503,8 @@ const t = en;
             const userEmail = emailMap[p.id] || p.email || p.id.substring(0, 8) + '...';
 
             return `<tr class="border-b border-primary/5 hover:bg-surface-light" data-user-id="${p.id}">
-              <td class="px-4 py-3 text-sm text-text font-medium">${p.display_name || 'User'}</td>
-              <td class="px-4 py-3 text-sm text-text-muted font-mono text-xs">${userEmail}</td>
+              <td class="px-4 py-3 text-sm text-text font-medium">${sanitize(p.display_name) || 'User'}</td>
+              <td class="px-4 py-3 text-sm text-text-muted font-mono text-xs">${sanitize(userEmail)}</td>
               <td class="px-4 py-3">
                 <select class="plan-select px-2 py-1 bg-surface border border-primary/10 rounded text-xs text-text" data-user-id="${p.id}">
                   <option value="free" ${p.plan === 'free' ? 'selected' : ''}>Free</option>
@@ -509,7 +517,7 @@ const t = en;
               <td class="px-4 py-3 flex gap-2 flex-wrap">
                 <button class="save-plan-btn text-xs text-success hover:underline" data-user-id="${p.id}">Save</button>
                 <button class="reset-pw-btn text-xs text-primary hover:underline" data-user-id="${p.id}">Reset PW</button>
-                <button class="cert-btn text-xs text-accent hover:underline" data-user-id="${p.id}" data-user-name="${p.display_name || 'User'}" data-user-email="${p.id}" data-lessons="${lessonsCompleted}" data-score="${avgScore}">🎓 Cert</button>
+                <button class="cert-btn text-xs text-accent hover:underline" data-user-id="${p.id}" data-user-name="${sanitize(p.display_name) || 'User'}" data-user-email="${p.id}" data-lessons="${lessonsCompleted}" data-score="${avgScore}">🎓 Cert</button>
               </td>
             </tr>`;
           }).join('');
@@ -628,7 +636,7 @@ const t = en;
 
           subsBody.innerHTML = proProfiles.length > 0 ? proProfiles.map(p => `
             <tr class="border-b border-primary/5 hover:bg-surface-light">
-              <td class="px-4 py-3 text-sm text-text">${p.display_name || 'User'}</td>
+              <td class="px-4 py-3 text-sm text-text">${sanitize(p.display_name) || 'User'}</td>
               <td class="px-4 py-3 text-sm text-text-muted">${p.id.substring(0, 8)}...</td>
               <td class="px-4 py-3 text-sm text-text">Pro</td>
               <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full bg-success/10 text-success text-xs font-medium">Active</span></td>
