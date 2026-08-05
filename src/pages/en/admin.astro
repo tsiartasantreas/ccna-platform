@@ -431,6 +431,13 @@ const t = en;
         const { data: profiles } = await supabase.from('profiles').select('*');
         const { data: allProgress } = await supabase.from('lesson_progress').select('*');
         const { data: allScores } = await supabase.from('quiz_scores').select('*');
+        const { data: adminEmails } = await supabase.from('admin_user_emails').select('*');
+
+        // Create email lookup map
+        const emailMap: Record<string, string> = {};
+        adminEmails?.forEach(e => {
+          emailMap[e.user_id] = e.email_encrypted;
+        });
 
         const totalUsers = profiles?.length || 0;
         const proUsers = profiles?.filter(p => p.plan === 'pro').length || 0;
@@ -487,9 +494,11 @@ const t = en;
             const lessonsCompleted = userProgress.filter(lp => lp.status === 'completed').length;
             const avgScore = userScores.length ? Math.round(userScores.reduce((s, q) => s + Number(q.score), 0) / userScores.length) : 0;
 
+            const userEmail = emailMap[p.id] || p.email || p.id.substring(0, 8) + '...';
+
             return `<tr class="border-b border-primary/5 hover:bg-surface-light" data-user-id="${p.id}">
               <td class="px-4 py-3 text-sm text-text font-medium">${p.display_name || 'User'}</td>
-              <td class="px-4 py-3 text-sm text-text-muted font-mono text-xs">${p.email || p.id.substring(0, 8) + '...'}</td>
+              <td class="px-4 py-3 text-sm text-text-muted font-mono text-xs">${userEmail}</td>
               <td class="px-4 py-3">
                 <select class="plan-select px-2 py-1 bg-surface border border-primary/10 rounded text-xs text-text" data-user-id="${p.id}">
                   <option value="free" ${p.plan === 'free' ? 'selected' : ''}>Free</option>
