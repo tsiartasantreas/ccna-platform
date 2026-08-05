@@ -13,3 +13,4 @@ scaling:
 
 redirect:
   force_https: true
+  not_found: /en/index.html
