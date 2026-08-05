@@ -1,12 +1,6 @@
 import { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  'https://jhesstimsojwmkdysmpy.supabase.co',
-  'sb_publishable_bKD9biIulcfC5iNipD-8IA_3Zu4bmWD'
-);
-
-const ADMIN_EMAIL = 'tsiartasantreas@gmail.com';
+import { supabase } from '../../lib/supabase';
+import { ADMIN_EMAIL, SITE_NAME } from '../../lib/config';
 
 interface HeaderProps {
   locale: 'en' | 'el';

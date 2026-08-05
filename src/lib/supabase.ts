@@ -3,7 +3,6 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config';
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Database types
 export interface Profile {
   id: string;
   email?: string;

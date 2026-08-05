@@ -1,9 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  'https://jhesstimsojwmkdysmpy.supabase.co',
-  'sb_publishable_bKD9biIulcfC5iNipD-8IA_3Zu4bmWD'
-);
+import { supabase } from './supabase';
 
 // Subscribe to real-time changes on a table
 export function subscribeToTable(

@@ -1,10 +1,5 @@
 import { useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  'https://jhesstimsojwmkdysmpy.supabase.co',
-  'sb_publishable_bKD9biIulcfC5iNipD-8IA_3Zu4bmWD'
-);
+import { supabase } from '../../lib/supabase';
 
 interface FeedbackFormProps {
   moduleNumber: number;
