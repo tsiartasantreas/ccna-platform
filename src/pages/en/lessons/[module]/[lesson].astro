@@ -358,21 +358,23 @@ function mdToHtml(md: string): string {
     let startTime = Date.now();
     let saved = false;
 
-    // Save lesson progress
-    // Helper: save to localStorage as fallback
+    // Get current user ID for user-specific localStorage
+    let currentUserId = localStorage.getItem('userId') || 'anonymous';
+
+    // Helper: save to localStorage (user-specific)
     function saveLocal(status: string) {
-      const key = `lesson_${moduleNum}_${lessonNum}`;
+      const key = `lesson_${currentUserId}_${moduleNum}_${lessonNum}`;
       localStorage.setItem(key, status);
       if (status === 'completed') {
-        const allCompleted = JSON.parse(localStorage.getItem('completedLessons') || '{}');
+        const allCompleted = JSON.parse(localStorage.getItem(`completedLessons_${currentUserId}`) || '{}');
         allCompleted[`${moduleNum}_${lessonNum}`] = true;
-        localStorage.setItem('completedLessons', JSON.stringify(allCompleted));
+        localStorage.setItem(`completedLessons_${currentUserId}`, JSON.stringify(allCompleted));
       }
     }
 
-    // Helper: check localStorage
+    // Helper: check localStorage (user-specific)
     function isCompletedLocal(): boolean {
-      const allCompleted = JSON.parse(localStorage.getItem('completedLessons') || '{}');
+      const allCompleted = JSON.parse(localStorage.getItem(`completedLessons_${currentUserId}`) || '{}');
       return !!allCompleted[`${moduleNum}_${lessonNum}`];
     }
 
@@ -404,8 +406,8 @@ function mdToHtml(md: string): string {
 
     // Update sidebar badges
     async function updateSidebarBadges() {
-      // First check localStorage
-      const allCompleted = JSON.parse(localStorage.getItem('completedLessons') || '{}');
+      // First check localStorage (user-specific)
+      const allCompleted = JSON.parse(localStorage.getItem(`completedLessons_${currentUserId}`) || '{}');
       for (let i = 1; i <= 8; i++) {
         if (allCompleted[`${moduleNum}_${i}`]) {
           const badge = document.getElementById(`lesson-badge-${i}`);
@@ -434,10 +436,10 @@ function mdToHtml(md: string): string {
               badge.textContent = '✓';
               badge.className = 'w-6 h-6 rounded flex items-center justify-center text-xs bg-success/20 text-success font-bold';
             }
-            // Sync to localStorage
-            const allCompleted = JSON.parse(localStorage.getItem('completedLessons') || '{}');
+            // Sync to localStorage (user-specific)
+            const allCompleted = JSON.parse(localStorage.getItem(`completedLessons_${currentUserId}`) || '{}');
             allCompleted[`${moduleNum}_${p.lesson_number}`] = true;
-            localStorage.setItem('completedLessons', JSON.stringify(allCompleted));
+            localStorage.setItem(`completedLessons_${currentUserId}`, JSON.stringify(allCompleted));
           }
         });
       }

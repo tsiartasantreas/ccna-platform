@@ -273,8 +273,8 @@ const modules = [
         .select('*')
         .eq('user_id', user.id);
 
-      // Load localStorage completions
-      const localCompletedMap = JSON.parse(localStorage.getItem('completedLessons') || '{}');
+      // Load localStorage completions (user-specific)
+      const localCompletedMap = JSON.parse(localStorage.getItem(`completedLessons_${user.id}`) || '{}');
 
       // Fetch quiz scores
       const { data: scores } = await supabase

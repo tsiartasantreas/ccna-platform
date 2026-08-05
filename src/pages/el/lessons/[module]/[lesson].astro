@@ -254,16 +254,18 @@ function mdToHtml(md: string): string {
     let startTime = Date.now();
     let saved = false;
 
+    const currentUserId = localStorage.getItem('userId') || 'anonymous';
+
     function saveLocal(status) {
-      localStorage.setItem(`lesson_${moduleNum}_${lessonNum}`, status);
+      localStorage.setItem(`lesson_${currentUserId}_${moduleNum}_${lessonNum}`, status);
       if (status === 'completed') {
-        const all = JSON.parse(localStorage.getItem('completedLessons') || '{}');
+        const all = JSON.parse(localStorage.getItem(`completedLessons_${currentUserId}`) || '{}');
         all[`${moduleNum}_${lessonNum}`] = true;
-        localStorage.setItem('completedLessons', JSON.stringify(all));
+        localStorage.setItem(`completedLessons_${currentUserId}`, JSON.stringify(all));
       }
     }
     function isCompletedLocal() {
-      return !!JSON.parse(localStorage.getItem('completedLessons') || '{}')[`${moduleNum}_${lessonNum}`];
+      return !!JSON.parse(localStorage.getItem(`completedLessons_${currentUserId}`) || '{}')[`${moduleNum}_${lessonNum}`];
     }
 
     async function saveLessonProgress(status) {
@@ -283,7 +285,7 @@ function mdToHtml(md: string): string {
     }
 
     async function updateSidebarBadges() {
-      const all = JSON.parse(localStorage.getItem('completedLessons') || '{}');
+      const all = JSON.parse(localStorage.getItem(`completedLessons_${currentUserId}`) || '{}');
       for (let i = 1; i <= 8; i++) {
         if (all[`${moduleNum}_${i}`]) {
           const badge = document.getElementById(`lesson-badge-${i}`);
@@ -298,9 +300,9 @@ function mdToHtml(md: string): string {
           if (p.status === 'completed') {
             const badge = document.getElementById(`lesson-badge-${p.lesson_number}`);
             if (badge) { badge.textContent = '✓'; badge.className = 'w-6 h-6 rounded flex items-center justify-center text-xs bg-success/20 text-success font-bold'; }
-            const allC = JSON.parse(localStorage.getItem('completedLessons') || '{}');
+            const allC = JSON.parse(localStorage.getItem(`completedLessons_${currentUserId}`) || '{}');
             allC[`${moduleNum}_${p.lesson_number}`] = true;
-            localStorage.setItem('completedLessons', JSON.stringify(allC));
+            localStorage.setItem(`completedLessons_${currentUserId}`, JSON.stringify(allC));
           }
         });
       }
