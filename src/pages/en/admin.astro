@@ -106,9 +106,16 @@ const t = en;
       <div id="tab-users" class="tab-content hidden">
         <div class="bg-surface-card rounded-xl border border-primary/10 overflow-hidden">
           <div class="p-4 border-b border-primary/10 flex items-center justify-between">
-            <h3 class="text-lg font-bold text-text">Registered Users</h3>
+            <div class="flex items-center gap-3">
+              <h3 class="text-lg font-bold text-text">Registered Users</h3>
+              <span id="refresh-timer" class="text-xs text-text-muted">Auto-refresh in 5:00</span>
+            </div>
             <div class="flex gap-2">
               <input type="text" placeholder="Search users..." class="px-3 py-1.5 bg-surface border border-primary/10 rounded-lg text-sm text-text" id="user-search" />
+              <button id="refresh-users-btn" class="px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-sm font-medium hover:bg-primary/20 transition-colors flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                Refresh
+              </button>
               <button class="px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-sm font-medium">Export CSV</button>
             </div>
           </div>
@@ -191,8 +198,12 @@ const t = en;
         </div>
 
         <div class="bg-surface-card rounded-xl border border-primary/10 overflow-hidden">
-          <div class="p-4 border-b border-primary/10">
+          <div class="p-4 border-b border-primary/10 flex items-center justify-between">
             <h3 class="text-lg font-bold text-text">Pro Subscriptions</h3>
+            <button id="refresh-subs-btn" class="px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-sm font-medium hover:bg-primary/20 transition-colors flex items-center gap-1">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+              Refresh
+            </button>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full">
@@ -684,6 +695,36 @@ const t = en;
           loadAdminData();
         })
         .subscribe();
+
+      // Auto-refresh timer (5 minutes)
+      let refreshInterval = 300; // 5 minutes in seconds
+      const timerEl = document.getElementById('refresh-timer');
+
+      function updateTimer() {
+        refreshInterval--;
+        if (refreshInterval <= 0) {
+          loadAdminData();
+          refreshInterval = 300;
+        }
+        const mins = Math.floor(refreshInterval / 60);
+        const secs = refreshInterval % 60;
+        if (timerEl) timerEl.textContent = `Auto-refresh in ${mins}:${secs.toString().padStart(2, '0')}`;
+      }
+
+      setInterval(updateTimer, 1000);
+
+      // Manual refresh buttons
+      document.getElementById('refresh-users-btn')?.addEventListener('click', () => {
+        loadAdminData();
+        refreshInterval = 300;
+        alert('User list refreshed!');
+      });
+
+      document.getElementById('refresh-subs-btn')?.addEventListener('click', () => {
+        loadAdminData();
+        refreshInterval = 300;
+        alert('Subscriptions refreshed!');
+      });
     }
 
     // Tab switching
