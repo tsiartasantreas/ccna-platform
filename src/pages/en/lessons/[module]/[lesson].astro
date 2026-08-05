@@ -327,14 +327,34 @@ function mdToHtml(md: string): string {
     let saved = false;
 
     // Save lesson progress
+    // Helper: save to localStorage as fallback
+    function saveLocal(status: string) {
+      const key = `lesson_${moduleNum}_${lessonNum}`;
+      localStorage.setItem(key, status);
+      if (status === 'completed') {
+        const allCompleted = JSON.parse(localStorage.getItem('completedLessons') || '{}');
+        allCompleted[`${moduleNum}_${lessonNum}`] = true;
+        localStorage.setItem('completedLessons', JSON.stringify(allCompleted));
+      }
+    }
+
+    // Helper: check localStorage
+    function isCompletedLocal(): boolean {
+      const allCompleted = JSON.parse(localStorage.getItem('completedLessons') || '{}');
+      return !!allCompleted[`${moduleNum}_${lessonNum}`];
+    }
+
     async function saveLessonProgress(status: 'in_progress' | 'completed') {
+      // Always save to localStorage
+      saveLocal(status);
+
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session?.user) return;
 
         const timeSpent = Math.floor((Date.now() - startTime) / 1000);
 
-        await supabase.from('lesson_progress').upsert({
+        const { error } = await supabase.from('lesson_progress').upsert({
           user_id: session.user.id,
           module_number: moduleNum,
           lesson_number: lessonNum,
@@ -343,14 +363,28 @@ function mdToHtml(md: string): string {
           completed_at: status === 'completed' ? new Date().toISOString() : null,
         }, { onConflict: 'user_id,module_number,lesson_number' });
 
-        saved = true;
+        if (error) console.error('Supabase save error:', error);
+        else saved = true;
       } catch (error) {
         console.error('Error saving lesson progress:', error);
       }
     }
 
-    // Update sidebar badges for completed lessons
+    // Update sidebar badges
     async function updateSidebarBadges() {
+      // First check localStorage
+      const allCompleted = JSON.parse(localStorage.getItem('completedLessons') || '{}');
+      for (let i = 1; i <= 8; i++) {
+        if (allCompleted[`${moduleNum}_${i}`]) {
+          const badge = document.getElementById(`lesson-badge-${i}`);
+          if (badge) {
+            badge.textContent = '✓';
+            badge.className = 'w-6 h-6 rounded flex items-center justify-center text-xs bg-success/20 text-success font-bold';
+          }
+        }
+      }
+
+      // Then check Supabase
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) return;
 
@@ -368,6 +402,10 @@ function mdToHtml(md: string): string {
               badge.textContent = '✓';
               badge.className = 'w-6 h-6 rounded flex items-center justify-center text-xs bg-success/20 text-success font-bold';
             }
+            // Sync to localStorage
+            const allCompleted = JSON.parse(localStorage.getItem('completedLessons') || '{}');
+            allCompleted[`${moduleNum}_${p.lesson_number}`] = true;
+            localStorage.setItem('completedLessons', JSON.stringify(allCompleted));
           }
         });
       }
@@ -376,6 +414,12 @@ function mdToHtml(md: string): string {
 
     // Check if already completed
     async function checkCompletion() {
+      if (isCompletedLocal()) {
+        saved = true;
+        document.getElementById('completed-badge')?.classList.remove('hidden');
+        return;
+      }
+
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) return;
 
@@ -390,6 +434,7 @@ function mdToHtml(md: string): string {
       if (data?.status === 'completed') {
         saved = true;
         document.getElementById('completed-badge')?.classList.remove('hidden');
+        saveLocal('completed');
       }
     }
     checkCompletion();

@@ -240,22 +240,42 @@ function mdToHtml(md: string): string {
     let startTime = Date.now();
     let saved = false;
 
+    function saveLocal(status) {
+      localStorage.setItem(`lesson_${moduleNum}_${lessonNum}`, status);
+      if (status === 'completed') {
+        const all = JSON.parse(localStorage.getItem('completedLessons') || '{}');
+        all[`${moduleNum}_${lessonNum}`] = true;
+        localStorage.setItem('completedLessons', JSON.stringify(all));
+      }
+    }
+    function isCompletedLocal() {
+      return !!JSON.parse(localStorage.getItem('completedLessons') || '{}')[`${moduleNum}_${lessonNum}`];
+    }
+
     async function saveLessonProgress(status) {
+      saveLocal(status);
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session?.user) return;
         const timeSpent = Math.floor((Date.now() - startTime) / 1000);
-        await supabase.from('lesson_progress').upsert({
+        const { error } = await supabase.from('lesson_progress').upsert({
           user_id: session.user.id, module_number: moduleNum, lesson_number: lessonNum,
           status, time_spent_seconds: timeSpent,
           completed_at: status === 'completed' ? new Date().toISOString() : null,
         }, { onConflict: 'user_id,module_number,lesson_number' });
-        saved = true;
+        if (error) console.error('Supabase error:', error);
+        else saved = true;
       } catch (e) { console.error('Error saving progress:', e); }
     }
 
-    // Update sidebar badges
     async function updateSidebarBadges() {
+      const all = JSON.parse(localStorage.getItem('completedLessons') || '{}');
+      for (let i = 1; i <= 8; i++) {
+        if (all[`${moduleNum}_${i}`]) {
+          const badge = document.getElementById(`lesson-badge-${i}`);
+          if (badge) { badge.textContent = '✓'; badge.className = 'w-6 h-6 rounded flex items-center justify-center text-xs bg-success/20 text-success font-bold'; }
+        }
+      }
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) return;
       const { data: progress } = await supabase.from('lesson_progress').select('lesson_number, status').eq('user_id', session.user.id).eq('module_number', moduleNum);
@@ -264,14 +284,17 @@ function mdToHtml(md: string): string {
           if (p.status === 'completed') {
             const badge = document.getElementById(`lesson-badge-${p.lesson_number}`);
             if (badge) { badge.textContent = '✓'; badge.className = 'w-6 h-6 rounded flex items-center justify-center text-xs bg-success/20 text-success font-bold'; }
+            const allC = JSON.parse(localStorage.getItem('completedLessons') || '{}');
+            allC[`${moduleNum}_${p.lesson_number}`] = true;
+            localStorage.setItem('completedLessons', JSON.stringify(allC));
           }
         });
       }
     }
     updateSidebarBadges();
 
-    // Check if already completed
     async function checkCompletion() {
+      if (isCompletedLocal()) { saved = true; document.getElementById('completed-badge')?.classList.remove('hidden'); return; }
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) return;
       const { data } = await supabase.from('lesson_progress').select('status').eq('user_id', session.user.id).eq('module_number', moduleNum).eq('lesson_number', lessonNum).single();
