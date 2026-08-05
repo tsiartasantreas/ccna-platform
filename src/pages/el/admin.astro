@@ -178,19 +178,19 @@ const t = el;
   </div>
 
   <script>
-    import { createClient } from '@supabase/supabase-js';
-
-    const supabase = createClient(
-      'https://jhesstimsojwmkdysmpy.supabase.co',
-      'sb_publishable_bKD9biIulcfC5iNipD-8IA_3Zu4bmWD'
-    );
-    const ADMIN_EMAIL = 'tsiartasantreas@gmail.com';
+    import { supabase } from '../../lib/supabase';
 
     const { data: { session } } = await supabase.auth.getSession();
     const accessDenied = document.getElementById('access-denied');
     const adminContent = document.getElementById('admin-content');
 
-    if (!session?.user || session.user.email !== ADMIN_EMAIL) {
+    let isAdmin = false;
+    if (session?.user) {
+      const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', session.user.id).single();
+      isAdmin = profile?.is_admin === true;
+    }
+
+    if (!session?.user || !isAdmin) {
       if (accessDenied) accessDenied.classList.remove('hidden');
       if (adminContent) adminContent.classList.add('hidden');
     } else {

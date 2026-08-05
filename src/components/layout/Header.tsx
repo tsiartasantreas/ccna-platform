@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { ADMIN_EMAIL, SITE_NAME } from '../../lib/config';
+import { SITE_NAME } from '../../lib/config';
 
 interface HeaderProps {
   locale: 'en' | 'el';
@@ -58,13 +58,23 @@ export default function Header({ locale, translations }: HeaderProps) {
         setIsLoggedIn(true);
         localStorage.setItem('userEmail', session.user.email || '');
         localStorage.setItem('userId', session.user.id);
-        setIsAdmin(session.user.email === ADMIN_EMAIL);
-        // Get display name from metadata or email
-        const name = session.user.user_metadata?.display_name || session.user.email?.split('@')[0] || 'User';
+        // Check admin status from database
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('is_admin, display_name, avatar_url')
+          .eq('id', session.user.id)
+          .single();
+        setIsAdmin(profile?.is_admin === true);
+        const name = profile?.display_name || session.user.user_metadata?.display_name || session.user.email?.split('@')[0] || 'User';
         setUserName(name);
-        // Get avatar from localStorage or profile
-        const savedAvatar = localStorage.getItem('userAvatar');
-        if (savedAvatar) setUserAvatar(savedAvatar);
+        // Get avatar from profile or localStorage
+        if (profile?.avatar_url) {
+          setUserAvatar(profile.avatar_url);
+          localStorage.setItem('userAvatar', profile.avatar_url);
+        } else {
+          const savedAvatar = localStorage.getItem('userAvatar');
+          if (savedAvatar) setUserAvatar(savedAvatar);
+        }
       } else {
         setIsLoggedIn(false);
         setIsAdmin(false);
@@ -76,11 +86,16 @@ export default function Header({ locale, translations }: HeaderProps) {
     checkAuth();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session?.user) {
         setIsLoggedIn(true);
-        setIsAdmin(session.user.email === ADMIN_EMAIL);
-        const name = session.user.user_metadata?.display_name || session.user.email?.split('@')[0] || 'User';
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('is_admin, display_name')
+          .eq('id', session.user.id)
+          .single();
+        setIsAdmin(profile?.is_admin === true);
+        const name = profile?.display_name || session.user.user_metadata?.display_name || session.user.email?.split('@')[0] || 'User';
         setUserName(name);
       } else {
         setIsLoggedIn(false);

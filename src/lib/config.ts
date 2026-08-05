@@ -1,15 +1,14 @@
 // ============================================================
 // Centralized Configuration — Single Source of Truth
 // ============================================================
-// All constants, keys, and configuration values live here.
-// Import from this file instead of hardcoding values.
 
 // --- Supabase ---
 export const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL || 'https://jhesstimsojwmkdysmpy.supabase.co';
 export const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY || '';
 
 // --- Admin ---
-export const ADMIN_EMAIL = 'tsiartasantreas@gmail.com';
+// Admin validation is now done via database (profiles.is_admin column)
+// No hardcoded email in client code
 
 // --- Contact ---
 export const CONTACT_EMAIL = 'info@abcdigital360.com';
@@ -36,3 +35,15 @@ export const ENABLE_REGISTRATION = true;
 export const ENABLE_PASSWORD_RESET = true;
 export const ENABLE_GOOGLE_OAUTH = false;
 export const MAINTENANCE_MODE = false;
+
+// Helper: Check if user is admin (queries database)
+export async function checkIsAdmin(supabase: any): Promise<boolean> {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user) return false;
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('is_admin')
+    .eq('id', session.user.id)
+    .single();
+  return profile?.is_admin === true;
+}
