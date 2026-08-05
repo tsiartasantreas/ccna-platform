@@ -1,20 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config';
 
-const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('Supabase URL or Anon Key not configured. Set PUBLIC_SUPABASE_URL and PUBLIC_SUPABASE_ANON_KEY in .env');
-}
-
-export const supabase = createClient(
-  supabaseUrl ?? '',
-  supabaseAnonKey ?? ''
-);
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Database types
 export interface Profile {
   id: string;
+  email?: string;
+  avatar_url?: string;
   display_name: string | null;
   preferred_language: 'en' | 'el';
   theme: 'dark' | 'light';
