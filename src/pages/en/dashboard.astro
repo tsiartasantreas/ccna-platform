@@ -116,6 +116,54 @@ const modules = [
         </div>
       </div>
 
+      {/* Quiz & Certificate Section */}
+      <div class="mb-8">
+        <h2 class="text-2xl font-bold mb-6">🎯 Quiz & Certification</h2>
+        <div class="bg-surface-card rounded-2xl border border-primary/10 p-6 mb-6">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h3 class="text-lg font-bold text-text">Module Quizzes</h3>
+              <p class="text-sm text-text-muted">Complete all quizzes with 80%+ to earn your certificate</p>
+            </div>
+            <div id="quiz-progress-badge" class="px-4 py-2 rounded-full bg-surface-light text-text-muted text-sm font-medium">
+              0/6 completed
+            </div>
+          </div>
+
+          <div id="quiz-list" class="space-y-3 mb-6">
+            {[
+              { num: 1, name: 'Network Fundamentals' },
+              { num: 2, name: 'Network Access' },
+              { num: 3, name: 'IP Connectivity' },
+              { num: 4, name: 'IP Services' },
+              { num: 5, name: 'Security Fundamentals' },
+              { num: 6, name: 'Automation & Programmability' },
+            ].map((mod) => (
+              <div class="flex items-center justify-between p-3 bg-surface-light rounded-lg" data-quiz-row={mod.num}>
+                <div class="flex items-center gap-3">
+                  <span class="w-8 h-8 rounded-lg bg-surface flex items-center justify-center text-sm font-bold text-text-muted" data-quiz-badge={mod.num}>
+                    {mod.num}
+                  </span>
+                  <div>
+                    <div class="font-medium text-text text-sm">Module {mod.num}: {mod.name}</div>
+                    <div class="text-xs text-text-muted" data-quiz-score={mod.num}>Not attempted</div>
+                  </div>
+                </div>
+                <a href={`/${locale}/lessons/${mod.num}/quiz`} class="text-xs text-primary hover:underline">Take Quiz →</a>
+              </div>
+            ))}
+          </div>
+
+          {/* Certificate Button */}
+          <button
+            id="certificate-btn"
+            class="w-full py-4 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+          >
+            🎓 Generate Certificate
+          </button>
+        </div>
+      </div>
+
       {/* Quick Actions */}
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <a href={`/${locale}/curriculum`} class="bg-gradient-to-r from-primary/10 to-accent/10 rounded-xl border border-primary/20 p-6 hover:border-primary/40 transition-colors">
@@ -139,6 +187,36 @@ const modules = [
       <h2 class="text-2xl font-bold text-text mb-2">You're Already Pro!</h2>
       <p class="text-text-muted mb-6">You have full access to all quizzes, certificates, and premium features.</p>
       <button onclick="document.getElementById('already-pro-modal').classList.add('hidden')" class="px-6 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity">
+        Got it!
+      </button>
+    </div>
+  </div>
+
+  {/* Upgrade to Pro for Certificate Modal */}
+  <div id="cert-upgrade-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div class="bg-surface-card rounded-2xl border border-primary/10 p-8 max-w-md mx-4 text-center animate-fade-in">
+      <div class="text-6xl mb-4">🔒</div>
+      <h2 class="text-2xl font-bold text-text mb-2">Pro Required</h2>
+      <p class="text-text-muted mb-6">You need a Pro subscription to generate your completion certificate.</p>
+      <div class="flex flex-col gap-3">
+        <a href={`/${locale}/pricing`} class="px-6 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity text-center">
+          Upgrade to Pro →
+        </a>
+        <button onclick="document.getElementById('cert-upgrade-modal').classList.add('hidden')" class="px-6 py-3 border border-primary/30 text-primary rounded-xl font-medium hover:bg-primary/10 transition-all">
+          Maybe Later
+        </button>
+      </div>
+    </div>
+  </div>
+
+  {/* Incomplete Quizzes Modal */}
+  <div id="incomplete-quizzes-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div class="bg-surface-card rounded-2xl border border-primary/10 p-8 max-w-lg mx-4 text-center animate-fade-in">
+      <div class="text-6xl mb-4">📝</div>
+      <h2 class="text-2xl font-bold text-text mb-2">Complete All Quizzes</h2>
+      <p class="text-text-muted mb-4">You need to pass all 6 module quizzes with 80%+ to earn your certificate.</p>
+      <div id="incomplete-list" class="text-left mb-6 space-y-2"></div>
+      <button onclick="document.getElementById('incomplete-quizzes-modal').classList.add('hidden')" class="px-6 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity">
         Got it!
       </button>
     </div>
@@ -253,6 +331,150 @@ const modules = [
     }
 
     loadDashboard();
+
+    // Quiz tracking
+    async function loadQuizData() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return;
+
+      const { data: scores } = await supabase
+        .from('quiz_scores')
+        .select('*')
+        .eq('user_id', session.user.id);
+
+      const moduleNames = ['Network Fundamentals', 'Network Access', 'IP Connectivity', 'IP Services', 'Security Fundamentals', 'Automation & Programmability'];
+      let passedCount = 0;
+
+      for (let m = 1; m <= 6; m++) {
+        const moduleScores = scores?.filter(s => s.module_number === m) || [];
+        const bestScore = moduleScores.length > 0 ? Math.max(...moduleScores.map(s => Number(s.score))) : 0;
+        const passed = bestScore >= 80;
+        if (passed) passedCount++;
+
+        // Update badge
+        const badge = document.querySelector(`[data-quiz-badge="${m}"]`);
+        if (badge) {
+          if (passed) {
+            badge.textContent = '✓';
+            badge.className = 'w-8 h-8 rounded-lg bg-success/20 text-success flex items-center justify-center text-sm font-bold';
+          } else if (moduleScores.length > 0) {
+            badge.textContent = '✗';
+            badge.className = 'w-8 h-8 rounded-lg bg-warning/20 text-warning flex items-center justify-center text-sm font-bold';
+          }
+        }
+
+        // Update score
+        const scoreEl = document.querySelector(`[data-quiz-score="${m}"]`);
+        if (scoreEl) {
+          if (moduleScores.length > 0) {
+            scoreEl.textContent = `Best: ${Math.round(bestScore)}% ${passed ? '✓ Passed' : '(need 80%)'}`;
+            scoreEl.className = passed ? 'text-xs text-success' : 'text-xs text-warning';
+          }
+        }
+      }
+
+      // Update progress badge
+      const progressBadge = document.getElementById('quiz-progress-badge');
+      if (progressBadge) {
+        progressBadge.textContent = `${passedCount}/6 completed`;
+        if (passedCount === 6) {
+          progressBadge.className = 'px-4 py-2 rounded-full bg-success/10 text-success text-sm font-medium';
+        }
+      }
+
+      return { passedCount, scores };
+    }
+
+    loadQuizData();
+
+    // Certificate button handler
+    document.getElementById('certificate-btn')?.addEventListener('click', async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) {
+        window.location.href = '/en/login';
+        return;
+      }
+
+      // Check if Pro
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('plan')
+        .eq('id', session.user.id)
+        .single();
+
+      if (profile?.plan !== 'pro') {
+        document.getElementById('cert-upgrade-modal')?.classList.remove('hidden');
+        return;
+      }
+
+      // Check if all quizzes passed
+      const quizData = await loadQuizData();
+      if (!quizData || quizData.passedCount < 6) {
+        // Show incomplete quizzes modal
+        const incompleteList = document.getElementById('incomplete-list');
+        if (incompleteList) {
+          const moduleNames = ['Network Fundamentals', 'Network Access', 'IP Connectivity', 'IP Services', 'Security Fundamentals', 'Automation & Programmability'];
+          let html = '';
+          for (let m = 1; m <= 6; m++) {
+            const moduleScores = quizData?.scores?.filter(s => s.module_number === m) || [];
+            const bestScore = moduleScores.length > 0 ? Math.max(...moduleScores.map(s => Number(s.score))) : 0;
+            const passed = bestScore >= 80;
+            html += `<div class="flex items-center justify-between p-2 rounded-lg ${passed ? 'bg-success/5' : 'bg-warning/5'}">
+              <span class="text-sm text-text">Module ${m}: ${moduleNames[m-1]}</span>
+              <span class="text-sm ${passed ? 'text-success' : 'text-warning'}">${passed ? '✓ Passed' : moduleScores.length > 0 ? Math.round(bestScore) + '%' : 'Not attempted'}</span>
+            </div>`;
+          }
+          incompleteList.innerHTML = html;
+        }
+        document.getElementById('incomplete-quizzes-modal')?.classList.remove('hidden');
+        return;
+      }
+
+      // Generate certificate
+      const userName = session.user.user_metadata?.display_name || session.user.email?.split('@')[0] || 'User';
+      const { jsPDF } = await import('jspdf');
+      const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+      const w = doc.internal.pageSize.getWidth();
+      const h = doc.internal.pageSize.getHeight();
+
+      try {
+        const templateUrl = 'https://raw.githubusercontent.com/tsiartasantreas/ccna-platform/main/public/images/certificate-bg.png';
+        const response = await fetch(templateUrl);
+        const blob = await response.blob();
+        const reader = new FileReader();
+        await new Promise((resolve) => {
+          reader.onload = function() { doc.addImage(reader.result, 'PNG', 0, 0, w, h); resolve(); };
+          reader.readAsDataURL(blob);
+        });
+      } catch(e) {
+        doc.setFillColor(255, 255, 255);
+        doc.rect(0, 0, w, h, 'F');
+      }
+
+      doc.setTextColor(100, 116, 139);
+      doc.setFontSize(12);
+      doc.text('This certificate is proudly awarded to', w / 2, 85, { align: 'center' });
+
+      doc.setTextColor(30, 41, 59);
+      doc.setFontSize(40);
+      doc.text(userName, w / 2, 105, { align: 'center' });
+
+      doc.setTextColor(100, 116, 139);
+      doc.setFontSize(12);
+      doc.text('for the successful completion of the', w / 2, 125, { align: 'center' });
+
+      doc.setTextColor(30, 41, 59);
+      doc.setFontSize(20);
+      doc.text('CCNA Training Program', w / 2, 140, { align: 'center' });
+
+      const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      doc.setTextColor(100, 116, 139);
+      doc.setFontSize(11);
+      doc.text(`Issued on ${date}`, w / 2, 160, { align: 'center' });
+
+      doc.save(`NetworkLearn-Certificate-${userName.replace(/\s+/g, '-').toLowerCase()}.pdf`);
+      alert('Certificate downloaded!');
+    });
 
     // Upgrade button handler
     document.getElementById('upgrade-btn')?.addEventListener('click', async () => {
