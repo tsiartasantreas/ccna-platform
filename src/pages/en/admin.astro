@@ -230,22 +230,9 @@ const t = en;
       <div id="tab-revolut" class="tab-content hidden">
         <div class="bg-surface-card rounded-xl border border-primary/10 p-6 mb-6">
           <h3 class="text-lg font-bold text-text mb-4">💰 Revolut Business API Configuration</h3>
-          <div class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-text mb-1">API Key</label>
-              <input type="password" id="revolut-api-key" placeholder="sk_live_..." class="w-full px-4 py-2 bg-surface border border-primary/10 rounded-lg text-text font-mono text-sm" />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-text mb-1">Webhook Secret</label>
-              <input type="password" id="revolut-webhook-secret" placeholder="whsec_..." class="w-full px-4 py-2 bg-surface border border-primary/10 rounded-lg text-text font-mono text-sm" />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-text mb-1">Merchant ID</label>
-              <input type="text" id="revolut-merchant-id" placeholder="merchant_..." class="w-full px-4 py-2 bg-surface border border-primary/10 rounded-lg text-text font-mono text-sm" />
-            </div>
-            <button id="save-revolut" class="px-6 py-2 bg-gradient-to-r from-primary to-accent text-white rounded-lg font-medium hover:opacity-90 transition-opacity">
-              Save Revolut Settings
-            </button>
+          <p class="text-sm text-text-muted mb-4">API keys are stored server-side for security. Configure via Supabase Edge Function environment variables.</p>
+          <div class="bg-success/10 rounded-lg p-4">
+            <p class="text-sm text-success">✓ Revolut API credentials are stored securely server-side.</p>
           </div>
         </div>
 
@@ -263,22 +250,19 @@ const t = en;
       <div id="tab-supabase" class="tab-content hidden">
         <div class="bg-surface-card rounded-xl border border-primary/10 p-6 mb-6">
           <h3 class="text-lg font-bold text-text mb-4">🗄️ Supabase Configuration</h3>
+          <p class="text-sm text-text-muted mb-4">Supabase keys are configured server-side via environment variables for security.</p>
           <div class="space-y-4">
             <div>
               <label class="block text-sm font-medium text-text mb-1">Project URL</label>
-              <input type="text" id="supabase-url" value="https://jhesstimsojwmkdysmpy.supabase.co" class="w-full px-4 py-2 bg-surface border border-primary/10 rounded-lg text-text font-mono text-sm" />
+              <div class="px-4 py-2 bg-surface-light border border-primary/10 rounded-lg text-text font-mono text-sm">https://jhesstimsojwmkdysmpy.supabase.co</div>
             </div>
             <div>
               <label class="block text-sm font-medium text-text mb-1">Anon Key (Public)</label>
-              <input type="password" id="supabase-anon-key" placeholder="eyJhbGciOiJIUzI1NiIs..." class="w-full px-4 py-2 bg-surface border border-primary/10 rounded-lg text-text font-mono text-sm" />
+              <div class="px-4 py-2 bg-surface-light border border-primary/10 rounded-lg text-text-muted font-mono text-sm">Configured via environment variable</div>
             </div>
-            <div>
-              <label class="block text-sm font-medium text-text mb-1">Service Role Key (Secret)</label>
-              <input type="password" id="supabase-service-key" placeholder="eyJhbGciOiJIUzI1NiIs..." class="w-full px-4 py-2 bg-surface border border-primary/10 rounded-lg text-text font-mono text-sm" />
+            <div class="bg-success/10 rounded-lg p-4">
+              <p class="text-sm text-success">✓ All sensitive keys are stored server-side and not exposed to the browser.</p>
             </div>
-            <button id="save-supabase" class="px-6 py-2 bg-gradient-to-r from-primary to-accent text-white rounded-lg font-medium hover:opacity-90 transition-opacity">
-              Save Supabase Settings
-            </button>
           </div>
         </div>
 
@@ -395,16 +379,9 @@ const t = en;
           {/* Payment Settings */}
           <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
             <h3 class="text-lg font-bold text-text mb-4">💳 Payment Settings (Stripe Backup)</h3>
-            <div class="space-y-4">
-              <div>
-                <label class="block text-sm font-medium text-text mb-1">Stripe Public Key</label>
-                <input type="text" id="stripe-public" placeholder="pk_live_..." class="w-full px-4 py-2 bg-surface border border-primary/10 rounded-lg text-text font-mono text-sm" />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-text mb-1">Stripe Secret Key</label>
-                <input type="password" id="stripe-secret" placeholder="sk_live_..." class="w-full px-4 py-2 bg-surface border border-primary/10 rounded-lg text-text font-mono text-sm" />
-              </div>
-              <button id="save-stripe" class="px-6 py-2 bg-primary/10 text-primary rounded-lg font-medium">Save Stripe Settings</button>
+            <p class="text-sm text-text-muted mb-4">Stripe credentials are stored server-side for security.</p>
+            <div class="bg-success/10 rounded-lg p-4">
+              <p class="text-sm text-success">✓ Payment credentials are stored securely server-side.</p>
             </div>
           </div>
         </div>
@@ -754,26 +731,8 @@ const t = en;
       firstTab.classList.remove('text-text-muted');
     }
 
-    // Save handlers
-    document.getElementById('save-revolut')?.addEventListener('click', () => {
-      const settings = {
-        revolutApiKey: (document.getElementById('revolut-api-key') as HTMLInputElement)?.value || '',
-        revolutWebhookSecret: (document.getElementById('revolut-webhook-secret') as HTMLInputElement)?.value || '',
-        revolutMerchantId: (document.getElementById('revolut-merchant-id') as HTMLInputElement)?.value || '',
-      };
-      localStorage.setItem('adminSettings', JSON.stringify({ ...JSON.parse(localStorage.getItem('adminSettings') || '{}'), ...settings }));
-      alert('Revolut settings saved!');
-    });
-
-    document.getElementById('save-supabase')?.addEventListener('click', () => {
-      const settings = {
-        supabaseUrl: (document.getElementById('supabase-url') as HTMLInputElement)?.value || '',
-        supabaseAnonKey: (document.getElementById('supabase-anon-key') as HTMLInputElement)?.value || '',
-        supabaseServiceKey: (document.getElementById('supabase-service-key') as HTMLInputElement)?.value || '',
-      };
-      localStorage.setItem('adminSettings', JSON.stringify({ ...JSON.parse(localStorage.getItem('adminSettings') || '{}'), ...settings }));
-      alert('Supabase settings saved!');
-    });
+    // Save handlers (non-sensitive settings only)
+    // Revolut and Supabase keys are configured server-side
 
     // Load saved settings on page load
     const savedSettings = JSON.parse(localStorage.getItem('adminSettings') || '{}');
