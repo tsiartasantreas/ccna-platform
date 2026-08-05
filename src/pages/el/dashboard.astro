@@ -155,5 +155,13 @@ const modules = [
     }
 
     loadDashboard();
+
+    // Real-time subscriptions
+    const userId = localStorage.getItem('userId');
+    if (userId) {
+      supabase.channel('el-progress').on('postgres_changes', { event: '*', schema: 'public', table: 'lesson_progress', filter: `user_id=eq.${userId}` }, () => loadDashboard()).subscribe();
+      supabase.channel('el-scores').on('postgres_changes', { event: '*', schema: 'public', table: 'quiz_scores', filter: `user_id=eq.${userId}` }, () => loadDashboard()).subscribe();
+      supabase.channel('el-points').on('postgres_changes', { event: '*', schema: 'public', table: 'user_points', filter: `user_id=eq.${userId}` }, () => loadDashboard()).subscribe();
+    }
   </script>
 </BaseLayout>

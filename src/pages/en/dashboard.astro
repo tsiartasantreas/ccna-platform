@@ -232,5 +232,49 @@ const modules = [
     }
 
     loadDashboard();
+
+    // Real-time subscriptions for live updates
+    const userId = localStorage.getItem('userId');
+    if (userId) {
+      // Subscribe to lesson progress changes
+      supabase
+        .channel('lesson-progress-changes')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'lesson_progress',
+          filter: `user_id=eq.${userId}`,
+        }, () => {
+          // Reload dashboard when progress changes
+          loadDashboard();
+        })
+        .subscribe();
+
+      // Subscribe to quiz score changes
+      supabase
+        .channel('quiz-score-changes')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'quiz_scores',
+          filter: `user_id=eq.${userId}`,
+        }, () => {
+          loadDashboard();
+        })
+        .subscribe();
+
+      // Subscribe to points changes
+      supabase
+        .channel('points-changes')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'user_points',
+          filter: `user_id=eq.${userId}`,
+        }, () => {
+          loadDashboard();
+        })
+        .subscribe();
+    }
   </script>
 </BaseLayout>

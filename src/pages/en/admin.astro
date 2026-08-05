@@ -654,10 +654,27 @@ const t = en;
       // Load data immediately
       loadAdminData();
 
-      // Auto-refresh every 5 minutes
-      setInterval(() => {
-        loadAdminData();
-      }, 5 * 60 * 1000);
+      // Real-time subscriptions for live updates
+      supabase
+        .channel('admin-profiles')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => {
+          loadAdminData();
+        })
+        .subscribe();
+
+      supabase
+        .channel('admin-progress')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'lesson_progress' }, () => {
+          loadAdminData();
+        })
+        .subscribe();
+
+      supabase
+        .channel('admin-scores')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'quiz_scores' }, () => {
+          loadAdminData();
+        })
+        .subscribe();
     }
 
     // Tab switching
