@@ -94,24 +94,26 @@ export default function Header({ locale, translations }: HeaderProps) {
         setUserName('');
       }
     });
-    return () => subscription.unsubscribe();
 
+    let prevScrollY = 0;
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       setIsScrolled(currentScrollY > 20);
-      // Hide header when scrolling down, show when scrolling up
-      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+      if (currentScrollY > prevScrollY && currentScrollY > 100) {
         setIsHidden(true);
       } else {
         setIsHidden(false);
       }
-      setLastScrollY(currentScrollY);
-      // Show back to top button when scrolled down
+      prevScrollY = currentScrollY;
       setShowBackToTop(currentScrollY > 500);
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY]);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      subscription.unsubscribe();
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   const toggleTheme = () => {
     const newTheme = isDark ? 'light' : 'dark';
