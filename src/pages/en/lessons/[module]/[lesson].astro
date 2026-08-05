@@ -273,31 +273,35 @@ function mdToHtml(md: string): string {
           ) : <div />}
         </div>
 
-        {/* Quiz Prompt - shown after last lesson of each module */}
+        {/* Module Complete Prompt - shown after last lesson */}
         {!nextLesson && (
           <div class="mt-12 bg-gradient-to-r from-primary/10 to-accent/10 rounded-2xl border border-primary/20 p-8 text-center">
-            <div class="text-5xl mb-4">🎯</div>
+            <div class="text-5xl mb-4">🎓</div>
             <h2 class="text-2xl font-bold text-text mb-2">
               {locale === 'el' ? 'Ολοκληρώσατε την Ενότητα!' : 'Module Complete!'}
             </h2>
             <p class="text-text-muted mb-6">
               {locale === 'el'
-                ? 'Είστε έτοιμοι να δοκιμάσετε τις γνώσεις σας; Το τεστ είναι διαθέσιμο μόνο για χρήστες Pro.'
-                : 'Ready to test your knowledge? The quiz is available for Pro users only.'}
+                ? 'Πατήστε "Ολοκλήρωση Μαθήματος" για να σημειωθεί αυτό το μάθημα ως ολοκληρωμένο και στη συνέχεια δοκιμάστε τις γνώσεις σας με το τεστ της ενότητας.'
+                : 'Press "Complete Lesson" to mark this lesson as done, then test your knowledge with the module quiz.'}
             </p>
             <div class="flex flex-col sm:flex-row gap-3 justify-center">
+              <button
+                id="complete-and-quiz-btn"
+                class="px-6 py-3 bg-gradient-to-r from-success to-emerald-500 text-white rounded-xl font-medium hover:opacity-90 transition-opacity cursor-pointer"
+              >
+                ✓ {locale === 'el' ? 'Ολοκλήρωση Μαθήματος' : 'Complete Lesson'}
+              </button>
               <a
                 href={`/${locale}/lessons/${moduleNum}/quiz`}
                 class="px-6 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity"
               >
-                {locale === 'el' ? 'Ξεκινήστε το Τεστ →' : 'Take the Quiz →'}
+                🎯 {locale === 'el' ? 'Ξεκινήστε το Τεστ' : 'Take the Quiz'} →
               </a>
-              <a
-                href={`/${locale}/curriculum`}
-                class="px-6 py-3 border border-primary/30 text-primary rounded-xl font-medium hover:bg-primary/10 transition-all"
-              >
-                {locale === 'el' ? 'Συνέχεια στο Πρόγραμμα' : 'Continue to Curriculum'}
-              </a>
+            </div>
+            <p class="text-xs text-text-muted mt-4">
+              {locale === 'el' ? 'Το τεστ είναι διαθέσιμο μόνο για χρήστες Pro.' : 'Quiz available for Pro users only.'}
+            </p>
             </div>
           </div>
         )}
@@ -515,6 +519,33 @@ function mdToHtml(md: string): string {
     modal?.addEventListener('click', (e) => {
       if (e.target === modal) modal.classList.add('hidden');
     });
+
+    // Complete and Quiz button (last lesson of module)
+    const completeQuizBtn = document.getElementById('complete-and-quiz-btn');
+    if (completeQuizBtn) {
+      // Update button text if already completed
+      if (saved || isCompletedLocal()) {
+        completeQuizBtn.textContent = '✓ Lesson Completed';
+        completeQuizBtn.classList.remove('from-success', 'to-emerald-500');
+        completeQuizBtn.classList.add('bg-success/20', 'text-success', 'cursor-default');
+      }
+
+      completeQuizBtn.addEventListener('click', async () => {
+        if (saved || isCompletedLocal()) return;
+        await saveLessonProgress('completed');
+        // Update sidebar badge
+        const badge = document.getElementById(`lesson-badge-${lessonNum}`);
+        if (badge) {
+          badge.textContent = '✓';
+          badge.className = 'w-6 h-6 rounded flex items-center justify-center text-xs bg-success/20 text-success font-bold';
+        }
+        // Update button
+        completeQuizBtn.textContent = '✓ Lesson Completed';
+        completeQuizBtn.classList.remove('from-success', 'to-emerald-500');
+        completeQuizBtn.classList.add('bg-success/20', 'text-success', 'cursor-default');
+        document.getElementById('completed-badge')?.classList.remove('hidden');
+      });
+    }
 
     // Save on page unload
     window.addEventListener('beforeunload', () => {
