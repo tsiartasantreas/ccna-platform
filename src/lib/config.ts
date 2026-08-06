@@ -4,7 +4,7 @@
 
 // --- Supabase ---
 export const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL || 'https://jhesstimsojwmkdysmpy.supabase.co';
-export const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZXNzdGltc29qd21reWRzbXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzUxMjY5NzQsImV4cCI6MjA1MDcwMjk3NH0.bHJy8ZJe9Sp5M1UQyS4eJ6oL6FDNVfMa2kXRFljIjXI';
+export const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_bKD9biIulcfC5iNipD-8IA_3Zu4bmWD';
 
 // --- Admin ---
 // Admin validation is now done via database (profiles.is_admin column)
