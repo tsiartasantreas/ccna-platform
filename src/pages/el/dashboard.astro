@@ -184,6 +184,15 @@ const modules = [
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) { window.location.href = '/el/login'; return; }
 
+      // Sync localStorage completions to database first
+      const localCompleted = JSON.parse(localStorage.getItem(`completedLessons_${session.user.id}`) || '{}');
+      for (const key of Object.keys(localCompleted)) {
+        const [m, l] = key.split('_').map(Number);
+        if (m && l) {
+          await supabase.rpc('user_complete_lesson', { p_module_number: m, p_lesson_number: l });
+        }
+      }
+
       // Fetch ALL user data via secure RPC
       const { data: dashboardData, error: dashboardError } = await supabase.rpc('user_get_dashboard_data');
       if (dashboardError) { console.error('Dashboard error:', dashboardError); return; }

@@ -253,6 +253,15 @@ const modules = [
       const greeting = document.getElementById('user-greeting');
       if (greeting) greeting.textContent = `Welcome back, ${userName}! Here's your learning progress.`;
 
+      // Sync localStorage completions to database first
+      const localCompleted = JSON.parse(localStorage.getItem(`completedLessons_${user.id}`) || '{}');
+      for (const key of Object.keys(localCompleted)) {
+        const [m, l] = key.split('_').map(Number);
+        if (m && l) {
+          await supabase.rpc('user_complete_lesson', { p_module_number: m, p_lesson_number: l });
+        }
+      }
+
       // Fetch ALL user data via secure RPC (bypasses RLS, uses auth.uid() server-side)
       const { data: dashboardData, error: dashboardError } = await supabase.rpc('user_get_dashboard_data');
 
