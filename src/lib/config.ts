@@ -47,3 +47,4 @@ export async function checkIsAdmin(supabase: any): Promise<boolean> {
     .single();
   return profile?.is_admin === true;
 }
+// Force rebuild Thu Aug  6 18:33:51 EEST 2026
