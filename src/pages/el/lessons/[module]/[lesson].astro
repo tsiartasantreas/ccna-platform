@@ -72,6 +72,7 @@ const nextLesson = lessonNum < lessonCount
   : moduleNum < 6
     ? { module: moduleNum + 1, lesson: 1 }
     : null;
+const nextModule = moduleNum < 6 ? moduleNum + 1 : null;
 
 function mdToHtml(md: string): string {
   let html = md
@@ -214,11 +215,27 @@ function mdToHtml(md: string): string {
             <p class="text-text-muted mb-6">Πατήστε "Ολοκλήρωση Μαθήματος" και στη συνέχεια δοκιμάστε τις γνώσεις σας.</p>
             <div class="flex flex-col sm:flex-row gap-3 justify-center">
               <button id="complete-and-quiz-btn" class="px-6 py-3 bg-gradient-to-r from-success to-emerald-500 text-white rounded-xl font-medium hover:opacity-90 transition-opacity cursor-pointer">✓ Ολοκλήρωση Μαθήματος</button>
-              <a href={`/${locale}/lessons/${moduleNum}/quiz`} class="px-6 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity">🎯 Ξεκινήστε το Τεστ →</a>
+              <button id="take-quiz-btn" class="px-6 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity cursor-pointer">🎯 Ξεκινήστε το Τεστ →</button>
             </div>
             <p class="text-xs text-text-muted mt-4">Το τεστ είναι διαθέσιμο μόνο για χρήστες Pro.</p>
           </div>
         )}
+
+        {/* Upgrade Modal for Free Users */}
+        <div id="quiz-upgrade-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div class="bg-surface-card rounded-2xl border border-primary/10 p-8 max-w-md mx-4 text-center animate-fade-in">
+            <div class="text-6xl mb-4">🔒</div>
+            <h2 class="text-2xl font-bold text-text mb-2">Απαιτείται Pro</h2>
+            <p class="text-text-muted mb-6">Χρειάζεστε συνδρομή Pro για πρόσβαση στα τεστ και τα πιστοποιητικά.</p>
+            <div class="flex flex-col gap-3">
+              <a href={`/${locale}/pricing`} class="px-6 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity text-center">⭐ Αναβάθμιση σε Pro →</a>
+              {nextModule && (
+                <a href={`/${locale}/lessons/${nextModule}/1`} class="px-6 py-3 border border-primary/30 text-primary rounded-xl font-medium hover:bg-primary/10 transition-all text-center">Μετάβαση στην Ενότητα {nextModule} →</a>
+              )}
+              <button onclick="document.getElementById('quiz-upgrade-modal').classList.add('hidden')" class="px-6 py-3 text-text-muted hover:text-primary transition-colors text-sm">Αργότερα</button>
+            </div>
+          </div>
+        </div>
 
         {/* Completion Modal */}
         <div id="completion-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
@@ -367,6 +384,30 @@ function mdToHtml(md: string): string {
         completeQuizBtn.classList.remove('from-success', 'to-emerald-500');
         completeQuizBtn.classList.add('bg-success/20', 'text-success', 'cursor-default');
         document.getElementById('completed-badge')?.classList.remove('hidden');
+      });
+    }
+
+    // Take Quiz button - check if Pro user
+    const takeQuizBtn = document.getElementById('take-quiz-btn');
+    if (takeQuizBtn) {
+      takeQuizBtn.addEventListener('click', async () => {
+        if (!saved && !isCompletedLocal()) {
+          await saveLessonProgress('completed');
+          const badge = document.getElementById(`lesson-badge-${lessonNum}`);
+          if (badge) { badge.textContent = '✓'; badge.className = 'w-6 h-6 rounded flex items-center justify-center text-xs bg-success/20 text-success font-bold'; }
+          if (completeQuizBtn) {
+            completeQuizBtn.textContent = '✓ Μάθημα Ολοκληρώθηκε';
+            completeQuizBtn.classList.remove('from-success', 'to-emerald-500');
+            completeQuizBtn.classList.add('bg-success/20', 'text-success', 'cursor-default');
+          }
+        }
+        const { data: dashboardData } = await supabase.rpc('user_get_dashboard_data');
+        const userPlan = dashboardData?.profile?.plan;
+        if (userPlan === 'pro') {
+          window.location.href = `/${locale}/lessons/${moduleNum}/quiz`;
+        } else {
+          document.getElementById('quiz-upgrade-modal')?.classList.remove('hidden');
+        }
       });
     }
 
