@@ -363,15 +363,10 @@ const modules = [
 
     loadDashboard();
 
-    // Quiz tracking
+    // Quiz tracking - use stored data from RPC
     async function loadQuizData() {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) return;
-
-      const { data: scores } = await supabase
-        .from('quiz_scores')
-        .select('*')
-        .eq('user_id', session.user.id);
+      // Use scores already fetched from user_get_dashboard_data()
+      const scores = currentUserData?.quiz_scores || [];
 
       const moduleNames = ['Network Fundamentals', 'Network Access', 'IP Connectivity', 'IP Services', 'Security Fundamentals', 'Automation & Programmability'];
       let passedCount = 0;
