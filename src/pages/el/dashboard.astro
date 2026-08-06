@@ -178,22 +178,39 @@ const modules = [
   <script>
     import { supabase } from '../../lib/supabase';
 
+    let currentUserData: any = null;
+
     async function loadDashboard() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) { window.location.href = '/el/login'; return; }
-      const user = session.user;
 
-      // Fetch profile
-      const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+      // Fetch ALL user data via secure RPC
+      const { data: dashboardData, error: dashboardError } = await supabase.rpc('user_get_dashboard_data');
+      if (dashboardError) { console.error('Dashboard error:', dashboardError); return; }
 
-      // Fetch progress
-      const { data: progress } = await supabase.from('lesson_progress').select('*').eq('user_id', user.id);
-      const { data: points } = await supabase.from('user_points').select('*').eq('user_id', user.id).single();
+      currentUserData = dashboardData;
+      const profile = dashboardData?.profile;
+      const progress = dashboardData?.lesson_progress || [];
+      const points = dashboardData?.user_points;
+
+      // Update plan status
+      const planIcon = document.getElementById('plan-icon');
+      const planName = document.getElementById('plan-name');
+      const planDesc = document.getElementById('plan-desc');
+      const planAction = document.getElementById('plan-action');
+      const upgradeBtn = document.getElementById('upgrade-btn');
+
+      if (profile?.plan === 'pro') {
+        if (planIcon) { planIcon.textContent = 'P'; planIcon.className = 'w-12 h-12 rounded-xl bg-gradient-to-br from-accent to-primary flex items-center justify-center text-white font-bold text-lg'; }
+        if (planName) planName.textContent = 'Pro';
+        if (planDesc) planDesc.textContent = 'Πλήρης πρόσβαση σε τεστ, πιστοποιητικά και περισσότερα';
+        if (planAction) { planAction.textContent = 'Ενεργό ✓'; planAction.className = 'px-4 py-2 bg-success/10 text-success rounded-lg text-sm font-medium cursor-default'; planAction.removeAttribute('href'); }
+        if (upgradeBtn) { upgradeBtn.innerHTML = '<div class="text-2xl mb-2">⭐</div><h3 class="font-bold text-text mb-1">Μέλος Pro</h3><p class="text-sm text-text-muted">Έχετε πλήρη πρόσβαση</p>'; upgradeBtn.className = 'bg-gradient-to-r from-success/10 to-accent/10 rounded-xl border border-success/20 p-6 hover:border-success/40 transition-colors text-left cursor-default'; }
+      }
 
       // Update points
       const totalPoints = document.getElementById('total-points');
       if (totalPoints && points) totalPoints.textContent = String(points.total_points || 0);
-
       const streak = document.getElementById('current-streak');
       if (streak && points) streak.textContent = `${points.current_streak || 0}`;
 
@@ -201,10 +218,9 @@ const modules = [
       const moduleLessons = [8, 7, 6, 5, 5, 4];
       let totalCompleted = 0;
       let modulesCompleted = 0;
-
       for (let m = 1; m <= 6; m++) {
-        const moduleProgress = progress?.filter(p => p.module_number === m) || [];
-        const completed = moduleProgress.filter(p => p.status === 'completed').length;
+        const mp = progress?.filter((p: any) => p.module_number === m) || [];
+        const completed = mp.filter((p: any) => p.status === 'completed').length;
         const total = moduleLessons[m - 1];
         const percent = Math.round((completed / total) * 100);
         const bar = document.querySelector(`[data-module-bar="${m}"]`);
@@ -214,25 +230,33 @@ const modules = [
         totalCompleted += completed;
         if (percent === 100) modulesCompleted++;
       }
-
       const lessonsEl = document.getElementById('lessons-completed');
       const modulesEl = document.getElementById('modules-completed');
       if (lessonsEl) lessonsEl.textContent = `${totalCompleted}/35`;
       if (modulesEl) modulesEl.textContent = `${modulesCompleted}/6`;
-    }
 
+      // Render recent quiz scores
+      const scores = dashboardData?.quiz_scores || [];
+      const scoresContainer = document.getElementById('recent-scores');
+      if (scoresContainer && scores.length > 0) {
+        const moduleNames = ['Θεμέλια Δικτύων', 'Πρόσβαση Δικτύου', 'Συνδεσιμότητα IP', 'Υπηρεσίες IP', 'Θεμέλια Ασφάλειας', 'Αυτοματοποίηση'];
+        scoresContainer.innerHTML = scores.slice(0, 10).map((s: any) => {
+          const passed = Number(s.score) >= 80;
+          const date = new Date(s.completed_at).toLocaleDateString();
+          return `<div class="flex items-center justify-between p-3 bg-surface-light rounded-lg"><div><div class="font-medium text-text text-sm">Ενότητα ${s.module_number}: ${moduleNames[s.module_number - 1]}</div><div class="text-xs text-text-muted">Προσπάθεια #${s.attempt_number} • ${date}</div></div><div class="text-right"><div class="text-lg font-bold ${passed ? 'text-success' : 'text-warning'}">${Math.round(Number(s.score))}%</div><div class="text-xs ${passed ? 'text-success' : 'text-text-muted'}">${s.correct_answers}/${s.total_questions}</div></div></div>`;
+        }).join('');
+      }
+    }
     loadDashboard();
 
     // Quiz tracking
     async function loadQuizData() {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) return;
-      const { data: scores } = await supabase.from('quiz_scores').select('*').eq('user_id', session.user.id);
+      const scores = currentUserData?.quiz_scores || [];
       const names = ['Θεμέλια Δικτύων', 'Πρόσβαση Δικτύου', 'Συνδεσιμότητα IP', 'Υπηρεσίες IP', 'Θεμέλια Ασφάλειας', 'Αυτοματοποίηση'];
       let passedCount = 0;
       for (let m = 1; m <= 6; m++) {
-        const ms = scores?.filter(s => s.module_number === m) || [];
-        const best = ms.length > 0 ? Math.max(...ms.map(s => Number(s.score))) : 0;
+        const ms = scores.filter((s: any) => s.module_number === m) || [];
+        const best = ms.length > 0 ? Math.max(...ms.map((s: any) => Number(s.score))) : 0;
         const passed = best >= 80;
         if (passed) passedCount++;
         const badge = document.querySelector(`[data-quiz-badge="${m}"]`);
@@ -248,10 +272,7 @@ const modules = [
 
     // Certificate button
     document.getElementById('certificate-btn')?.addEventListener('click', async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) { window.location.href = '/el/login'; return; }
-      const { data: profile } = await supabase.from('profiles').select('plan').eq('id', session.user.id).single();
-      if (profile?.plan !== 'pro') { document.getElementById('cert-upgrade-modal')?.classList.remove('hidden'); return; }
+      if (currentUserData?.profile?.plan !== 'pro') { document.getElementById('cert-upgrade-modal')?.classList.remove('hidden'); return; }
       const quizData = await loadQuizData();
       if (!quizData || quizData.passedCount < 6) {
         const list = document.getElementById('incomplete-list');
@@ -259,8 +280,8 @@ const modules = [
           const names = ['Θεμέλια Δικτύων', 'Πρόσβαση Δικτύου', 'Συνδεσιμότητα IP', 'Υπηρεσίες IP', 'Θεμέλια Ασφάλειας', 'Αυτοματοποίηση'];
           let html = '';
           for (let m = 1; m <= 6; m++) {
-            const ms = quizData?.scores?.filter(s => s.module_number === m) || [];
-            const best = ms.length > 0 ? Math.max(...ms.map(s => Number(s.score))) : 0;
+            const ms = quizData?.scores?.filter((s: any) => s.module_number === m) || [];
+            const best = ms.length > 0 ? Math.max(...ms.map((s: any) => Number(s.score))) : 0;
             const passed = best >= 80;
             html += `<div class="flex items-center justify-between p-2 rounded-lg ${passed ? 'bg-success/5' : 'bg-warning/5'}"><span class="text-sm text-text">Ενότητα ${m}: ${names[m-1]}</span><span class="text-sm ${passed ? 'text-success' : 'text-warning'}">${passed ? '✓' : ms.length > 0 ? Math.round(best) + '%' : 'Δεν δοκιμάστηκε'}</span></div>`;
           }
@@ -274,22 +295,11 @@ const modules = [
 
     // Upgrade button handler
     document.getElementById('upgrade-btn')?.addEventListener('click', async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) { window.location.href = '/el/login'; return; }
-      const { data: profile } = await supabase.from('profiles').select('plan').eq('id', session.user.id).single();
-      if (profile?.plan === 'pro') {
+      if (currentUserData?.profile?.plan === 'pro') {
         document.getElementById('already-pro-modal')?.classList.remove('hidden');
       } else {
         window.location.href = '/el/pricing';
       }
     });
-
-    // Real-time subscriptions
-    const userId = localStorage.getItem('userId');
-    if (userId) {
-      supabase.channel('el-progress').on('postgres_changes', { event: '*', schema: 'public', table: 'lesson_progress', filter: `user_id=eq.${userId}` }, () => loadDashboard()).subscribe();
-      supabase.channel('el-scores').on('postgres_changes', { event: '*', schema: 'public', table: 'quiz_scores', filter: `user_id=eq.${userId}` }, () => loadDashboard()).subscribe();
-      supabase.channel('el-points').on('postgres_changes', { event: '*', schema: 'public', table: 'user_points', filter: `user_id=eq.${userId}` }, () => loadDashboard()).subscribe();
-    }
   </script>
 </BaseLayout>

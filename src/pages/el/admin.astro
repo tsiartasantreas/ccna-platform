@@ -180,14 +180,21 @@ const t = el;
   <script>
     import { supabase } from '../../lib/supabase';
 
+    function sanitize(str: string | null | undefined): string {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
     const { data: { session } } = await supabase.auth.getSession();
     const accessDenied = document.getElementById('access-denied');
     const adminContent = document.getElementById('admin-content');
 
     let isAdmin = false;
     if (session?.user) {
-      const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', session.user.id).single();
-      isAdmin = profile?.is_admin === true;
+      const { data: adminCheck } = await supabase.rpc('check_is_admin');
+      isAdmin = adminCheck === true;
     }
 
     if (!session?.user || !isAdmin) {
@@ -197,27 +204,28 @@ const t = el;
       if (accessDenied) accessDenied.classList.add('hidden');
       if (adminContent) adminContent.classList.remove('hidden');
 
-      // Set admin as pro
-      await supabase.from('profiles').update({ plan: 'pro' }).eq('id', session.user.id);
-
-      // Load real data
       async function loadAdminData() {
-        const { data: profiles } = await supabase.from('profiles').select('*');
-        const { data: allProgress } = await supabase.from('lesson_progress').select('*');
-        const { data: allScores } = await supabase.from('quiz_scores').select('*');
+        const { data: adminData, error: adminError } = await supabase.rpc('admin_get_all_data');
+        if (adminError) { console.error('Admin error:', adminError); return; }
 
-        const totalUsers = profiles?.length || 0;
-        const proUsers = profiles?.filter(p => p.plan === 'pro').length || 0;
+        const profiles = adminData?.profiles || [];
+        const allProgress = adminData?.lesson_progress || [];
+        const allScores = adminData?.quiz_scores || [];
+        const adminEmails = adminData?.admin_emails || [];
+
+        const emailMap: Record<string, string> = {};
+        adminEmails.forEach((e: any) => { emailMap[e.user_id] = e.email_encrypted; });
+
+        const totalUsers = profiles.length;
+        const proUsers = profiles.filter((p: any) => p.plan === 'pro').length;
         const revenue = proUsers * 0.99;
-
         const now = new Date();
         const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        const newThisWeek = profiles?.filter(p => new Date(p.created_at) >= weekAgo).length || 0;
-        const totalLessons = allProgress?.filter(p => p.status === 'completed').length || 0;
-        const totalQuizzes = allScores?.length || 0;
-        const avgScore = allScores?.length ? Math.round(allScores.reduce((s, q) => s + Number(q.score), 0) / allScores.length) : 0;
+        const newThisWeek = profiles.filter((p: any) => new Date(p.created_at) >= weekAgo).length;
+        const totalLessons = allProgress.filter((p: any) => p.status === 'completed').length;
+        const totalQuizzes = allScores.length;
+        const avgScore = allScores.length ? Math.round(allScores.reduce((s: number, q: any) => s + Number(q.score), 0) / allScores.length) : 0;
 
-        // Update stats
         document.getElementById('stat-total-users-el')!.textContent = String(totalUsers);
         document.getElementById('stat-pro-users-el')!.textContent = String(proUsers);
         document.getElementById('stat-revenue-el')!.textContent = `€${revenue.toFixed(2)}`;
@@ -227,110 +235,87 @@ const t = el;
         document.getElementById('stat-quizzes-el')!.textContent = totalQuizzes.toLocaleString();
 
         const tableBody = document.getElementById('users-table-body-el');
-        if (tableBody && profiles) {
-          tableBody.innerHTML = profiles.map(p => {
-            const userProgress = allProgress?.filter(lp => lp.user_id === p.id) || [];
-            const userScores = allScores?.filter(qs => qs.user_id === p.id) || [];
-            const lessonsCompleted = userProgress.filter(lp => lp.status === 'completed').length;
-            const avgScore = userScores.length ? Math.round(userScores.reduce((s, q) => s + Number(q.score), 0) / userScores.length) : 0;
+        if (tableBody) {
+          tableBody.innerHTML = profiles.map((p: any) => {
+            const up = allProgress.filter((lp: any) => lp.user_id === p.id) || [];
+            const us = allScores.filter((qs: any) => qs.user_id === p.id) || [];
+            const lc = up.filter((lp: any) => lp.status === 'completed').length;
+            const as2 = us.length ? Math.round(us.reduce((s: number, q: any) => s + Number(q.score), 0) / us.length) : 0;
+            const em = emailMap[p.id] || p.id.substring(0, 8) + '...';
 
             return `<tr class="border-b border-primary/5 hover:bg-surface-light">
-              <td class="px-4 py-3 text-sm text-text font-medium">${p.display_name || 'User'}</td>
-              <td class="px-4 py-3 text-sm text-text-muted">${p.id.substring(0, 8)}...</td>
-              <td class="px-4 py-3">
-                <select class="plan-select-el px-2 py-1 bg-surface border border-primary/10 rounded text-xs text-text" data-user-id="${p.id}">
-                  <option value="free" ${p.plan === 'free' ? 'selected' : ''}>Free</option>
-                  <option value="pro" ${p.plan === 'pro' ? 'selected' : ''}>Pro</option>
-                </select>
-              </td>
-              <td class="px-4 py-3 text-sm text-text">${lessonsCompleted}/35</td>
-              <td class="px-4 py-3 text-sm ${avgScore >= 80 ? 'text-success' : avgScore > 0 ? 'text-warning' : 'text-text-muted'}">${avgScore > 0 ? avgScore + '%' : '—'}</td>
+              <td class="px-4 py-3 text-sm text-text font-medium">${sanitize(p.display_name) || 'User'}</td>
+              <td class="px-4 py-3 text-sm text-text-muted font-mono text-xs">${sanitize(em)}</td>
+              <td class="px-4 py-3"><select class="plan-select-el px-2 py-1 bg-surface border border-primary/10 rounded text-xs text-text" data-user-id="${p.id}"><option value="free" ${p.plan === 'free' ? 'selected' : ''}>Free</option><option value="pro" ${p.plan === 'pro' ? 'selected' : ''}>Pro</option></select></td>
+              <td class="px-4 py-3 text-sm text-text">${lc}/35</td>
+              <td class="px-4 py-3 text-sm ${as2 >= 80 ? 'text-success' : as2 > 0 ? 'text-warning' : 'text-text-muted'}">${as2 > 0 ? as2 + '%' : '—'}</td>
               <td class="px-4 py-3 flex gap-2 flex-wrap">
                 <button class="save-plan-btn-el text-xs text-success hover:underline" data-user-id="${p.id}">Αποθήκευση</button>
-                <button class="cert-btn-el text-xs text-accent hover:underline" data-user-id="${p.id}" data-user-name="${p.display_name || 'User'}" data-lessons="${lessonsCompleted}" data-score="${avgScore}">🎓 Πιστοπ.</button>
+                <button class="cert-btn-el text-xs text-accent hover:underline" data-user-id="${p.id}" data-user-name="${sanitize(p.display_name) || 'User'}" data-lessons="${lc}" data-score="${as2}">🎓 Πιστοπ.</button>
+                <button class="delete-user-btn-el text-xs text-error hover:underline" data-user-id="${p.id}" data-user-name="${sanitize(p.display_name) || 'User'}">🗑️ Διαγρ.</button>
               </td>
             </tr>`;
           }).join('');
 
-          // Plan change handlers
           document.querySelectorAll('.save-plan-btn-el').forEach(btn => {
             btn.addEventListener('click', async () => {
               const userId = btn.getAttribute('data-user-id');
               const select = document.querySelector(`.plan-select-el[data-user-id="${userId}"]`) as HTMLSelectElement;
               if (userId && select) {
-                const { error } = await supabase.from('profiles').update({ plan: select.value }).eq('id', userId);
+                const { error } = await supabase.rpc('admin_update_user_plan', { target_user_id: userId, new_plan: select.value });
                 if (error) alert('Σφάλμα: ' + error.message);
                 else { alert('Το πλάνο ενημερώθηκε!'); loadAdminData(); }
               }
             });
           });
 
-          // Certificate handlers
+          document.querySelectorAll('.delete-user-btn-el').forEach(btn => {
+            btn.addEventListener('click', async () => {
+              const userId = btn.getAttribute('data-user-id');
+              const userName = btn.getAttribute('data-user-name') || 'User';
+              if (!userId) return;
+              if (!confirm(`ΔΙΑΓΡΑΦΗ: ${userName}\n\nΑυτό θα διαγράψει μόνιμα όλα τα δεδομένα. Σίγουρος;`)) return;
+              const { error } = await supabase.rpc('delete_user_account', { target_user_id: userId });
+              if (error) alert('Σφάλμα: ' + error.message);
+              else { alert(`Ο χρήστης ${userName} διαγράφηκε.`); loadAdminData(); }
+            });
+          });
+
           document.querySelectorAll('.cert-btn-el').forEach(btn => {
             btn.addEventListener('click', async () => {
               const userName = btn.getAttribute('data-user-name') || 'User';
-              const lessons = btn.getAttribute('data-lessons') || '0';
-              const score = btn.getAttribute('data-score') || '0';
               if (!confirm(`Δημιουργία πιστοποιητικού για ${userName};`)) return;
-
               const { jsPDF } = await import('jspdf');
               const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
               const w = doc.internal.pageSize.getWidth();
               const h = doc.internal.pageSize.getHeight();
-
-              // Load certificate template background
               try {
                 const templateUrl = 'https://raw.githubusercontent.com/tsiartasantreas/ccna-platform/main/public/images/certificate-bg.png';
                 const response = await fetch(templateUrl);
                 const blob = await response.blob();
                 const reader = new FileReader();
-                await new Promise((resolve) => {
-                  reader.onload = function() { doc.addImage(reader.result, 'PNG', 0, 0, w, h); resolve(); };
-                  reader.readAsDataURL(blob);
-                });
-              } catch(e) {
-                doc.setFillColor(255, 255, 255);
-                doc.rect(0, 0, w, h, 'F');
-              }
-
-              // Only dynamic text - rest is in template
-
-              doc.setTextColor(100, 116, 139);
-              doc.setFontSize(12);
+                await new Promise((resolve) => { reader.onload = function() { doc.addImage(reader.result, 'PNG', 0, 0, w, h); resolve(); }; reader.readAsDataURL(blob); });
+              } catch(e) { doc.setFillColor(255, 255, 255); doc.rect(0, 0, w, h, 'F'); }
+              doc.setTextColor(100, 116, 139); doc.setFontSize(12);
               doc.text('Αυτό το πιστοποιητικό απονέμεται στον/στην', w / 2, 85, { align: 'center' });
-
-              doc.setTextColor(30, 41, 59);
-              doc.setFontSize(40);
+              doc.setTextColor(30, 41, 59); doc.setFontSize(40);
               doc.text(userName, w / 2, 105, { align: 'center' });
-
-              doc.setTextColor(100, 116, 139);
-              doc.setFontSize(12);
+              doc.setTextColor(100, 116, 139); doc.setFontSize(12);
               doc.text('για την επιτυχή ολοκλήρωση του', w / 2, 125, { align: 'center' });
-
-              doc.setTextColor(30, 41, 59);
-              doc.setFontSize(20);
+              doc.setTextColor(30, 41, 59); doc.setFontSize(20);
               doc.text('Προγράμματος Εκπαίδευσης CCNA', w / 2, 140, { align: 'center' });
-
-              doc.setTextColor(100, 116, 139);
-              doc.setFontSize(11);
+              doc.setTextColor(100, 116, 139); doc.setFontSize(11);
               doc.text(`Εκδόθηκε στις ${new Date().toLocaleDateString('el-GR')}`, w / 2, 160, { align: 'center' });
-              doc.setTextColor(148, 163, 184);
-              doc.setFontSize(9);
+              doc.setTextColor(148, 163, 184); doc.setFontSize(9);
               doc.text('networklearn.wasmer.app', w / 2, h - 18, { align: 'center' });
-
               doc.save(`NetworkLearn-Certificate-${userName.replace(/\s+/g, '-').toLowerCase()}.pdf`);
               alert(`Το πιστοποιητικό λήφθηκε για ${userName}!`);
             });
           });
         }
       }
-      // Load data immediately
       loadAdminData();
-
-      // Auto-refresh every 5 minutes
-      setInterval(() => {
-        loadAdminData();
-      }, 5 * 60 * 1000);
+      setInterval(() => loadAdminData(), 5 * 60 * 1000);
     }
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
