@@ -431,8 +431,8 @@ const t = en;
         if (btn) { btn.textContent = 'Deleting...'; (btn as HTMLButtonElement).disabled = true; }
 
         try {
-          // Use server-side RPC for account deletion
-          const { error } = await supabase.rpc('delete_own_account');
+          // Use server-side RPC for account deletion (deletes auth.users too)
+          const { error } = await supabase.rpc('delete_user_account', { target_user_id: session.user.id });
           if (error) throw error;
 
           // Clear localStorage
