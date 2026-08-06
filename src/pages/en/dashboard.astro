@@ -255,11 +255,19 @@ const modules = [
 
       // Sync localStorage completions to database first
       const localCompleted = JSON.parse(localStorage.getItem(`completedLessons_${user.id}`) || '{}');
+      const syncErrors: string[] = [];
       for (const key of Object.keys(localCompleted)) {
         const [m, l] = key.split('_').map(Number);
         if (m && l) {
-          await supabase.rpc('user_complete_lesson', { p_module_number: m, p_lesson_number: l });
+          const { error } = await supabase.rpc('user_complete_lesson', { p_module_number: m, p_lesson_number: l });
+          if (error) {
+            console.error(`Sync failed for lesson ${m}_${l}:`, error);
+            syncErrors.push(`${m}_${l}`);
+          }
         }
+      }
+      if (syncErrors.length > 0) {
+        console.warn('Failed to sync these lessons to database:', syncErrors);
       }
 
       // Fetch ALL user data via secure RPC (bypasses RLS, uses auth.uid() server-side)
@@ -306,9 +314,6 @@ const modules = [
         }
       }
 
-      // Load localStorage completions (user-specific)
-      const localCompletedMap = JSON.parse(localStorage.getItem(`completedLessons_${user.id}`) || '{}');
-
       // Update points
       const totalPoints = document.getElementById('total-points');
       if (totalPoints && points) totalPoints.textContent = String(points.total_points || 0);
@@ -317,20 +322,14 @@ const modules = [
       const streak = document.getElementById('current-streak');
       if (streak && points) streak.textContent = `${points.current_streak || 0} days`;
 
-      // Calculate module progress (merge Supabase + localStorage)
+      // Calculate module progress (use database only - already synced from localStorage)
       const moduleLessons = [8, 7, 6, 5, 5, 4];
       let totalCompleted = 0;
       let modulesCompleted = 0;
 
       for (let m = 1; m <= 6; m++) {
-        const moduleProgress = progress?.filter(p => p.module_number === m) || [];
-        const supabaseCompleted = moduleProgress.filter(p => p.status === 'completed').length;
-        // Count localStorage completions for this module
-        let localCount = 0;
-        for (let l = 1; l <= moduleLessons[m - 1]; l++) {
-          if (localCompletedMap[`${m}_${l}`]) localCount++;
-        }
-        const completed = Math.max(supabaseCompleted, localCount);
+        const moduleProgress = progress?.filter((p: any) => p.module_number === m) || [];
+        const completed = moduleProgress.filter((p: any) => p.status === 'completed').length;
         const total = moduleLessons[m - 1];
         const percent = Math.round((completed / total) * 100);
 

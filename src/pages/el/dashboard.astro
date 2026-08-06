@@ -186,11 +186,19 @@ const modules = [
 
       // Sync localStorage completions to database first
       const localCompleted = JSON.parse(localStorage.getItem(`completedLessons_${session.user.id}`) || '{}');
+      const syncErrors: string[] = [];
       for (const key of Object.keys(localCompleted)) {
         const [m, l] = key.split('_').map(Number);
         if (m && l) {
-          await supabase.rpc('user_complete_lesson', { p_module_number: m, p_lesson_number: l });
+          const { error } = await supabase.rpc('user_complete_lesson', { p_module_number: m, p_lesson_number: l });
+          if (error) {
+            console.error(`Sync failed for lesson ${m}_${l}:`, error);
+            syncErrors.push(`${m}_${l}`);
+          }
         }
+      }
+      if (syncErrors.length > 0) {
+        console.warn('Failed to sync these lessons to database:', syncErrors);
       }
 
       // Fetch ALL user data via secure RPC
