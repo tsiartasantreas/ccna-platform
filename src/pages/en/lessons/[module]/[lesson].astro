@@ -378,22 +378,31 @@ function mdToHtml(md: string): string {
       saveLocal(status);
 
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session?.user) return;
+        if (status === 'completed') {
+          // Use secure RPC for lesson completion (uses auth.uid() server-side)
+          const { error } = await supabase.rpc('user_complete_lesson', {
+            p_module_number: moduleNum,
+            p_lesson_number: lessonNum,
+          });
 
-        const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+          if (error) console.error('Supabase save error:', error);
+          else saved = true;
+        } else {
+          // For in_progress, use direct insert (RLS allows own data)
+          const { data: { session } } = await supabase.auth.getSession();
+          if (!session?.user) return;
 
-        const { error } = await supabase.from('lesson_progress').upsert({
-          user_id: session.user.id,
-          module_number: moduleNum,
-          lesson_number: lessonNum,
-          status: status,
-          time_spent_seconds: timeSpent,
-          completed_at: status === 'completed' ? new Date().toISOString() : null,
-        }, { onConflict: 'user_id,module_number,lesson_number' });
+          const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+          const { error } = await supabase.from('lesson_progress').upsert({
+            user_id: session.user.id,
+            module_number: moduleNum,
+            lesson_number: lessonNum,
+            status: status,
+            time_spent_seconds: timeSpent,
+          }, { onConflict: 'user_id,module_number,lesson_number' });
 
-        if (error) console.error('Supabase save error:', error);
-        else if (status === 'completed') saved = true;
+          if (error) console.error('Supabase save error:', error);
+        }
       } catch (error) {
         console.error('Error saving lesson progress:', error);
       }

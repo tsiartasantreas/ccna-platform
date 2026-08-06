@@ -250,12 +250,18 @@ const modules = [
       const greeting = document.getElementById('user-greeting');
       if (greeting) greeting.textContent = `Welcome back, ${userName}! Here's your learning progress.`;
 
-      // Fetch user profile
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
+      // Fetch ALL user data via secure RPC (bypasses RLS, uses auth.uid() server-side)
+      const { data: dashboardData, error: dashboardError } = await supabase.rpc('user_get_dashboard_data');
+
+      if (dashboardError) {
+        console.error('Dashboard data fetch error:', dashboardError);
+        return;
+      }
+
+      const profile = dashboardData?.profile;
+      const progress = dashboardData?.lesson_progress || [];
+      const scores = dashboardData?.quiz_scores || [];
+      const points = dashboardData?.user_points;
 
       // Update plan status
       const planIcon = document.getElementById('plan-icon');
@@ -270,34 +276,8 @@ const modules = [
         if (planAction) { planAction.textContent = 'Active'; planAction.className = 'px-4 py-2 bg-success/10 text-success rounded-lg text-sm font-medium cursor-default'; }
       }
 
-      // Fetch lesson progress from Supabase (only this user's data)
-      const { data: progress, error: progressError } = await supabase
-        .from('lesson_progress')
-        .select('*')
-        .eq('user_id', user.id);
-
-      if (progressError) console.error('Progress fetch error:', progressError);
-
       // Load localStorage completions (user-specific)
       const localCompletedMap = JSON.parse(localStorage.getItem(`completedLessons_${user.id}`) || '{}');
-
-      // Fetch quiz scores (only this user's scores)
-      const { data: scores, error: scoresError } = await supabase
-        .from('quiz_scores')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('completed_at', { ascending: false });
-
-      if (scoresError) console.error('Scores fetch error:', scoresError);
-
-      // Fetch user points (only this user's points)
-      const { data: points, error: pointsError } = await supabase
-        .from('user_points')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
-
-      if (pointsError) console.error('Points fetch error:', pointsError);
 
       // Update points
       const totalPoints = document.getElementById('total-points');

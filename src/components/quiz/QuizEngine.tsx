@@ -88,26 +88,22 @@ export default function QuizEngine({ moduleNumber, moduleName, questions, locale
     setShowResults(true);
     setCurrentQuestion(0);
 
-    // Save quiz score via server-side RPC (prevents client tampering)
+    // Save quiz score via secure server-side RPC (uses auth.uid(), no client user_id)
     try {
       setSaving(true);
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        const score = calculateScore();
+      const score = calculateScore();
 
-        // Use server-side RPC for validation and saving
-        const { data, error } = await supabase.rpc('save_quiz_score', {
-          p_user_id: session.user.id,
-          p_module_number: moduleNumber,
-          p_score: score.percentage,
-          p_total_questions: score.total,
-          p_correct_answers: score.correct,
-          p_time_taken: 0,
-        });
+      // Use secure RPC - server validates auth and saves score
+      const { data, error } = await supabase.rpc('user_save_quiz_score', {
+        p_module_number: moduleNumber,
+        p_score: score.percentage,
+        p_total_questions: score.total,
+        p_correct_answers: score.correct,
+        p_time_taken: 0,
+      });
 
-        if (error) {
-          console.error('Error saving quiz score:', error);
-        }
+      if (error) {
+        console.error('Error saving quiz score:', error);
       }
     } catch (error) {
       console.error('Error saving quiz score:', error);
