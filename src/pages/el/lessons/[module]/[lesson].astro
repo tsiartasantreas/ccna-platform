@@ -404,7 +404,7 @@ function mdToHtml(md: string): string {
         const { data: dashboardData } = await supabase.rpc('user_get_dashboard_data');
         const userPlan = dashboardData?.profile?.plan;
         if (userPlan === 'pro') {
-          window.location.href = `/${locale}/lessons/${moduleNum}/quiz`;
+          window.location.href = `/el/lessons/${moduleNum}/quiz`;
         } else {
           document.getElementById('quiz-upgrade-modal')?.classList.remove('hidden');
         }

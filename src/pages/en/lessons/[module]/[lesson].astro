@@ -606,7 +606,7 @@ function mdToHtml(md: string): string {
 
         if (userPlan === 'pro') {
           // Pro user - go to quiz
-          window.location.href = `/${locale}/lessons/${moduleNum}/quiz`;
+          window.location.href = `/en/lessons/${moduleNum}/quiz`;
         } else {
           // Free user - show upgrade modal
           document.getElementById('quiz-upgrade-modal')?.classList.remove('hidden');
