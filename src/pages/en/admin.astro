@@ -524,8 +524,9 @@ const t = en;
               <td class="px-4 py-3 text-sm text-text-muted">${new Date(p.updated_at).toLocaleDateString()}</td>
               <td class="px-4 py-3 flex gap-2 flex-wrap">
                 <button class="save-plan-btn text-xs text-success hover:underline" data-user-id="${p.id}">Save</button>
-                <button class="reset-pw-btn text-xs text-primary hover:underline" data-user-id="${p.id}">Reset PW</button>
+                <button class="reset-pw-btn text-xs text-primary hover:underline" data-user-id="${p.id}" data-user-email="${sanitize(userEmail)}">Reset PW</button>
                 <button class="cert-btn text-xs text-accent hover:underline" data-user-id="${p.id}" data-user-name="${sanitize(p.display_name) || 'User'}" data-user-email="${p.id}" data-lessons="${lessonsCompleted}" data-score="${avgScore}">🎓 Cert</button>
+                <button class="delete-user-btn text-xs text-error hover:underline" data-user-id="${p.id}" data-user-name="${sanitize(p.display_name) || 'User'}">🗑️ Delete</button>
               </td>
             </tr>`;
           }).join('');
@@ -551,9 +552,20 @@ const t = en;
           document.querySelectorAll('.reset-pw-btn').forEach(btn => {
             btn.addEventListener('click', async () => {
               const userId = btn.getAttribute('data-user-id');
-              const user = profiles?.find(p => p.id === userId);
-              if (user && confirm(`Send password reset to ${user.id}?`)) {
-                alert('Password reset email sent!');
+              const userEmail = btn.getAttribute('data-user-email');
+              if (!userEmail || userEmail.includes('...')) {
+                alert('Cannot send reset: user email not available');
+                return;
+              }
+              if (confirm(`Send password reset email to ${userEmail}?`)) {
+                const { error } = await supabase.auth.resetPasswordForEmail(userEmail, {
+                  redirectTo: window.location.origin + '/en/reset-password',
+                });
+                if (error) {
+                  alert('Error: ' + error.message);
+                } else {
+                  alert('Password reset email sent to ' + userEmail);
+                }
               }
             });
           });
@@ -628,6 +640,31 @@ const t = en;
 
               doc.save(`NetworkLearn-Certificate-${userName.replace(/\s+/g, '-').toLowerCase()}.pdf`);
               alert(`Certificate downloaded for ${userName}!`);
+            });
+          });
+
+          // Delete user handlers
+          document.querySelectorAll('.delete-user-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+              const userId = btn.getAttribute('data-user-id');
+              const userName = btn.getAttribute('data-user-name') || 'User';
+              if (!userId) return;
+
+              if (!confirm(`DELETE USER: ${userName}\n\nThis will permanently delete:\n- All lesson progress\n- All quiz scores\n- All points\n- Their profile\n- Their auth account\n\nThis CANNOT be undone. Are you sure?`)) return;
+
+              if (!confirm(`Type the user name to confirm: ${userName}\n\nClick OK to proceed with deletion.`)) return;
+
+              try {
+                const { error } = await supabase.rpc('delete_user_account', { target_user_id: userId });
+                if (error) {
+                  alert('Error deleting user: ' + error.message);
+                } else {
+                  alert(`User ${userName} has been permanently deleted.`);
+                  loadAdminData();
+                }
+              } catch (err: any) {
+                alert('Error: ' + (err.message || 'Failed to delete user'));
+              }
             });
           });
         }
