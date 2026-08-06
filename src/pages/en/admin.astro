@@ -429,15 +429,23 @@ const t = en;
       await supabase.from('profiles').update({ plan: 'pro' }).eq('id', session.user.id);
 
       async function loadAdminData() {
-        const { data: profiles, error: profilesError } = await supabase.from('profiles').select('*');
-        const { data: allProgress, error: progressError } = await supabase.from('lesson_progress').select('*');
-        const { data: allScores, error: scoresError } = await supabase.from('quiz_scores').select('*');
-        const { data: adminEmails, error: emailsError } = await supabase.from('admin_user_emails').select('*');
+        console.log('Loading admin data...');
 
-        if (profilesError) console.error('Profiles error:', profilesError);
-        if (progressError) console.error('Progress error:', progressError);
-        if (scoresError) console.error('Scores error:', scoresError);
-        if (emailsError) console.error('Emails error:', emailsError);
+        // Use server-side function to bypass RLS
+        const { data: adminData, error: adminError } = await supabase.rpc('admin_get_all_data');
+
+        if (adminError) {
+          console.error('Admin data fetch error:', adminError);
+          alert('Error loading admin data: ' + adminError.message);
+          return;
+        }
+
+        console.log('Admin data received:', adminData);
+
+        const profiles = adminData?.profiles || [];
+        const allProgress = adminData?.lesson_progress || [];
+        const allScores = adminData?.quiz_scores || [];
+        const adminEmails = adminData?.admin_emails || [];
 
         // Create email lookup map
         const emailMap: Record<string, string> = {};
