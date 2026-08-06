@@ -235,6 +235,9 @@ const modules = [
   <script>
     import { supabase } from '../../lib/supabase';
 
+    // Store dashboard data globally for other handlers
+    let currentUserData: any = null;
+
     async function loadDashboard() {
       const { data: { session } } = await supabase.auth.getSession();
 
@@ -258,6 +261,9 @@ const modules = [
         return;
       }
 
+      // Store for other handlers
+      currentUserData = dashboardData;
+
       const profile = dashboardData?.profile;
       const progress = dashboardData?.lesson_progress || [];
       const scores = dashboardData?.quiz_scores || [];
@@ -268,12 +274,27 @@ const modules = [
       const planName = document.getElementById('plan-name');
       const planDesc = document.getElementById('plan-desc');
       const planAction = document.getElementById('plan-action');
+      const upgradeBtn = document.getElementById('upgrade-btn');
 
       if (profile?.plan === 'pro') {
         if (planIcon) { planIcon.textContent = 'P'; planIcon.className = 'w-12 h-12 rounded-xl bg-gradient-to-br from-accent to-primary flex items-center justify-center text-white font-bold text-lg'; }
         if (planName) planName.textContent = 'Pro Plan';
         if (planDesc) planDesc.textContent = 'Full access to quizzes, certificates, and more';
-        if (planAction) { planAction.textContent = 'Active'; planAction.className = 'px-4 py-2 bg-success/10 text-success rounded-lg text-sm font-medium cursor-default'; }
+        if (planAction) {
+          planAction.textContent = 'Active ✓';
+          planAction.className = 'px-4 py-2 bg-success/10 text-success rounded-lg text-sm font-medium cursor-default';
+          planAction.removeAttribute('href');
+          planAction.removeAttribute('onclick');
+        }
+        // Update upgrade button for Pro users
+        if (upgradeBtn) {
+          upgradeBtn.innerHTML = `
+            <div class="text-2xl mb-2">⭐</div>
+            <h3 class="font-bold text-text mb-1">Pro Member</h3>
+            <p class="text-sm text-text-muted">You have full access to all features</p>
+          `;
+          upgradeBtn.className = 'bg-gradient-to-r from-success/10 to-accent/10 rounded-xl border border-success/20 p-6 hover:border-success/40 transition-colors text-left cursor-default';
+        }
       }
 
       // Load localStorage completions (user-specific)
@@ -405,14 +426,8 @@ const modules = [
         return;
       }
 
-      // Check if Pro
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('plan')
-        .eq('id', session.user.id)
-        .single();
-
-      if (profile?.plan !== 'pro') {
+      // Use stored profile data instead of separate query
+      if (currentUserData?.profile?.plan !== 'pro') {
         document.getElementById('cert-upgrade-modal')?.classList.remove('hidden');
         return;
       }
@@ -494,13 +509,8 @@ const modules = [
         return;
       }
 
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('plan')
-        .eq('id', session.user.id)
-        .single();
-
-      if (profile?.plan === 'pro') {
+      // Use stored profile data instead of separate query
+      if (currentUserData?.profile?.plan === 'pro') {
         // Show already Pro modal
         document.getElementById('already-pro-modal')?.classList.remove('hidden');
       } else {
