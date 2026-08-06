@@ -425,13 +425,10 @@ const t = en;
       if (accessDenied) accessDenied.classList.add('hidden');
       if (adminContent) adminContent.classList.remove('hidden');
 
-      // Set admin as pro user if not already
-      await supabase.from('profiles').update({ plan: 'pro' }).eq('id', session.user.id);
-
       async function loadAdminData() {
         console.log('Loading admin data...');
 
-        // Use server-side function to bypass RLS
+        // Use server-side function to bypass RLS - returns ALL data
         const { data: adminData, error: adminError } = await supabase.rpc('admin_get_all_data');
 
         if (adminError) {
@@ -531,13 +528,16 @@ const t = en;
             </tr>`;
           }).join('');
 
-          // Plan change handlers
+          // Plan change handlers (use RPC to bypass RLS)
           document.querySelectorAll('.save-plan-btn').forEach(btn => {
             btn.addEventListener('click', async () => {
               const userId = btn.getAttribute('data-user-id');
               const select = document.querySelector(`.plan-select[data-user-id="${userId}"]`) as HTMLSelectElement;
               if (userId && select) {
-                const { error } = await supabase.from('profiles').update({ plan: select.value }).eq('id', userId);
+                const { error } = await supabase.rpc('admin_update_user_plan', {
+                  target_user_id: userId,
+                  new_plan: select.value
+                });
                 if (error) {
                   alert('Error: ' + error.message);
                 } else {
@@ -693,12 +693,15 @@ const t = en;
             </tr>
           `).join('') : '<tr><td colspan="7" class="px-4 py-8 text-center text-text-muted">No active subscriptions</td></tr>';
 
-          // Cancel subscription handlers
+          // Cancel subscription handlers (use RPC to bypass RLS)
           document.querySelectorAll('.cancel-sub-btn').forEach(btn => {
             btn.addEventListener('click', async () => {
               const userId = btn.getAttribute('data-user-id');
               if (userId && confirm('Cancel this subscription? User will be downgraded to Free.')) {
-                const { error } = await supabase.from('profiles').update({ plan: 'free' }).eq('id', userId);
+                const { error } = await supabase.rpc('admin_update_user_plan', {
+                  target_user_id: userId,
+                  new_plan: 'free'
+                });
                 if (error) {
                   alert('Error: ' + error.message);
                 } else {
