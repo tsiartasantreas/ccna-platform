@@ -58,12 +58,9 @@ export default function Header({ locale, translations }: HeaderProps) {
         setIsLoggedIn(true);
         localStorage.setItem('userEmail', session.user.email || '');
         localStorage.setItem('userId', session.user.id);
-        // Check admin status from database
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('is_admin, display_name, avatar_url')
-          .eq('id', session.user.id)
-          .single();
+        // Get user data via RPC (bypasses RLS)
+        const { data: dashData } = await supabase.rpc('user_get_dashboard_data');
+        const profile = dashData?.profile;
         setIsAdmin(profile?.is_admin === true);
         const name = profile?.display_name || session.user.user_metadata?.display_name || session.user.email?.split('@')[0] || 'User';
         setUserName(name);
@@ -81,6 +78,7 @@ export default function Header({ locale, translations }: HeaderProps) {
         setUserName('');
         localStorage.removeItem('userEmail');
         localStorage.removeItem('userId');
+        localStorage.removeItem('userAvatar');
       }
     };
     checkAuth();
@@ -89,11 +87,8 @@ export default function Header({ locale, translations }: HeaderProps) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session?.user) {
         setIsLoggedIn(true);
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('is_admin, display_name')
-          .eq('id', session.user.id)
-          .single();
+        const { data: dashData } = await supabase.rpc('user_get_dashboard_data');
+        const profile = dashData?.profile;
         setIsAdmin(profile?.is_admin === true);
         const name = profile?.display_name || session.user.user_metadata?.display_name || session.user.email?.split('@')[0] || 'User';
         setUserName(name);
