@@ -550,6 +550,9 @@ const modules = [
         doc.rect(0, 0, w, h, 'F');
       }
 
+      // Set font to helvetica for proper character rendering
+      doc.setFont('helvetica');
+
       doc.setTextColor(100, 116, 139);
       doc.setFontSize(12);
       doc.text('This certificate is proudly awarded to', w / 2, 85, { align: 'center' });

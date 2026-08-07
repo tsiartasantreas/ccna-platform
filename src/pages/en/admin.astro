@@ -623,6 +623,9 @@ const t = en;
                 doc.rect(0, 0, w, h, 'F');
               }
 
+              // Set font to helvetica for proper character rendering
+              doc.setFont('helvetica');
+
               // Only add dynamic text - everything else is in the template
 
               // "This certificate is proudly awarded to"

@@ -446,6 +446,7 @@ const t = el;
                   doc.setFillColor(255, 255, 255); doc.rect(0, 0, w, h, 'F');
                 }
               } catch(e) { doc.setFillColor(255, 255, 255); doc.rect(0, 0, w, h, 'F'); }
+              doc.setFont('helvetica');
               doc.setTextColor(100, 116, 139); doc.setFontSize(12);
               doc.text('Αυτό το πιστοποιητικό απονέμεται στον/στην', w / 2, 85, { align: 'center' });
               doc.setTextColor(30, 41, 59); doc.setFontSize(40);
