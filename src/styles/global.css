@@ -1,19 +1,21 @@
 @import "tailwindcss";
 
 @theme {
-  /* Professional Network Engineering Color Palette */
-  --color-primary: #0ea5e9;
-  --color-primary-dark: #0284c7;
-  --color-accent: #06b6d4;
-  --color-accent-light: #22d3ee;
-  --color-surface: #0f172a;
-  --color-surface-light: #1e293b;
-  --color-surface-card: #334155;
-  --color-text: #f1f5f9;
-  --color-text-muted: #94a3b8;
-  --color-success: #22c55e;
-  --color-warning: #eab308;
-  --color-error: #ef4444;
+  /* Cisco NetAcad-inspired Color Palette */
+  --color-primary: #049fd9;
+  --color-primary-dark: #0077b6;
+  --color-primary-light: #48cae4;
+  --color-accent: #00b4d8;
+  --color-accent-light: #90e0ef;
+  --color-surface: #1a1a2e;
+  --color-surface-light: #16213e;
+  --color-surface-card: #0f3460;
+  --color-text: #e8e8e8;
+  --color-text-muted: #a0a0b0;
+  --color-success: #06d6a0;
+  --color-warning: #ffd166;
+  --color-error: #ef476f;
+  --color-highlight: #f72585;
 
   /* Typography */
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
@@ -21,13 +23,13 @@
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 }
 
-/* Light mode overrides */
+/* Light mode overrides - Cisco clean white style */
 .light {
-  --color-surface: #f8fafc;
-  --color-surface-light: #e2e8f0;
+  --color-surface: #ffffff;
+  --color-surface-light: #f8f9fa;
   --color-surface-card: #ffffff;
-  --color-text: #0f172a;
-  --color-text-muted: #64748b;
+  --color-text: #1a1a2e;
+  --color-text-muted: #6c757d;
 }
 
 /* Base styles */
@@ -45,6 +47,8 @@ body {
 /* Display headings */
 h1, h2, h3 {
   font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 /* Code blocks */
@@ -54,27 +58,27 @@ code, pre {
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-surface);
+  background: var(--color-surface-light);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-text-muted);
-  border-radius: 4px;
+  background: var(--color-primary);
+  border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-primary);
+  background: var(--color-primary-dark);
 }
 
 /* Selection */
 ::selection {
   background-color: var(--color-primary);
-  color: var(--color-surface);
+  color: white;
 }
 
 /* Focus styles */
@@ -99,6 +103,21 @@ code, pre {
   50% { box-shadow: 0 0 20px var(--color-primary), 0 0 40px var(--color-primary); }
 }
 
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
 .animate-fade-in {
   animation: fadeIn 0.5s ease-out forwards;
 }
@@ -111,70 +130,75 @@ code, pre {
   animation: pulse-glow 2s ease-in-out infinite;
 }
 
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
 /* Professional glass morphism utility */
 .glass {
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(4, 159, 217, 0.05);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(148, 163, 184, 0.1);
+  border: 1px solid rgba(4, 159, 217, 0.15);
 }
 
 .light .glass {
   background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(4, 159, 217, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
-/* Light mode card shadows */
+/* Light mode card shadows - Cisco clean style */
 .light .bg-surface-card {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
-/* Light mode header */
+/* Light mode header - Cisco white style */
 .light header {
-  background-color: rgba(248, 250, 252, 0.9);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background-color: rgba(255, 255, 255, 0.98);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .light header.scrolled {
-  background-color: rgba(248, 250, 252, 0.95);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  background-color: rgba(255, 255, 255, 1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
 }
 
 /* Light mode footer */
 .light footer {
-  background-color: #e2e8f0;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  background-color: #1a1a2e;
+  color: #e8e8e8;
 }
 
 /* Light mode borders */
 .light .border-primary\/10 {
-  border-color: rgba(0, 0, 0, 0.1);
+  border-color: rgba(4, 159, 217, 0.15);
 }
 
 .light .border-primary\/20 {
-  border-color: rgba(0, 0, 0, 0.15);
+  border-color: rgba(4, 159, 217, 0.25);
 }
 
 /* Light mode inputs */
 .light input, .light select, .light textarea {
   background-color: #ffffff;
-  border-color: rgba(0, 0, 0, 0.15);
-  color: #0f172a;
+  border-color: rgba(0, 0, 0, 0.12);
+  color: #1a1a2e;
 }
 
 .light input:focus, .light select:focus, .light textarea:focus {
-  border-color: #0ea5e9;
-  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.15);
+  border-color: #049fd9;
+  box-shadow: 0 0 0 3px rgba(4, 159, 217, 0.12);
 }
 
 /* Light mode buttons */
 .light .bg-surface-light {
-  background-color: #e2e8f0;
+  background-color: #f8f9fa;
 }
 
 .light .bg-surface {
-  background-color: #f8fafc;
+  background-color: #ffffff;
 }
 
 /* Header smooth transition */
@@ -200,28 +224,138 @@ button[title="Επιστροφή στην κορυφή"] {
 
 /* Logo frame styling */
 header a .relative {
-  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
+  box-shadow: 0 0 0 2px rgba(4, 159, 217, 0.2);
 }
 
 header a:hover .relative {
-  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.5), 0 0 15px rgba(14, 165, 233, 0.2);
+  box-shadow: 0 0 0 2px rgba(4, 159, 217, 0.5), 0 0 15px rgba(4, 159, 217, 0.3);
 }
 
-/* Circuit board pattern background */
-.circuit-pattern {
+/* Network grid background pattern */
+.network-grid {
   background-image:
-    linear-gradient(rgba(14, 165, 233, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(14, 165, 233, 0.03) 1px, transparent 1px);
-  background-size: 50px 50px;
+    linear-gradient(rgba(4, 159, 217, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(4, 159, 217, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Dot matrix pattern */
+.dot-matrix {
+  background-image: radial-gradient(circle, rgba(4, 159, 217, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Gradient mesh background */
+.gradient-mesh {
+  background:
+    radial-gradient(at 0% 0%, rgba(4, 159, 217, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(0, 180, 216, 0.1) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(247, 37, 133, 0.05) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(0, 119, 182, 0.1) 0px, transparent 50%);
 }
 
 /* Professional card hover effect */
 .card-professional {
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
 .card-professional:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(4, 159, 217, 0.15);
+  border-color: rgba(4, 159, 217, 0.4);
+}
+
+/* Gradient text utility */
+.gradient-text {
+  background: linear-gradient(135deg, #049fd9 0%, #00b4d8 50%, #90e0ef 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Cisco-style button with shine effect */
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-shine::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-shine:hover::after {
+  left: 100%;
+}
+
+/* Network connection lines decoration */
+.network-lines {
+  background-image:
+    linear-gradient(45deg, transparent 48%, rgba(4, 159, 217, 0.1) 48%, rgba(4, 159, 217, 0.1) 52%, transparent 52%),
+    linear-gradient(-45deg, transparent 48%, rgba(0, 180, 216, 0.1) 48%, rgba(0, 180, 216, 0.1) 52%, transparent 52%);
+  background-size: 30px 30px;
+}
+
+/* Animated gradient border */
+.gradient-border {
+  position: relative;
+  background: var(--color-surface-card);
+  border-radius: 1rem;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 1rem;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(4, 159, 217, 0.5), rgba(0, 180, 216, 0.2), transparent);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Badge style */
+.badge-cisco {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, rgba(4, 159, 217, 0.1), rgba(0, 180, 216, 0.05));
+  border: 1px solid rgba(4, 159, 217, 0.25);
+  color: var(--color-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Stats card style */
+.stats-card {
+  background: linear-gradient(135deg, rgba(4, 159, 217, 0.05), rgba(0, 180, 216, 0.02));
+  border: 1px solid rgba(4, 159, 217, 0.15);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.stats-card:hover {
+  background: linear-gradient(135deg, rgba(4, 159, 217, 0.1), rgba(0, 180, 216, 0.05));
+  border-color: rgba(4, 159, 217, 0.3);
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-  border-color: rgba(14, 165, 233, 0.3);
+}
+
+/* Glow effect for CTAs */
+.glow-primary {
+  box-shadow: 0 0 20px rgba(4, 159, 217, 0.3);
+}
+
+.glow-primary:hover {
+  box-shadow: 0 0 30px rgba(4, 159, 217, 0.5);
 }

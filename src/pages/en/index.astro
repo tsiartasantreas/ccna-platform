@@ -21,23 +21,21 @@ const t = en;
     </div>
 
     <!-- Overlay gradient for text readability -->
-    <div class="absolute inset-0 bg-gradient-to-b from-surface/80 via-surface/50 to-surface/90"></div>
+    <div class="absolute inset-0 bg-gradient-to-b from-surface/80 via-surface/50 to-surface/95"></div>
 
-    <!-- Animated grid background -->
-    <div class="absolute inset-0 opacity-10">
-      <div class="absolute inset-0" style="background-image: radial-gradient(circle at 1px 1px, var(--color-primary) 1px, transparent 0); background-size: 40px 40px;"></div>
-    </div>
+    <!-- Network grid background -->
+    <div class="absolute inset-0 opacity-20 network-grid"></div>
 
     <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
       <!-- Badge -->
-      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-8 animate-fade-in">
+      <div class="badge-cisco mb-8 animate-fade-in">
         <span class="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
         Network Engineering Fundamentals
       </div>
 
       <!-- Main heading -->
       <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 animate-fade-in" style="animation-delay: 0.1s;">
-        <span class="bg-gradient-to-r from-primary via-accent-light to-accent bg-clip-text text-transparent">
+        <span class="gradient-text">
           {t.hero.title}
         </span>
       </h1>
@@ -51,45 +49,73 @@ const t = en;
       <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16 animate-fade-in" style="animation-delay: 0.3s;">
         <a
           href={`/${locale}/login?mode=signup`}
-          class="px-8 py-4 text-lg font-semibold bg-gradient-to-r from-primary to-accent text-white rounded-xl hover:opacity-90 transition-all hover:scale-105 shadow-lg shadow-primary/25"
+          class="btn-shine px-8 py-4 text-lg font-semibold bg-gradient-to-r from-primary to-accent text-white rounded-xl hover:opacity-90 transition-all hover:scale-105 shadow-lg glow-primary"
         >
           {t.hero.cta_primary} →
         </a>
         <a
           href={`/${locale}/curriculum`}
-          class="px-8 py-4 text-lg font-semibold border border-primary/30 text-primary rounded-xl hover:bg-primary/10 transition-all"
+          class="px-8 py-4 text-lg font-semibold border-2 border-primary/30 text-primary rounded-xl hover:bg-primary/10 transition-all"
         >
           {t.hero.cta_secondary}
         </a>
       </div>
 
-      <!-- Stats -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 max-w-2xl mx-auto animate-fade-in" style="animation-delay: 0.4s;">
-        <div class="text-center">
-          <div class="text-3xl font-bold text-primary">35</div>
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto animate-fade-in" style="animation-delay: 0.4s;">
+        <div class="stats-card text-center">
+          <div class="text-4xl font-bold gradient-text mb-1">35</div>
           <div class="text-sm text-text-muted">Lessons</div>
         </div>
-        <div class="text-center">
-          <div class="text-3xl font-bold text-primary">6</div>
+        <div class="stats-card text-center">
+          <div class="text-4xl font-bold gradient-text mb-1">6</div>
           <div class="text-sm text-text-muted">Modules</div>
         </div>
-        <div class="text-center">
-          <div class="text-3xl font-bold text-primary">80+</div>
+        <div class="stats-card text-center">
+          <div class="text-4xl font-bold gradient-text mb-1">90+</div>
           <div class="text-sm text-text-muted">Quiz Questions</div>
         </div>
-        <div class="text-center">
-          <div class="text-3xl font-bold text-primary">3D</div>
+        <div class="stats-card text-center">
+          <div class="text-4xl font-bold gradient-text mb-1">3D</div>
           <div class="text-sm text-text-muted">Interactive</div>
         </div>
       </div>
     </div>
   </section>
 
+  <!-- Trust Bar / Logos -->
+  <section class="py-8 border-y border-primary/10 bg-surface-light">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-wrap items-center justify-center gap-8 text-text-muted text-sm">
+        <span class="flex items-center gap-2">
+          <svg class="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          Industry-aligned curriculum
+        </span>
+        <span class="flex items-center gap-2">
+          <svg class="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          Hands-on 3D labs
+        </span>
+        <span class="flex items-center gap-2">
+          <svg class="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          Real network protocols
+        </span>
+        <span class="flex items-center gap-2">
+          <svg class="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          Bilingual EN/EL support
+        </span>
+      </div>
+    </div>
+  </section>
+
   <!-- Curriculum Overview -->
   <section class="py-24 relative">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Background decoration -->
+    <div class="absolute inset-0 gradient-mesh opacity-30"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <!-- Section header -->
       <div class="text-center mb-16">
+        <div class="badge-cisco mb-4">📚 {t.modules.module} Overview</div>
         <h2 class="text-3xl sm:text-4xl font-bold mb-4">
           {t.modules.title}
         </h2>
@@ -101,43 +127,50 @@ const t = en;
       <!-- Module cards -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {[
-          { num: 1, name: t.module_names['1'], desc: t.module_descriptions['1'], lessons: 8, weight: '20%', color: 'from-blue-500 to-cyan-500' },
-          { num: 2, name: t.module_names['2'], desc: t.module_descriptions['2'], lessons: 7, weight: '20%', color: 'from-purple-500 to-pink-500' },
-          { num: 3, name: t.module_names['3'], desc: t.module_descriptions['3'], lessons: 6, weight: '25%', color: 'from-green-500 to-emerald-500' },
-          { num: 4, name: t.module_names['4'], desc: t.module_descriptions['4'], lessons: 5, weight: '10%', color: 'from-orange-500 to-red-500' },
-          { num: 5, name: t.module_names['5'], desc: t.module_descriptions['5'], lessons: 5, weight: '15%', color: 'from-red-500 to-rose-500' },
-          { num: 6, name: t.module_names['6'], desc: t.module_descriptions['6'], lessons: 4, weight: '10%', color: 'from-indigo-500 to-violet-500' },
+          { num: 1, name: t.module_names['1'], desc: t.module_descriptions['1'], lessons: 8, weight: '20%', icon: '🌐', color: 'from-blue-500 to-cyan-500', iconBg: 'from-blue-500/20 to-cyan-500/20' },
+          { num: 2, name: t.module_names['2'], desc: t.module_descriptions['2'], lessons: 7, weight: '20%', icon: '🔌', color: 'from-cyan-500 to-teal-500', iconBg: 'from-cyan-500/20 to-teal-500/20' },
+          { num: 3, name: t.module_names['3'], desc: t.module_descriptions['3'], lessons: 6, weight: '25%', icon: '🛣️', color: 'from-teal-500 to-emerald-500', iconBg: 'from-teal-500/20 to-emerald-500/20' },
+          { num: 4, name: t.module_names['4'], desc: t.module_descriptions['4'], lessons: 5, weight: '10%', icon: '⚙️', color: 'from-emerald-500 to-green-500', iconBg: 'from-emerald-500/20 to-green-500/20' },
+          { num: 5, name: t.module_names['5'], desc: t.module_descriptions['5'], lessons: 5, weight: '15%', icon: '🔒', color: 'from-blue-600 to-indigo-600', iconBg: 'from-blue-600/20 to-indigo-600/20' },
+          { num: 6, name: t.module_names['6'], desc: t.module_descriptions['6'], lessons: 4, weight: '10%', icon: '🤖', color: 'from-indigo-500 to-purple-500', iconBg: 'from-indigo-500/20 to-purple-500/20' },
         ].map((module) => (
           <a
             href={`/${locale}/lessons/${module.num}/1`}
-            class="group relative bg-surface-card rounded-2xl border border-primary/10 hover:border-primary/30 p-6 transition-all hover:scale-[1.02] hover:shadow-lg hover:shadow-primary/10"
+            class="card-professional group relative bg-surface-card rounded-2xl border border-primary/15 p-8 overflow-hidden"
           >
-            <!-- Module number badge -->
-            <div class={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br ${module.color} text-white font-bold text-lg mb-4`}>
-              {module.num}
-            </div>
-
-            <!-- Exam weight -->
-            <div class="absolute top-4 right-4 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
-              {module.weight} exam
-            </div>
+            <!-- Background gradient on hover -->
+            <div class={`absolute inset-0 bg-gradient-to-br ${module.iconBg} opacity-0 group-hover:opacity-100 transition-opacity`}></div>
 
             <!-- Content -->
-            <h3 class="text-xl font-bold text-text mb-2 group-hover:text-primary transition-colors">
-              {module.name}
-            </h3>
-            <p class="text-text-muted text-sm mb-4 line-clamp-2">
-              {module.desc}
-            </p>
+            <div class="relative">
+              <!-- Icon and module number -->
+              <div class="flex items-center justify-between mb-6">
+                <div class={`inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br ${module.color} text-white text-2xl`}>
+                  {module.icon}
+                </div>
+                <span class="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold">
+                  {module.weight}
+                </span>
+              </div>
 
-            <!-- Footer -->
-            <div class="flex items-center justify-between text-sm">
-              <span class="text-text-muted">
-                {module.lessons} {t.modules.lessons}
-              </span>
-              <span class="text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                Start →
-              </span>
+              <!-- Title -->
+              <h3 class="text-xl font-bold text-text mb-2 group-hover:text-primary transition-colors">
+                {module.name}
+              </h3>
+              <p class="text-text-muted text-sm mb-6 line-clamp-2">
+                {module.desc}
+              </p>
+
+              <!-- Footer -->
+              <div class="flex items-center justify-between text-sm pt-4 border-t border-primary/10">
+                <span class="flex items-center gap-1 text-text-muted">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                  {module.lessons} {t.modules.lessons}
+                </span>
+                <span class="text-primary font-medium opacity-0 group-hover:opacity-100 transition-all group-hover:translate-x-1">
+                  {t.modules.start} →
+                </span>
+              </div>
             </div>
           </a>
         ))}
@@ -145,10 +178,55 @@ const t = en;
     </div>
   </section>
 
+  <!-- Learning Path Section -->
+  <section class="py-24 bg-surface-light relative overflow-hidden">
+    <div class="absolute inset-0 dot-matrix opacity-30"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <div class="badge-cisco mb-4">🎯 Learning Path</div>
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4">A Structured Journey to Mastery</h2>
+        <p class="text-text-muted max-w-2xl mx-auto">
+          Follow our proven learning path from fundamentals to advanced topics
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Step 1 -->
+        <div class="relative">
+          <div class="stats-card">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-xl mb-4">01</div>
+            <h3 class="text-lg font-bold text-text mb-2">Learn the Fundamentals</h3>
+            <p class="text-text-muted text-sm">Start with OSI model, TCP/IP, and addressing. Build a solid foundation with interactive 3D diagrams.</p>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="relative">
+          <div class="stats-card">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-xl mb-4">02</div>
+            <h3 class="text-lg font-bold text-text mb-2">Practice with Quizzes</h3>
+            <p class="text-text-muted text-sm">Test your knowledge with gamified quizzes. Earn points, maintain streaks, and track your progress.</p>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="relative">
+          <div class="stats-card">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-xl mb-4">03</div>
+            <h3 class="text-lg font-bold text-text mb-2">Earn Your Certificate</h3>
+            <p class="text-text-muted text-sm">Complete all modules and quizzes with 80%+ to earn your Network Engineering Certificate.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Features Section -->
-  <section class="py-24 bg-surface-light">
+  <section class="py-24 relative">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-16">
+        <div class="badge-cisco mb-4">✨ Features</div>
         <h2 class="text-3xl sm:text-4xl font-bold mb-4">
           Why Choose NetworkLearn?
         </h2>
@@ -157,40 +235,16 @@ const t = en;
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {[
-          {
-            icon: '🎮',
-            title: 'Gamified Learning',
-            description: 'Earn points, maintain streaks, and unlock achievements as you progress through the curriculum.'
-          },
-          {
-            icon: '🌐',
-            title: '3D Interactive Diagrams',
-            description: 'Explore network concepts with rotatable 3D models that bring abstract ideas to life.'
-          },
-          {
-            icon: '📋',
-            title: 'Structured Curriculum',
-            description: 'Follow a carefully designed learning path aligned with network engineering fundamentals.'
-          },
-          {
-            icon: '🧠',
-            title: 'Active Recall Quizzes',
-            description: 'Test your knowledge with multiple choice, drag-and-drop, and CLI simulation exercises.'
-          },
-          {
-            icon: '📊',
-            title: 'Progress Tracking',
-            description: 'Monitor your advancement with detailed dashboards showing completion and scores.'
-          },
-          {
-            icon: '🌍',
-            title: 'Bilingual Support',
-            description: 'Learn in English or Greek with fully translated content and interface.'
-          },
+          { icon: '🎮', title: 'Gamified Learning', description: 'Earn points, maintain streaks, and unlock achievements as you progress through the curriculum.' },
+          { icon: '🌐', title: '3D Interactive Diagrams', description: 'Explore network concepts with rotatable 3D models that bring abstract ideas to life.' },
+          { icon: '📋', title: 'Structured Curriculum', description: 'Follow a carefully designed learning path aligned with network engineering fundamentals.' },
+          { icon: '🧠', title: 'Active Recall Quizzes', description: 'Test your knowledge with multiple choice, drag-and-drop, and CLI simulation exercises.' },
+          { icon: '📊', title: 'Progress Tracking', description: 'Monitor your advancement with detailed dashboards showing completion and scores.' },
+          { icon: '🌍', title: 'Bilingual Support', description: 'Learn in English or Greek with fully translated content and interface.' },
         ].map((feature) => (
-          <div class="flex gap-4 p-6 rounded-2xl bg-surface border border-primary/10 hover:border-primary/20 transition-all">
+          <div class="card-professional flex gap-4 p-6 rounded-2xl bg-surface-card border border-primary/15">
             <div class="text-4xl flex-shrink-0">{feature.icon}</div>
             <div>
               <h3 class="text-lg font-bold text-text mb-2">{feature.title}</h3>
@@ -202,11 +256,18 @@ const t = en;
     </div>
   </section>
 
+  <!-- Feedback/Testimonials -->
+  <FeedbackDisplay locale={locale} client:load />
+
   <!-- CTA Section -->
-  <section class="py-24">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-      <div class="bg-gradient-to-r from-primary/10 to-accent/10 rounded-3xl border border-primary/20 p-12">
-        <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+  <section class="py-24 relative overflow-hidden">
+    <div class="absolute inset-0 gradient-mesh opacity-40"></div>
+    <div class="absolute inset-0 network-lines opacity-20"></div>
+
+    <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div class="bg-gradient-to-r from-primary/10 to-accent/10 rounded-3xl border border-primary/30 p-12 backdrop-blur-sm">
+        <div class="text-5xl mb-4">🚀</div>
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4 gradient-text">
           Ready to Start Your Networking Journey?
         </h2>
         <p class="text-text-muted mb-8 max-w-xl mx-auto">
@@ -214,16 +275,13 @@ const t = en;
         </p>
         <a
           href={`/${locale}/login?mode=signup`}
-          class="inline-flex px-8 py-4 text-lg font-semibold bg-gradient-to-r from-primary to-accent text-white rounded-xl hover:opacity-90 transition-all hover:scale-105 shadow-lg shadow-primary/25"
+          class="btn-shine inline-flex px-8 py-4 text-lg font-semibold bg-gradient-to-r from-primary to-accent text-white rounded-xl hover:opacity-90 transition-all hover:scale-105 shadow-lg glow-primary"
         >
           Get Started Free →
         </a>
       </div>
     </div>
   </section>
-
-  {/* Student Feedback Section */}
-  <FeedbackDisplay locale={locale} client:load />
 
   <Footer locale={locale} translations={t} />
 </BaseLayout>
