@@ -451,6 +451,46 @@ const t = el;
             });
           });
         }
+
+        // Update subscriptions table
+        const subsBody = document.getElementById('subscriptions-table-body');
+        if (subsBody) {
+          const proProfiles = profiles.filter((p: any) => p.plan === 'pro');
+          const monthlyUsers = proProfiles.length;
+          const revenue = monthlyUsers * 0.99;
+
+          document.getElementById('active-subs-count')!.textContent = String(monthlyUsers);
+          document.getElementById('monthly-revenue')!.textContent = `€${revenue.toFixed(2)}`;
+
+          subsBody.innerHTML = proProfiles.length > 0 ? proProfiles.map((p: any) => `
+            <tr class="border-b border-primary/5 hover:bg-surface-light">
+              <td class="px-4 py-3 text-sm text-text">${sanitize(p.display_name) || 'User'}</td>
+              <td class="px-4 py-3 text-sm text-text-muted">${p.id.substring(0, 8)}...</td>
+              <td class="px-4 py-3 text-sm text-text">Pro</td>
+              <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full bg-success/10 text-success text-xs font-medium">Ενεργό</span></td>
+              <td class="px-4 py-3 text-sm text-text">€0.99</td>
+              <td class="px-4 py-3 text-sm text-text-muted">${new Date(p.updated_at).toLocaleDateString()}</td>
+              <td class="px-4 py-3">
+                <button class="cancel-sub-btn-el text-xs text-error hover:underline" data-user-id="${p.id}">Ακύρωση</button>
+              </td>
+            </tr>
+          `).join('') : '<tr><td colspan="7" class="px-4 py-8 text-center text-text-muted">Δεν υπάρχουν ενεργές συνδρομές</td></tr>';
+
+          // Cancel subscription handlers
+          document.querySelectorAll('.cancel-sub-btn-el').forEach(btn => {
+            btn.addEventListener('click', async () => {
+              const userId = btn.getAttribute('data-user-id');
+              if (userId && confirm('Ακύρωση συνδρομής; Ο χρήστης θα υποβιβαστεί σε Free.')) {
+                const { error } = await supabase.rpc('admin_update_user_plan', {
+                  target_user_id: userId,
+                  new_plan: 'free'
+                });
+                if (error) alert('Σφάλμα: ' + error.message);
+                else { alert('Η συνδρομή ακυρώθηκε.'); loadAdminData(); }
+              }
+            });
+          });
+        }
       }
       loadAdminData();
       setInterval(() => loadAdminData(), 5 * 60 * 1000);
