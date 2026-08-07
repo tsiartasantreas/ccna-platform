@@ -447,6 +447,19 @@ const t = el;
                 }
               } catch(e) { doc.setFillColor(255, 255, 255); doc.rect(0, 0, w, h, 'F'); }
               doc.setFont('helvetica');
+
+              // Cover existing text areas from background image
+              doc.setFillColor(255, 255, 255);
+              doc.rect(w/2 - 120, 30, 240, 40, 'F');
+              doc.rect(w/2 - 100, 68, 200, 15, 'F');
+              doc.rect(w/2 - 100, 78, 200, 12, 'F');
+              doc.rect(w/2 - 120, 90, 240, 20, 'F');
+              doc.rect(w/2 - 100, 115, 200, 12, 'F');
+              doc.rect(w/2 - 100, 125, 200, 20, 'F');
+              doc.rect(w/2 - 80, 150, 160, 15, 'F');
+              doc.rect(w/2 - 80, 170, 160, 10, 'F');
+
+              // Add our own text
               doc.setTextColor(100, 116, 139); doc.setFontSize(12);
               doc.text('Αυτό το πιστοποιητικό απονέμεται στον/στην', w / 2, 85, { align: 'center' });
               doc.setTextColor(30, 41, 59); doc.setFontSize(40);
