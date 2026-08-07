@@ -44,6 +44,7 @@ const t = en;
         <button class="tab-btn active px-4 py-2 rounded-lg text-sm font-medium transition-all" data-tab="stats">📊 Statistics</button>
         <button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all" data-tab="users">👥 Users</button>
         <button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all" data-tab="subscriptions">💳 Subscriptions</button>
+        <button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all" data-tab="feedback">💬 Feedback</button>
         <button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all" data-tab="revolut">💰 Revolut</button>
         <button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all" data-tab="supabase">🗄️ Supabase</button>
         <button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all" data-tab="settings">⚙️ Settings</button>
@@ -220,6 +221,37 @@ const t = en;
                 </tr>
               </thead>
               <tbody id="subscriptions-table-body">
+                <tr><td colspan="7" class="px-4 py-8 text-center text-text-muted">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      {/* Feedback Tab */}
+      <div id="tab-feedback" class="tab-content hidden">
+        <div class="bg-surface-card rounded-xl border border-primary/10 overflow-hidden">
+          <div class="p-4 border-b border-primary/10 flex items-center justify-between">
+            <h3 class="text-lg font-bold text-text">💬 User Feedback Management</h3>
+            <div class="flex items-center gap-2">
+              <span class="text-sm text-text-muted">Show on homepage:</span>
+              <span id="approved-count" class="px-2 py-1 bg-success/10 text-success text-xs font-medium rounded">0</span>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="border-b border-primary/10">
+                  <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">User</th>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Module</th>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Rating</th>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Comment</th>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Date</th>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Status</th>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="feedback-table-body">
                 <tr><td colspan="7" class="px-4 py-8 text-center text-text-muted">Loading...</td></tr>
               </tbody>
             </table>
@@ -721,6 +753,83 @@ const t = en;
                   loadAdminData();
                 }
               }
+            });
+          });
+        }
+
+        // Update feedback table
+        const feedbackBody = document.getElementById('feedback-table-body');
+        const approvedCount = document.getElementById('approved-count');
+        if (feedbackBody) {
+          const feedback = adminData?.feedback || [];
+          const approvedFeedback = feedback.filter((f: any) => f.is_approved);
+          if (approvedCount) approvedCount.textContent = String(approvedFeedback.length);
+
+          feedbackBody.innerHTML = feedback.length > 0 ? feedback.map((f: any) => {
+            const moduleNames = ['Network Fundamentals', 'Network Access', 'IP Connectivity', 'IP Services', 'Security Fundamentals', 'Automation'];
+            const stars = '⭐'.repeat(f.rating || 0);
+            const date = new Date(f.created_at).toLocaleDateString();
+            const statusClass = f.is_approved ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning';
+            const statusText = f.is_approved ? 'Approved' : 'Pending';
+
+            return `<tr class="border-b border-primary/5 hover:bg-surface-light">
+              <td class="px-4 py-3 text-sm text-text">${sanitize(f.display_name) || 'Anonymous'}</td>
+              <td class="px-4 py-3 text-sm text-text-muted">${moduleNames[(f.module_number || 1) - 1]}</td>
+              <td class="px-4 py-3 text-sm">${stars}</td>
+              <td class="px-4 py-3 text-sm text-text-muted max-w-xs truncate">${sanitize(f.comment) || '—'}</td>
+              <td class="px-4 py-3 text-sm text-text-muted">${date}</td>
+              <td class="px-4 py-3">
+                <span class="px-2 py-0.5 rounded-full ${statusClass} text-xs font-medium">${statusText}</span>
+              </td>
+              <td class="px-4 py-3 flex gap-2">
+                ${f.is_approved
+                  ? `<button class="reject-feedback-btn text-xs text-warning hover:underline" data-feedback-id="${f.id}">Hide</button>`
+                  : `<button class="approve-feedback-btn text-xs text-success hover:underline" data-feedback-id="${f.id}">Show</button>`
+                }
+                <button class="delete-feedback-btn text-xs text-error hover:underline" data-feedback-id="${f.id}">Delete</button>
+              </td>
+            </tr>`;
+          }).join('') : '<tr><td colspan="7" class="px-4 py-8 text-center text-text-muted">No feedback yet</td></tr>';
+
+          // Approve feedback handlers
+          document.querySelectorAll('.approve-feedback-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+              const feedbackId = btn.getAttribute('data-feedback-id');
+              if (!feedbackId) return;
+              const { error } = await supabase.rpc('admin_update_feedback_status', {
+                p_feedback_id: feedbackId,
+                p_is_approved: true
+              });
+              if (error) alert('Error: ' + error.message);
+              else { alert('Feedback approved and will show on homepage!'); loadAdminData(); }
+            });
+          });
+
+          // Reject feedback handlers
+          document.querySelectorAll('.reject-feedback-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+              const feedbackId = btn.getAttribute('data-feedback-id');
+              if (!feedbackId) return;
+              const { error } = await supabase.rpc('admin_update_feedback_status', {
+                p_feedback_id: feedbackId,
+                p_is_approved: false
+              });
+              if (error) alert('Error: ' + error.message);
+              else { alert('Feedback hidden from homepage.'); loadAdminData(); }
+            });
+          });
+
+          // Delete feedback handlers
+          document.querySelectorAll('.delete-feedback-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+              const feedbackId = btn.getAttribute('data-feedback-id');
+              if (!feedbackId) return;
+              if (!confirm('Delete this feedback permanently?')) return;
+              const { error } = await supabase.rpc('admin_delete_feedback', {
+                p_feedback_id: feedbackId
+              });
+              if (error) alert('Error: ' + error.message);
+              else { alert('Feedback deleted.'); loadAdminData(); }
             });
           });
         }

@@ -33,12 +33,13 @@ export default function FeedbackDisplay({ locale }: FeedbackDisplayProps) {
         // Load from localStorage
         const stored = JSON.parse(localStorage.getItem('moduleFeedback') || '[]');
 
-        // Load from Supabase (if table exists)
+        // Load from Supabase (only approved feedback)
         let dbFeedback: Feedback[] = [];
         try {
           const { data } = await supabase
             .from('module_feedback')
             .select('*')
+            .eq('is_approved', true)
             .order('created_at', { ascending: false })
             .limit(20);
 
