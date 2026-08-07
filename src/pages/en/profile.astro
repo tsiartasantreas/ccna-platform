@@ -171,23 +171,6 @@ const t = en;
         <p class="text-text-muted text-sm mb-6">{t.profile.gdpr_notice}</p>
 
         <div class="space-y-4">
-          {/* Download data */}
-          <button
-            id="download-data-btn"
-            class="w-full flex items-center justify-between p-4 bg-surface-light rounded-xl hover:bg-surface transition-colors"
-          >
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-xl">📥</div>
-              <div class="text-left">
-                <div class="font-medium text-text">{t.profile.download_data}</div>
-                <div class="text-xs text-text-muted">Export all your data as JSON</div>
-              </div>
-            </div>
-            <svg class="w-5 h-5 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-
           {/* Delete account */}
           <button
             id="delete-account-btn"
@@ -390,34 +373,6 @@ const t = en;
         const lang = btn.getAttribute('data-lang') || 'en';
         window.location.href = `/${lang}/profile`;
       });
-    });
-
-    // Download data (GDPR)
-    document.getElementById('download-data-btn')?.addEventListener('click', async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) return;
-
-      const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
-      const { data: progress } = await supabase.from('lesson_progress').select('*').eq('user_id', session.user.id);
-      const { data: scores } = await supabase.from('quiz_scores').select('*').eq('user_id', session.user.id);
-      const { data: points } = await supabase.from('user_points').select('*').eq('user_id', session.user.id).single();
-
-      const data = {
-        exportDate: new Date().toISOString(),
-        user: { id: session.user.id, email: session.user.email },
-        profile,
-        lessonProgress: progress,
-        quizScores: scores,
-        points,
-      };
-
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `networklearn-data-${new Date().toISOString().split('T')[0]}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
     });
 
     // Delete account (GDPR) — uses server-side RPC for security

@@ -96,15 +96,6 @@ const t = el;
         <h2 class="text-xl font-bold mb-2">Δεδομένα & Απόρρητο</h2>
         <p class="text-text-muted text-sm mb-6">{t.profile.gdpr_notice}</p>
         <div class="space-y-4">
-          <button id="download-data-btn" class="w-full flex items-center justify-between p-4 bg-surface-light rounded-xl hover:bg-surface transition-colors">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-xl">📥</div>
-              <div class="text-left">
-                <div class="font-medium text-text">{t.profile.download_data}</div>
-                <div class="text-xs text-text-muted">Εξαγωγή δεδομένων ως JSON</div>
-              </div>
-            </div>
-          </button>
           <button id="delete-account-btn" class="w-full flex items-center justify-between p-4 bg-error/5 rounded-xl border border-error/20 hover:bg-error/10 transition-colors">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-lg bg-error/10 flex items-center justify-center text-xl">🗑️</div>
@@ -229,15 +220,6 @@ const t = el;
     });
     document.querySelectorAll('.lang-btn').forEach(btn => {
       btn.addEventListener('click', () => { window.location.href = `/${btn.getAttribute('data-lang') || 'el'}/profile`; });
-    });
-    document.getElementById('download-data-btn')?.addEventListener('click', async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) return;
-      const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
-      const { data: progress } = await supabase.from('lesson_progress').select('*').eq('user_id', session.user.id);
-      const { data: scores } = await supabase.from('quiz_scores').select('*').eq('user_id', session.user.id);
-      const blob = new Blob([JSON.stringify({ exportDate: new Date().toISOString(), profile, progress, scores }, null, 2)], { type: 'application/json' });
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `networklearn-data-${new Date().toISOString().split('T')[0]}.json`; a.click();
     });
     document.getElementById('delete-account-btn')?.addEventListener('click', async () => {
       const msg = 'Είστε σίγουροι;\n\nΘα διαγραφούν μόνιμα:\n• Όλη η πρόοδος μαθημάτων\n• Όλες οι βαθμολογίες τεστ\n• Οι πόντοι και τα σερί\n• Τα δεδομένα προφίλ\n\nΑυτή η ενέργεια ΔΕΝ μπορεί να αναιρεθεί.';
