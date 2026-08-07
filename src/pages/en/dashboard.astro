@@ -512,15 +512,38 @@ const modules = [
       try {
         const QRCode = await import('qrcode');
         qrDataUrl = await QRCode.toDataURL(verificationUrl, {
-          width: 150,
-          margin: 1,
+          width: 200,
+          margin: 2,
           color: {
-            dark: '#1a1a2e',
+            dark: '#000000',
             light: '#ffffff'
-          }
+          },
+          errorCorrectionLevel: 'M'
         });
+        console.log('QR code generated successfully');
       } catch (qrError) {
         console.error('QR code generation error:', qrError);
+        // Fallback: create a simple QR code using canvas
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = 200;
+          canvas.height = 200;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, 200, 200);
+            ctx.fillStyle = '#000000';
+            ctx.font = '10px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Verification:', 100, 80);
+            ctx.fillText(verificationCode, 100, 100);
+            ctx.fillText('Visit:', 100, 120);
+            ctx.fillText('networklearn.wasmer.app', 100, 140);
+            qrDataUrl = canvas.toDataURL('image/png');
+          }
+        } catch (canvasError) {
+          console.error('Canvas fallback error:', canvasError);
+        }
       }
 
       // Generate PDF certificate
@@ -579,15 +602,25 @@ const modules = [
 
       // Add QR code to bottom right corner
       if (qrDataUrl) {
-        const qrSize = 25;
-        const qrX = w - qrSize - 15;
-        const qrY = h - qrSize - 15;
+        const qrSize = 30;
+        const qrX = w - qrSize - 20;
+        const qrY = h - qrSize - 20;
+
+        // Add white background behind QR code
+        doc.setFillColor(255, 255, 255);
+        doc.roundedRect(qrX - 3, qrY - 3, qrSize + 6, qrSize + 6, 2, 2, 'F');
+
+        // Add QR code image
         doc.addImage(qrDataUrl, 'PNG', qrX, qrY, qrSize, qrSize);
 
-        // Add verification URL text near QR code
+        // Add verification text below QR code
         doc.setFontSize(7);
         doc.setTextColor(100, 116, 139);
-        doc.text('Scan to verify', qrX + qrSize/2, qrY + qrSize + 3, { align: 'center' });
+        doc.text('Scan to verify', qrX + qrSize/2, qrY + qrSize + 5, { align: 'center' });
+
+        // Add verification code below
+        doc.setFontSize(6);
+        doc.text(verificationCode, qrX + qrSize/2, qrY + qrSize + 9, { align: 'center' });
       }
 
       doc.save(`NetworkLearn-Certificate-${userName.replace(/\s+/g, '-').toLowerCase()}.pdf`);
