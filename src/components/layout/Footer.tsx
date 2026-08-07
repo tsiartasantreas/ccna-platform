@@ -45,8 +45,8 @@ export default function Footer({ locale, translations }: FooterProps) {
             </div>
             <p className="text-text-muted text-sm max-w-md">
               {locale === 'en'
-                ? 'Master networking fundamentals with interactive 3D lessons and gamified quizzes. Prepare for your CCNA certification with a structured, engaging learning experience.'
-                : 'Κατακτήστε τα θεμέλια των δικτύων με διαδραστικά 3D μαθήματα και gamified τεστ. Προετοιμαστείτε για την πιστοποίηση CCNA με μια δομημένη, ελκυστική εμπειρία μάθησης.'}
+                ? 'Master networking fundamentals with interactive 3D lessons and gamified quizzes. Prepare for your network certification with a structured, engaging learning experience.'
+                : 'Κατακτήστε τα θεμέλια των δικτύων με διαδραστικά 3D μαθήματα και gamified τεστ. Προετοιμαστείτε για την πιστοποίηση δικτύων με μια δομημένη, ελκυστική εμπειρία μάθησης.'}
             </p>
           </div>
 
@@ -102,11 +102,6 @@ export default function Footer({ locale, translations }: FooterProps) {
         {/* Bottom bar */}
         <div className="mt-12 pt-8 border-t border-primary/10 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-text-muted text-sm">{translations.footer.copyright}</p>
-          <p className="text-text-muted text-xs">
-            {locale === 'en'
-              ? 'CCNA® is a registered trademark of Cisco Systems, Inc. This platform is not affiliated with Cisco.'
-              : 'Το CCNA® είναι σήμα κατατεθέν της Cisco Systems, Inc. Αυτή η πλατφόρμα δεν σχετίζεται με την Cisco.'}
-          </p>
         </div>
       </div>
     </footer>

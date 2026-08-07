@@ -1,7 +1,7 @@
 {
   "site": {
     "title": "NetworkLearn",
-    "subtitle": "Interactive CCNA Training Platform",
+    "subtitle": "Interactive Network Engineering Training Platform",
     "description": "Master networking fundamentals with interactive 3D lessons and gamified quizzes"
   },
   "nav": {
@@ -15,14 +15,14 @@
     "logout": "Logout"
   },
   "hero": {
-    "title": "Master CCNA Networking",
-    "subtitle": "Interactive 3D lessons, gamified quizzes, and a structured path to your Cisco certification",
+    "title": "Master Network Engineering",
+    "subtitle": "Interactive 3D lessons, gamified quizzes, and a structured path to your network certification",
     "cta_primary": "Start Learning Free",
     "cta_secondary": "View Curriculum"
   },
   "modules": {
-    "title": "CCNA Curriculum",
-    "subtitle": "6 comprehensive modules covering the entire CCNA 200-301 exam",
+    "title": "Network Engineering Curriculum",
+    "subtitle": "6 comprehensive modules covering network engineering fundamentals",
     "module": "Module",
     "lessons": "lessons",
     "progress": "Progress",
@@ -40,12 +40,12 @@
     "6": "Automation & Programmability"
   },
   "module_descriptions": {
-    "1": "OSI model, TCP/IP, IPv4/IPv6 addressing, subnetting, and Cisco CLI basics",
+    "1": "OSI model, TCP/IP, IPv4/IPv6 addressing, subnetting, and network CLI basics",
     "2": "Switching, VLANs, trunking, STP, wireless fundamentals, and PoE",
     "3": "Routing table, static routes, OSPF, inter-VLAN routing, and FHRPs",
     "4": "DHCP, NAT/PAT, NTP, Syslog, SNMP, QoS, and SSH",
     "5": "Security threats, ACLs, port security, AAA, 802.1X, and VPNs",
-    "6": "SDN concepts, REST APIs, configuration management, and Cisco DNA Center"
+    "6": "SDN concepts, REST APIs, configuration management, and network automation"
   },
   "lesson": {
     "objectives": "Learning Objectives",
@@ -149,10 +149,10 @@
   },
   "certificate": {
     "title": "Certificate of Completion",
-    "subtitle": "CCNA Training Program",
+    "subtitle": "Network Engineering Program",
     "certifies": "This certifies that",
     "has_completed": "has successfully completed the",
-    "program": "CCNA Training Program",
+    "program": "Network Engineering Program",
     "download": "Download Certificate",
     "share": "Share"
   }

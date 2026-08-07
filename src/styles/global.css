@@ -1,29 +1,33 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #00d4ff;
-  --color-primary-dark: #0099cc;
-  --color-accent: #7c3aed;
-  --color-accent-light: #a78bfa;
-  --color-surface: #0a0f1e;
-  --color-surface-light: #111827;
-  --color-surface-card: #1a2332;
-  --color-text: #e2e8f0;
+  /* Professional Network Engineering Color Palette */
+  --color-primary: #0ea5e9;
+  --color-primary-dark: #0284c7;
+  --color-accent: #06b6d4;
+  --color-accent-light: #22d3ee;
+  --color-surface: #0f172a;
+  --color-surface-light: #1e293b;
+  --color-surface-card: #334155;
+  --color-text: #f1f5f9;
   --color-text-muted: #94a3b8;
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
+  --color-success: #22c55e;
+  --color-warning: #eab308;
   --color-error: #ef4444;
+
+  /* Typography */
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 }
 
 /* Light mode overrides */
 .light {
-  --color-surface: #f0f2f5;
-  --color-surface-light: #e4e7ec;
+  --color-surface: #f8fafc;
+  --color-surface-light: #e2e8f0;
   --color-surface-card: #ffffff;
-  --color-text: #1a1a2e;
-  --color-text-muted: #4a5568;
+  --color-text: #0f172a;
+  --color-text-muted: #64748b;
 }
 
 /* Base styles */
@@ -36,6 +40,11 @@ body {
   background-color: var(--color-surface);
   color: var(--color-text);
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Display headings */
+h1, h2, h3 {
+  font-family: var(--font-display);
 }
 
 /* Code blocks */
@@ -102,11 +111,11 @@ code, pre {
   animation: pulse-glow 2s ease-in-out infinite;
 }
 
-/* Glass morphism utility */
+/* Professional glass morphism utility */
 .glass {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(148, 163, 184, 0.1);
 }
 
 .light .glass {
@@ -123,18 +132,18 @@ code, pre {
 
 /* Light mode header */
 .light header {
-  background-color: rgba(240, 242, 245, 0.9);
+  background-color: rgba(248, 250, 252, 0.9);
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .light header.scrolled {
-  background-color: rgba(240, 242, 245, 0.95);
+  background-color: rgba(248, 250, 252, 0.95);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 /* Light mode footer */
 .light footer {
-  background-color: #e4e7ec;
+  background-color: #e2e8f0;
   border-top: 1px solid rgba(0, 0, 0, 0.08);
 }
 
@@ -151,21 +160,21 @@ code, pre {
 .light input, .light select, .light textarea {
   background-color: #ffffff;
   border-color: rgba(0, 0, 0, 0.15);
-  color: #1a1a2e;
+  color: #0f172a;
 }
 
 .light input:focus, .light select:focus, .light textarea:focus {
-  border-color: #00d4ff;
-  box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.15);
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.15);
 }
 
 /* Light mode buttons */
 .light .bg-surface-light {
-  background-color: #e4e7ec;
+  background-color: #e2e8f0;
 }
 
 .light .bg-surface {
-  background-color: #f0f2f5;
+  background-color: #f8fafc;
 }
 
 /* Header smooth transition */
@@ -191,15 +200,28 @@ button[title="Επιστροφή στην κορυφή"] {
 
 /* Logo frame styling */
 header a .relative {
-  box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.2);
+  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
 }
 
 header a:hover .relative {
-  box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.5), 0 0 15px rgba(0, 212, 255, 0.2);
+  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.5), 0 0 15px rgba(14, 165, 233, 0.2);
 }
-// Last build: Wed Aug  5 08:51:35 EEST 2026
-/* Rebuild: Wed Aug  5 09:44:23 EEST 2026 */
-/* Build: Wed Aug  5 10:43:58 EEST 2026 */
-/* Wed Aug  5 11:27:58 EEST 2026 */
-/* Deploy fix: Wed Aug  5 12:20:30 EEST 2026 */
-/* Build: Wed Aug  5 13:50:26 EEST 2026 */
+
+/* Circuit board pattern background */
+.circuit-pattern {
+  background-image:
+    linear-gradient(rgba(14, 165, 233, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14, 165, 233, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+/* Professional card hover effect */
+.card-professional {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.card-professional:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  border-color: rgba(14, 165, 233, 0.3);
+}
