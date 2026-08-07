@@ -172,6 +172,81 @@ const modules = [
         </div>
       </div>
 
+      {/* Progress Comparison */}
+      <div class="mb-8">
+        <h2 class="text-2xl font-bold mb-6">📈 Your Progress vs Others</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Lessons Comparison */}
+          <div class="bg-surface-card rounded-2xl border border-primary/10 p-6">
+            <h3 class="text-lg font-bold text-text mb-4">Lessons Completed</h3>
+            <div class="space-y-4">
+              <div>
+                <div class="flex justify-between text-sm mb-1">
+                  <span class="text-text">You</span>
+                  <span id="user-lessons-count" class="text-primary font-bold">0/35</span>
+                </div>
+                <div class="w-full h-3 bg-surface-light rounded-full overflow-hidden">
+                  <div id="user-lessons-bar" class="h-full bg-gradient-to-r from-primary to-accent rounded-full transition-all" style="width: 0%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-sm mb-1">
+                  <span class="text-text-muted">Average</span>
+                  <span id="avg-lessons-count" class="text-text-muted">0/35</span>
+                </div>
+                <div class="w-full h-3 bg-surface-light rounded-full overflow-hidden">
+                  <div id="avg-lessons-bar" class="h-full bg-text-muted/30 rounded-full transition-all" style="width: 0%"></div>
+                </div>
+              </div>
+            </div>
+            <p id="lessons-comparison-text" class="text-xs text-text-muted mt-4 text-center"></p>
+          </div>
+
+          {/* Score Comparison */}
+          <div class="bg-surface-card rounded-2xl border border-primary/10 p-6">
+            <h3 class="text-lg font-bold text-text mb-4">Average Quiz Score</h3>
+            <div class="space-y-4">
+              <div>
+                <div class="flex justify-between text-sm mb-1">
+                  <span class="text-text">You</span>
+                  <span id="user-avg-score" class="text-primary font-bold">0%</span>
+                </div>
+                <div class="w-full h-3 bg-surface-light rounded-full overflow-hidden">
+                  <div id="user-score-bar" class="h-full bg-gradient-to-r from-primary to-accent rounded-full transition-all" style="width: 0%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-sm mb-1">
+                  <span class="text-text-muted">Average</span>
+                  <span id="avg-score" class="text-text-muted">0%</span>
+                </div>
+                <div class="w-full h-3 bg-surface-light rounded-full overflow-hidden">
+                  <div id="avg-score-bar" class="h-full bg-text-muted/30 rounded-full transition-all" style="width: 0%"></div>
+                </div>
+              </div>
+            </div>
+            <p id="score-comparison-text" class="text-xs text-text-muted mt-4 text-center"></p>
+          </div>
+        </div>
+
+        {/* Community Stats */}
+        <div class="mt-6 bg-surface-card rounded-2xl border border-primary/10 p-6">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-xl">👥</div>
+              <div>
+                <div class="text-sm text-text-muted">Active Learners</div>
+                <div id="total-learners" class="text-xl font-bold text-text">0</div>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-sm text-text-muted">Your Rank</div>
+              <div id="user-rank" class="text-xl font-bold text-primary">-</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Quick Actions */}
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <a href={`/${locale}/curriculum`} class="bg-gradient-to-r from-primary/10 to-accent/10 rounded-xl border border-primary/20 p-6 hover:border-primary/40 transition-colors">
@@ -352,6 +427,9 @@ const modules = [
       const streak = document.getElementById('current-streak');
       if (streak && points) streak.textContent = `${points.current_streak || 0} days`;
 
+      // Load progress comparison data
+      loadProgressComparison();
+
       // Calculate module progress (use database only - already synced from localStorage)
       const moduleLessons = [8, 7, 6, 5, 5, 4];
       let totalCompleted = 0;
@@ -450,6 +528,90 @@ const modules = [
     }
 
     loadQuizData();
+
+    // Progress comparison
+    async function loadProgressComparison() {
+      const { data: comparison, error } = await supabase.rpc('get_progress_comparison');
+      if (error || !comparison) {
+        console.error('Comparison data error:', error);
+        return;
+      }
+
+      const totalLessons = 35;
+
+      // Update lessons comparison
+      const userLessonsCount = document.getElementById('user-lessons-count');
+      const userLessonsBar = document.getElementById('user-lessons-bar');
+      const avgLessonsCount = document.getElementById('avg-lessons-count');
+      const avgLessonsBar = document.getElementById('avg-lessons-bar');
+      const lessonsComparisonText = document.getElementById('lessons-comparison-text');
+
+      if (userLessonsCount) userLessonsCount.textContent = `${comparison.user_lessons}/${totalLessons}`;
+      if (userLessonsBar) userLessonsBar.style.width = `${(comparison.user_lessons / totalLessons) * 100}%`;
+      if (avgLessonsCount) avgLessonsCount.textContent = `${comparison.avg_lessons}/${totalLessons}`;
+      if (avgLessonsBar) avgLessonsBar.style.width = `${(comparison.avg_lessons / totalLessons) * 100}%`;
+
+      if (lessonsComparisonText) {
+        const diff = comparison.user_lessons - comparison.avg_lessons;
+        if (diff > 0) {
+          lessonsComparisonText.textContent = `You're ${Math.round(diff)} lessons ahead of the average! 🎉`;
+          lessonsComparisonText.className = 'text-xs text-success mt-4 text-center';
+        } else if (diff < 0) {
+          lessonsComparisonText.textContent = `${Math.round(Math.abs(diff))} lessons behind average. Keep going! 💪`;
+          lessonsComparisonText.className = 'text-xs text-warning mt-4 text-center';
+        } else {
+          lessonsComparisonText.textContent = 'Right at the average. Keep learning!';
+          lessonsComparisonText.className = 'text-xs text-text-muted mt-4 text-center';
+        }
+      }
+
+      // Update score comparison
+      const userAvgScore = document.getElementById('user-avg-score');
+      const userScoreBar = document.getElementById('user-score-bar');
+      const avgScoreEl = document.getElementById('avg-score');
+      const avgScoreBar = document.getElementById('avg-score-bar');
+      const scoreComparisonText = document.getElementById('score-comparison-text');
+
+      if (userAvgScore) userAvgScore.textContent = `${comparison.user_avg_score}%`;
+      if (userScoreBar) userScoreBar.style.width = `${comparison.user_avg_score}%`;
+      if (avgScoreEl) avgScoreEl.textContent = `${comparison.avg_score}%`;
+      if (avgScoreBar) avgScoreBar.style.width = `${comparison.avg_score}%`;
+
+      if (scoreComparisonText) {
+        const diff = comparison.user_avg_score - comparison.avg_score;
+        if (diff > 0) {
+          scoreComparisonText.textContent = `${Math.round(diff)}% above average! Excellent work! 🌟`;
+          scoreComparisonText.className = 'text-xs text-success mt-4 text-center';
+        } else if (diff < 0) {
+          scoreComparisonText.textContent = `${Math.round(Math.abs(diff))}% below average. Practice makes perfect! 📚`;
+          scoreComparisonText.className = 'text-xs text-warning mt-4 text-center';
+        } else {
+          scoreComparisonText.textContent = 'Right at the average score.';
+          scoreComparisonText.className = 'text-xs text-text-muted mt-4 text-center';
+        }
+      }
+
+      // Update community stats
+      const totalLearners = document.getElementById('total-learners');
+      if (totalLearners) totalLearners.textContent = String(comparison.total_users || 0);
+
+      // Calculate user rank (approximate based on lessons completed)
+      const userRank = document.getElementById('user-rank');
+      if (userRank && comparison.total_users > 0) {
+        const percentile = Math.round((1 - (comparison.user_lessons / totalLessons)) * 100);
+        if (comparison.user_lessons >= totalLessons) {
+          userRank.textContent = '🏆 Top';
+        } else if (percentile <= 10) {
+          userRank.textContent = '🥇 Top 10%';
+        } else if (percentile <= 25) {
+          userRank.textContent = '🥈 Top 25%';
+        } else if (percentile <= 50) {
+          userRank.textContent = '🥉 Top 50%';
+        } else {
+          userRank.textContent = `Top ${percentile}%`;
+        }
+      }
+    }
 
     // Certificate button handler
     document.getElementById('certificate-btn')?.addEventListener('click', async () => {
