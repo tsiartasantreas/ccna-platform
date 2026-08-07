@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
-  <rect width="800" height="500" fill="#0a0f1e"/>
-  <text x="400" y="30" font-family="Arial" font-size="20" fill="#00d4ff" text-anchor="middle" font-weight="bold">Traditional vs SDN Architecture</text>
+  <rect width="800" height="500" fill="currentColor" opacity="0.05"/>
+  <text x="400" y="30" font-family="Arial" font-size="20" fill="#049a49" text-anchor="middle" font-weight="bold">Traditional vs SDN Architecture</text>
 
   <!-- Traditional -->
   <rect x="30" y="60" width="350" height="400" rx="10" fill="#1a2332" stroke="#ef4444" stroke-width="1"/>
@@ -31,13 +31,13 @@
   <text x="595" y="165" font-family="Arial" font-size="10" fill="#94a3b8" text-anchor="middle">Centralized Control Plane</text>
 
   <!-- SDN Devices -->
-  <rect x="460" y="280" width="80" height="50" rx="6" fill="#00d4ff" fill-opacity="0.2" stroke="#00d4ff" stroke-width="1"/>
+  <rect x="460" y="280" width="80" height="50" rx="6" fill="#049a49" fill-opacity="0.2" stroke="#049a49" stroke-width="1"/>
   <text x="500" y="310" font-family="Arial" font-size="10" fill="#e2e8f0" text-anchor="middle">Switch</text>
 
-  <rect x="560" y="280" width="80" height="50" rx="6" fill="#00d4ff" fill-opacity="0.2" stroke="#00d4ff" stroke-width="1"/>
+  <rect x="560" y="280" width="80" height="50" rx="6" fill="#049a49" fill-opacity="0.2" stroke="#049a49" stroke-width="1"/>
   <text x="600" y="310" font-family="Arial" font-size="10" fill="#e2e8f0" text-anchor="middle">Switch</text>
 
-  <rect x="660" y="280" width="80" height="50" rx="6" fill="#00d4ff" fill-opacity="0.2" stroke="#00d4ff" stroke-width="1"/>
+  <rect x="660" y="280" width="80" height="50" rx="6" fill="#049a49" fill-opacity="0.2" stroke="#049a49" stroke-width="1"/>
   <text x="700" y="310" font-family="Arial" font-size="10" fill="#e2e8f0" text-anchor="middle">Switch</text>
 
   <!-- Lines -->
@@ -50,7 +50,7 @@
 
   <!-- API Labels -->
   <text x="450" y="250" font-family="Arial" font-size="9" fill="#f59e0b">Southbound API</text>
-  <text x="450" y="350" font-family="Arial" font-size="9" fill="#7c3aed">OpenFlow</text>
+  <text x="450" y="350" font-family="Arial" font-size="9" fill="#6cc04a">OpenFlow</text>
 
   <!-- Benefits -->
   <rect x="460" y="370" width="230" height="70" rx="6" fill="#10b981" fill-opacity="0.1" stroke="#10b981" stroke-width="1"/>

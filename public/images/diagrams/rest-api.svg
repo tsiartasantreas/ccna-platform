@@ -1,21 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 400">
-  <rect width="700" height="400" fill="#0a0f1e"/>
-  <text x="350" y="30" font-family="Arial" font-size="20" fill="#00d4ff" text-anchor="middle" font-weight="bold">REST API Request/Response</text>
+  <rect width="700" height="400" fill="currentColor" opacity="0.05"/>
+  <text x="350" y="30" font-family="Arial" font-size="20" fill="#049a49" text-anchor="middle" font-weight="bold">REST API Request/Response</text>
 
   <!-- Client -->
-  <rect x="50" y="100" width="120" height="60" rx="8" fill="#1a2332" stroke="#00d4ff" stroke-width="2"/>
+  <rect x="50" y="100" width="120" height="60" rx="8" fill="#1a2332" stroke="#049a49" stroke-width="2"/>
   <text x="110" y="130" font-family="Arial" font-size="14" fill="#e2e8f0" text-anchor="middle" font-weight="bold">Client</text>
   <text x="110" y="150" font-family="Arial" font-size="10" fill="#94a3b8" text-anchor="middle">Browser/App</text>
 
   <!-- Server -->
-  <rect x="530" y="100" width="120" height="60" rx="8" fill="#1a2332" stroke="#7c3aed" stroke-width="2"/>
+  <rect x="530" y="100" width="120" height="60" rx="8" fill="#1a2332" stroke="#6cc04a" stroke-width="2"/>
   <text x="590" y="130" font-family="Arial" font-size="14" fill="#e2e8f0" text-anchor="middle" font-weight="bold">API Server</text>
   <text x="590" y="150" font-family="Arial" font-size="10" fill="#94a3b8" text-anchor="middle">REST Endpoint</text>
 
   <!-- Request -->
-  <line x1="170" y1="200" x2="530" y2="200" stroke="#00d4ff" stroke-width="2" marker-end="url(#arrow)"/>
-  <rect x="220" y="180" width="260" height="40" rx="6" fill="#00d4ff" fill-opacity="0.1" stroke="#00d4ff" stroke-width="1"/>
-  <text x="350" y="205" font-family="Arial" font-size="12" fill="#00d4ff" text-anchor="middle" font-weight="bold">GET /api/users HTTP/1.1</text>
+  <line x1="170" y1="200" x2="530" y2="200" stroke="#049a49" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="220" y="180" width="260" height="40" rx="6" fill="#049a49" fill-opacity="0.1" stroke="#049a49" stroke-width="1"/>
+  <text x="350" y="205" font-family="Arial" font-size="12" fill="#049a49" text-anchor="middle" font-weight="bold">GET /api/users HTTP/1.1</text>
 
   <!-- Response -->
   <line x1="530" y1="260" x2="170" y2="260" stroke="#10b981" stroke-width="2" marker-end="url(#arrow2)"/>
@@ -27,17 +27,17 @@
   <text x="350" y="345" font-family="Arial" font-size="14" fill="#f59e0b" text-anchor="middle" font-weight="bold">HTTP Methods</text>
   <text x="110" y="375" font-family="Arial" font-size="11" fill="#10b981" text-anchor="middle" font-weight="bold">GET</text>
   <text x="110" y="388" font-family="Arial" font-size="9" fill="#94a3b8" text-anchor="middle">Read</text>
-  <text x="230" y="375" font-family="Arial" font-size="11" fill="#00d4ff" text-anchor="middle" font-weight="bold">POST</text>
+  <text x="230" y="375" font-family="Arial" font-size="11" fill="#049a49" text-anchor="middle" font-weight="bold">POST</text>
   <text x="230" y="388" font-family="Arial" font-size="9" fill="#94a3b8" text-anchor="middle">Create</text>
   <text x="350" y="375" font-family="Arial" font-size="11" fill="#f59e0b" text-anchor="middle" font-weight="bold">PUT</text>
   <text x="350" y="388" font-family="Arial" font-size="9" fill="#94a3b8" text-anchor="middle">Update</text>
-  <text x="470" y="375" font-family="Arial" font-size="11" fill="#7c3aed" text-anchor="middle" font-weight="bold">PATCH</text>
+  <text x="470" y="375" font-family="Arial" font-size="11" fill="#6cc04a" text-anchor="middle" font-weight="bold">PATCH</text>
   <text x="470" y="388" font-family="Arial" font-size="9" fill="#94a3b8" text-anchor="middle">Partial</text>
   <text x="590" y="375" font-family="Arial" font-size="11" fill="#ef4444" text-anchor="middle" font-weight="bold">DELETE</text>
   <text x="590" y="388" font-family="Arial" font-size="9" fill="#94a3b8" text-anchor="middle">Delete</text>
 
   <defs>
-    <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#00d4ff"/></marker>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#049a49"/></marker>
     <marker id="arrow2" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#10b981"/></marker>
   </defs>
 </svg>

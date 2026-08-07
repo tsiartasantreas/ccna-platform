@@ -32,7 +32,7 @@ export default function Header({ locale, translations }: HeaderProps) {
   const [userAvatar, setUserAvatar] = useState('');
 
   useEffect(() => {
-    const theme = localStorage.getItem('theme') || 'dark';
+    const theme = localStorage.getItem('theme') || 'light';
     setIsDark(theme === 'dark');
 
     // Load site settings

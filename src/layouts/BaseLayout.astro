@@ -12,7 +12,7 @@ const currentPath = Astro.url.pathname;
 ---
 
 <!doctype html>
-<html lang={lang} class="dark">
+<html lang={lang} class="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="description" content={description} />
@@ -28,7 +28,7 @@ const currentPath = Astro.url.pathname;
     <script>
       // Theme initialization - runs before paint
       (function() {
-        const theme = localStorage.getItem('theme') || 'dark';
+        const theme = localStorage.getItem('theme') || 'light';
         document.documentElement.classList.toggle('light', theme === 'light');
         document.documentElement.classList.toggle('dark', theme === 'dark');
       })();
