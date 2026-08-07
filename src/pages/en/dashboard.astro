@@ -552,35 +552,6 @@ const modules = [
 
       // Set font to helvetica for proper character rendering
       doc.setFont('helvetica');
-
-      // Cover existing text areas from background image with white rectangles
-      doc.setFillColor(255, 255, 255);
-
-      // Cover title area (top)
-      doc.rect(w/2 - 120, 30, 240, 40, 'F');
-
-      // Cover subtitle area
-      doc.rect(w/2 - 100, 68, 200, 15, 'F');
-
-      // Cover "awarded to" area
-      doc.rect(w/2 - 100, 78, 200, 12, 'F');
-
-      // Cover name area
-      doc.rect(w/2 - 120, 90, 240, 20, 'F');
-
-      // Cover "completion of" area
-      doc.rect(w/2 - 100, 115, 200, 12, 'F');
-
-      // Cover program name area
-      doc.rect(w/2 - 100, 125, 200, 20, 'F');
-
-      // Cover date area
-      doc.rect(w/2 - 80, 150, 160, 15, 'F');
-
-      // Cover footer area
-      doc.rect(w/2 - 80, 170, 160, 10, 'F');
-
-      // Add our own text
       doc.setTextColor(100, 116, 139);
       doc.setFontSize(12);
       doc.text('This certificate is proudly awarded to', w / 2, 85, { align: 'center' });
