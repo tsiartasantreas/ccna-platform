@@ -109,44 +109,112 @@ const t = el;
 
       {/* Subscriptions Tab */}
       <div id="tab-subscriptions" class="tab-content hidden">
-        <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
-          <h3 class="text-lg font-bold text-text mb-4">Ενεργές Συνδρομές</h3>
-          <p class="text-text-muted">3 ενεργές συνδρομές</p>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
+          <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
+            <div class="text-sm text-text-muted mb-1">Ενεργές Συνδρομές</div>
+            <div class="text-3xl font-bold text-success" id="active-subs-count">0</div>
+          </div>
+          <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
+            <div class="text-sm text-text-muted mb-1">Μηνιαίο Έσοδο</div>
+            <div class="text-3xl font-bold text-primary" id="monthly-revenue">€0.00</div>
+          </div>
+        </div>
+
+        <div class="bg-surface-card rounded-xl border border-primary/10 overflow-hidden">
+          <div class="p-4 border-b border-primary/10 flex items-center justify-between">
+            <h3 class="text-lg font-bold text-text">Συνδρομές Pro</h3>
+            <button id="refresh-subs-btn" class="px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-sm font-medium hover:bg-primary/20 transition-colors flex items-center gap-1">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+              Ανανέωση
+            </button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="border-b border-primary/10">
+                  <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Χρήστης</th>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">ID</th>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Πλάνο</th>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Κατάσταση</th>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Ποσό</th>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Από</th>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Ενέργειες</th>
+                </tr>
+              </thead>
+              <tbody id="subscriptions-table-body">
+                <tr><td colspan="7" class="px-4 py-8 text-center text-text-muted">Φόρτωση...</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
       {/* Revolut Tab */}
       <div id="tab-revolut" class="tab-content hidden">
+        <div class="bg-surface-card rounded-xl border border-primary/10 p-6 mb-6">
+          <h3 class="text-lg font-bold text-text mb-4">💰 Revolut Business API Configuration</h3>
+          <p class="text-sm text-text-muted mb-4">Τα API keys αποθηκεύονται στον server για ασφάλεια. Διαμορφώστε μέσω Supabase Edge Function environment variables.</p>
+          <div class="bg-success/10 rounded-lg p-4">
+            <p class="text-sm text-success">✓ Τα Revolut API credentials αποθηκεύονται με ασφάλεια στον server.</p>
+          </div>
+        </div>
+
         <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
-          <h3 class="text-lg font-bold text-text mb-4">💰 Revolut Business API</h3>
-          <div class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-text mb-1">API Key</label>
-              <input type="password" id="revolut-api-key" placeholder="sk_live_..." class="w-full px-4 py-2 bg-surface border border-primary/10 rounded-lg text-text font-mono text-sm" />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-text mb-1">Webhook Secret</label>
-              <input type="password" id="revolut-webhook-secret" placeholder="whsec_..." class="w-full px-4 py-2 bg-surface border border-primary/10 rounded-lg text-text font-mono text-sm" />
-            </div>
-            <button id="save-revolut" class="px-6 py-2 bg-gradient-to-r from-primary to-accent text-white rounded-lg font-medium">Αποθήκευση</button>
+          <h3 class="text-lg font-bold text-text mb-4">Διαμόρφωση Webhook</h3>
+          <p class="text-text-muted text-sm mb-4">Διαμορφώστε αυτό το webhook URL στο Revolut Business dashboard σας:</p>
+          <div class="flex items-center gap-2">
+            <code class="flex-1 px-4 py-2 bg-surface rounded-lg text-primary text-sm font-mono">https://ccna-platform.wasmer.app/api/revolut/webhook</code>
+            <button class="px-3 py-2 bg-primary/10 text-primary rounded-lg text-sm font-medium" onclick="navigator.clipboard.writeText('https://ccna-platform.wasmer.app/api/revolut/webhook')">Αντιγραφή</button>
           </div>
         </div>
       </div>
 
       {/* Supabase Tab */}
       <div id="tab-supabase" class="tab-content hidden">
-        <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
-          <h3 class="text-lg font-bold text-text mb-4">🗄️ Supabase</h3>
+        <div class="bg-surface-card rounded-xl border border-primary/10 p-6 mb-6">
+          <h3 class="text-lg font-bold text-text mb-4">🗄️ Supabase Configuration</h3>
+          <p class="text-sm text-text-muted mb-4">Τα Supabase keys είναι διαμορφωμένα στον server μέσω environment variables για ασφάλεια.</p>
           <div class="space-y-4">
             <div>
               <label class="block text-sm font-medium text-text mb-1">Project URL</label>
-              <input type="text" value="https://jhesstimsojwmkdysmpy.supabase.co" class="w-full px-4 py-2 bg-surface border border-primary/10 rounded-lg text-text font-mono text-sm" />
+              <div class="px-4 py-2 bg-surface-light border border-primary/10 rounded-lg text-text font-mono text-sm">https://jhesstimsojwmkdysmpy.supabase.co</div>
             </div>
-            <div class="grid grid-cols-2 gap-4">
-              <div class="flex items-center gap-3"><div class="w-3 h-3 rounded-full bg-success"></div><span class="text-sm text-text">profiles</span></div>
-              <div class="flex items-center gap-3"><div class="w-3 h-3 rounded-full bg-success"></div><span class="text-sm text-text">lesson_progress</span></div>
-              <div class="flex items-center gap-3"><div class="w-3 h-3 rounded-full bg-success"></div><span class="text-sm text-text">quiz_scores</span></div>
-              <div class="flex items-center gap-3"><div class="w-3 h-3 rounded-full bg-success"></div><span class="text-sm text-text">user_points</span></div>
+            <div>
+              <label class="block text-sm font-medium text-text mb-1">Anon Key (Public)</label>
+              <div class="px-4 py-2 bg-surface-light border border-primary/10 rounded-lg text-text-muted font-mono text-sm">Διαμορφωμένο μέσω environment variable</div>
+            </div>
+            <div class="bg-success/10 rounded-lg p-4">
+              <p class="text-sm text-success">✓ Όλα τα ευαίσθητα keys αποθηκεύονται στον server και δεν εκτίθενται στον browser.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
+          <h3 class="text-lg font-bold text-text mb-4">Κατάσταση Βάσης Δεδομένων</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="flex items-center gap-3">
+              <div class="w-3 h-3 rounded-full bg-success"></div>
+              <span class="text-sm text-text">profiles table</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-3 h-3 rounded-full bg-success"></div>
+              <span class="text-sm text-text">lesson_progress table</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-3 h-3 rounded-full bg-success"></div>
+              <span class="text-sm text-text">quiz_scores table</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-3 h-3 rounded-full bg-success"></div>
+              <span class="text-sm text-text">user_points table</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-3 h-3 rounded-full bg-success"></div>
+              <span class="text-sm text-text">RLS policies</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-3 h-3 rounded-full bg-success"></div>
+              <span class="text-sm text-text">Triggers</span>
             </div>
           </div>
         </div>
@@ -154,26 +222,96 @@ const t = el;
 
       {/* Settings Tab */}
       <div id="tab-settings" class="tab-content hidden">
-        <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
-          <h3 class="text-lg font-bold text-text mb-4">⚙️ Ρυθμίσεις</h3>
-          <div class="space-y-4">
-            <label class="flex items-center justify-between">
-              <span class="text-sm text-text">Ενεργοποίηση Εγγραφών</span>
-              <input type="checkbox" checked class="w-5 h-5 rounded" />
-            </label>
-            <label class="flex items-center justify-between">
-              <span class="text-sm text-text">Ενεργοποίηση Επαναφοράς Κωδικού</span>
-              <input type="checkbox" checked class="w-5 h-5 rounded" />
-            </label>
-            <label class="flex items-center justify-between">
-              <span class="text-sm text-text">Λειτουργία Συντήρησης</span>
-              <input type="checkbox" class="w-5 h-5 rounded" />
-            </label>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* General Settings */}
+          <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
+            <h3 class="text-lg font-bold text-text mb-4">⚙️ Γενικές Ρυθμίσεις</h3>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-text mb-1">Όνομα Ιστοσελίδας</label>
+                <input type="text" id="site-name" value="NetworkLearn" class="w-full px-4 py-2 bg-surface border border-primary/10 rounded-lg text-text" />
+                <p class="text-xs text-text-muted mt-1">Εμφανίζεται στην κεφαλίδα και τους τίτλους σελίδων</p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-text mb-1">Logo URL</label>
+                <input type="text" id="logo-url" placeholder="https://example.com/logo.png" class="w-full px-4 py-2 bg-surface border border-primary/10 rounded-lg text-text" />
+                <p class="text-xs text-text-muted mt-1">Εισάγετε URL για την εικόνα logo (PNG/SVG)</p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-text mb-1">Προεπισκόπηση Logo</label>
+                <div class="flex items-center gap-3 p-3 bg-surface rounded-lg border border-primary/10">
+                  <div id="logo-preview" class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-xl">N</div>
+                  <span id="logo-name-preview" class="text-text font-medium">NetworkLearn</span>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-text mb-1">URL Ιστοσελίδας</label>
+                <input type="text" id="site-url" value="https://networklearn.wasmer.app" class="w-full px-4 py-2 bg-surface border border-primary/10 rounded-lg text-text" />
+              </div>
+              <button id="save-general" class="w-full px-6 py-2 bg-gradient-to-r from-primary to-accent text-white rounded-lg font-medium hover:opacity-90 transition-opacity">Αποθήκευση Γενικών Ρυθμίσεων</button>
+            </div>
+          </div>
+
+          {/* Feature Flags */}
+          <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
+            <h3 class="text-lg font-bold text-text mb-4">🚩 Feature Flags</h3>
+            <div class="space-y-4">
+              <label class="flex items-center justify-between">
+                <span class="text-sm text-text">Ενεργοποίηση Εγγραφών</span>
+                <input type="checkbox" checked class="w-5 h-5 rounded" id="flag-registration" />
+              </label>
+              <label class="flex items-center justify-between">
+                <span class="text-sm text-text">Ενεργοποίηση Επαναφοράς Κωδικού</span>
+                <input type="checkbox" checked class="w-5 h-5 rounded" id="flag-password-reset" />
+              </label>
+              <label class="flex items-center justify-between">
+                <span class="text-sm text-text">Ενεργοποίηση Google OAuth</span>
+                <input type="checkbox" class="w-5 h-5 rounded" id="flag-google-oauth" />
+              </label>
+              <label class="flex items-center justify-between">
+                <span class="text-sm text-text">Λειτουργία Συντήρησης</span>
+                <input type="checkbox" class="w-5 h-5 rounded" id="flag-maintenance" />
+              </label>
+            </div>
+          </div>
+
+          {/* Email Settings */}
+          <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
+            <h3 class="text-lg font-bold text-text mb-4">📧 Ρυθμίσεις Email (SMTP)</h3>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-text mb-1">SMTP Host</label>
+                <input type="text" id="smtp-host" placeholder="smtp.gmail.com" class="w-full px-4 py-2 bg-surface border border-primary/10 rounded-lg text-text text-sm" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-text mb-1">SMTP Port</label>
+                <input type="text" id="smtp-port" value="587" class="w-full px-4 py-2 bg-surface border border-primary/10 rounded-lg text-text text-sm" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-text mb-1">SMTP Username</label>
+                <input type="text" id="smtp-user" placeholder="your@email.com" class="w-full px-4 py-2 bg-surface border border-primary/10 rounded-lg text-text text-sm" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-text mb-1">SMTP Password</label>
+                <input type="password" id="smtp-pass" class="w-full px-4 py-2 bg-surface border border-primary/10 rounded-lg text-text text-sm" />
+              </div>
+              <button id="save-email" class="px-6 py-2 bg-primary/10 text-primary rounded-lg font-medium">Αποθήκευση Ρυθμίσεων Email</button>
+            </div>
+          </div>
+
+          {/* Payment Settings */}
+          <div class="bg-surface-card rounded-xl border border-primary/10 p-6">
+            <h3 class="text-lg font-bold text-text mb-4">💳 Ρυθμίσεις Πληρωμών (Stripe Backup)</h3>
+            <p class="text-sm text-text-muted mb-4">Τα Stripe credentials αποθηκεύονται στον server για ασφάλεια.</p>
+            <div class="bg-success/10 rounded-lg p-4">
+              <p class="text-sm text-success">✓ Τα credentials πληρωμών αποθηκεύονται με ασφάλεια στον server.</p>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </main>
+
   <Footer locale={locale} translations={t} />
   </div>
 
