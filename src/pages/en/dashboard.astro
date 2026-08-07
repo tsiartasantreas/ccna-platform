@@ -501,23 +501,27 @@ const modules = [
 
       if (certError) {
         console.error('Certificate verification error:', certError);
-        alert('Error creating certificate verification. Please try again.');
-        return;
+        // Continue with certificate generation even if verification fails
       }
 
-      const verificationCode = certData?.verification_code;
+      const verificationCode = certData?.verification_code || 'PENDING';
       const verificationUrl = `https://networklearn.wasmer.app/en/verify/${verificationCode}`;
 
       // Generate QR code
-      const QRCode = await import('qrcode');
-      const qrDataUrl = await QRCode.toDataURL(verificationUrl, {
-        width: 150,
-        margin: 1,
-        color: {
-          dark: '#1a1a2e',
-          light: '#ffffff'
-        }
-      });
+      let qrDataUrl = null;
+      try {
+        const QRCode = await import('qrcode');
+        qrDataUrl = await QRCode.toDataURL(verificationUrl, {
+          width: 150,
+          margin: 1,
+          color: {
+            dark: '#1a1a2e',
+            light: '#ffffff'
+          }
+        });
+      } catch (qrError) {
+        console.error('QR code generation error:', qrError);
+      }
 
       // Generate PDF certificate
       const { jsPDF } = await import('jspdf');
@@ -525,15 +529,22 @@ const modules = [
       const w = doc.internal.pageSize.getWidth();
       const h = doc.internal.pageSize.getHeight();
 
+      // Load certificate template from local path
       try {
-        const templateUrl = 'https://raw.githubusercontent.com/tsiartasantreas/ccna-platform/main/public/images/certificate-bg.png';
+        const templateUrl = '/images/certificate-bg.png';
         const response = await fetch(templateUrl);
-        const blob = await response.blob();
-        const reader = new FileReader();
-        await new Promise((resolve) => {
-          reader.onload = function() { doc.addImage(reader.result, 'PNG', 0, 0, w, h); resolve(); };
-          reader.readAsDataURL(blob);
-        });
+        if (response.ok) {
+          const blob = await response.blob();
+          const reader = new FileReader();
+          await new Promise((resolve) => {
+            reader.onload = function() { doc.addImage(reader.result, 'PNG', 0, 0, w, h); resolve(); };
+            reader.readAsDataURL(blob);
+          });
+        } else {
+          // Fallback: white background
+          doc.setFillColor(255, 255, 255);
+          doc.rect(0, 0, w, h, 'F');
+        }
       } catch(e) {
         doc.setFillColor(255, 255, 255);
         doc.rect(0, 0, w, h, 'F');
@@ -565,15 +576,17 @@ const modules = [
       doc.text(`Verification Code: ${verificationCode}`, w / 2, 170, { align: 'center' });
 
       // Add QR code to bottom right corner
-      const qrSize = 25;
-      const qrX = w - qrSize - 15;
-      const qrY = h - qrSize - 15;
-      doc.addImage(qrDataUrl, 'PNG', qrX, qrY, qrSize, qrSize);
+      if (qrDataUrl) {
+        const qrSize = 25;
+        const qrX = w - qrSize - 15;
+        const qrY = h - qrSize - 15;
+        doc.addImage(qrDataUrl, 'PNG', qrX, qrY, qrSize, qrSize);
 
-      // Add verification URL text near QR code
-      doc.setFontSize(7);
-      doc.setTextColor(100, 116, 139);
-      doc.text('Scan to verify', qrX + qrSize/2, qrY + qrSize + 3, { align: 'center' });
+        // Add verification URL text near QR code
+        doc.setFontSize(7);
+        doc.setTextColor(100, 116, 139);
+        doc.text('Scan to verify', qrX + qrSize/2, qrY + qrSize + 3, { align: 'center' });
+      }
 
       doc.save(`NetworkLearn-Certificate-${userName.replace(/\s+/g, '-').toLowerCase()}.pdf`);
 

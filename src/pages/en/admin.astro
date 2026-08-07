@@ -600,19 +600,24 @@ const t = en;
               const w = doc.internal.pageSize.getWidth();
               const h = doc.internal.pageSize.getHeight();
 
-              // Load certificate template background
+              // Load certificate template background from local path
               try {
-                const templateUrl = 'https://raw.githubusercontent.com/tsiartasantreas/ccna-platform/main/public/images/certificate-bg.png';
+                const templateUrl = '/images/certificate-bg.png';
                 const response = await fetch(templateUrl);
-                const blob = await response.blob();
-                const reader = new FileReader();
-                await new Promise((resolve) => {
-                  reader.onload = function() {
-                    doc.addImage(reader.result, 'PNG', 0, 0, w, h);
-                    resolve();
-                  };
-                  reader.readAsDataURL(blob);
-                });
+                if (response.ok) {
+                  const blob = await response.blob();
+                  const reader = new FileReader();
+                  await new Promise((resolve) => {
+                    reader.onload = function() {
+                      doc.addImage(reader.result, 'PNG', 0, 0, w, h);
+                      resolve();
+                    };
+                    reader.readAsDataURL(blob);
+                  });
+                } else {
+                  doc.setFillColor(255, 255, 255);
+                  doc.rect(0, 0, w, h, 'F');
+                }
               } catch(e) {
                 doc.setFillColor(255, 255, 255);
                 doc.rect(0, 0, w, h, 'F');
