@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 @theme {
-  /* Cisco NetAcad-inspired Color Palette */
-  --color-primary: #049fd9;
-  --color-primary-dark: #0077b6;
-  --color-primary-light: #48cae4;
-  --color-accent: #00b4d8;
-  --color-accent-light: #90e0ef;
+  /* Cisco Green Color Palette */
+  --color-primary: #049a49;
+  --color-primary-dark: #037a3a;
+  --color-primary-light: #04b85a;
+  --color-accent: #6cc04a;
+  --color-accent-light: #8ed06a;
   --color-surface: #1a1a2e;
   --color-surface-light: #16213e;
   --color-surface-card: #0f3460;
@@ -136,14 +136,14 @@ code, pre {
 
 /* Professional glass morphism utility */
 .glass {
-  background: rgba(4, 159, 217, 0.05);
+  background: rgba(4, 154, 73, 0.05);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(4, 159, 217, 0.15);
+  border: 1px solid rgba(4, 154, 73, 0.15);
 }
 
 .light .glass {
   background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(4, 159, 217, 0.2);
+  border: 1px solid rgba(4, 154, 73, 0.2);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
@@ -173,11 +173,11 @@ code, pre {
 
 /* Light mode borders */
 .light .border-primary\/10 {
-  border-color: rgba(4, 159, 217, 0.15);
+  border-color: rgba(4, 154, 73, 0.15);
 }
 
 .light .border-primary\/20 {
-  border-color: rgba(4, 159, 217, 0.25);
+  border-color: rgba(4, 154, 73, 0.25);
 }
 
 /* Light mode inputs */
@@ -188,8 +188,8 @@ code, pre {
 }
 
 .light input:focus, .light select:focus, .light textarea:focus {
-  border-color: #049fd9;
-  box-shadow: 0 0 0 3px rgba(4, 159, 217, 0.12);
+  border-color: #049a49;
+  box-shadow: 0 0 0 3px rgba(4, 154, 73, 0.12);
 }
 
 /* Light mode buttons */
@@ -224,34 +224,34 @@ button[title="Επιστροφή στην κορυφή"] {
 
 /* Logo frame styling */
 header a .relative {
-  box-shadow: 0 0 0 2px rgba(4, 159, 217, 0.2);
+  box-shadow: 0 0 0 2px rgba(4, 154, 73, 0.2);
 }
 
 header a:hover .relative {
-  box-shadow: 0 0 0 2px rgba(4, 159, 217, 0.5), 0 0 15px rgba(4, 159, 217, 0.3);
+  box-shadow: 0 0 0 2px rgba(4, 154, 73, 0.5), 0 0 15px rgba(4, 154, 73, 0.3);
 }
 
 /* Network grid background pattern */
 .network-grid {
   background-image:
-    linear-gradient(rgba(4, 159, 217, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(4, 159, 217, 0.05) 1px, transparent 1px);
+    linear-gradient(rgba(4, 154, 73, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(4, 154, 73, 0.05) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
 /* Dot matrix pattern */
 .dot-matrix {
-  background-image: radial-gradient(circle, rgba(4, 159, 217, 0.1) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(4, 154, 73, 0.1) 1px, transparent 1px);
   background-size: 20px 20px;
 }
 
 /* Gradient mesh background */
 .gradient-mesh {
   background:
-    radial-gradient(at 0% 0%, rgba(4, 159, 217, 0.15) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(0, 180, 216, 0.1) 0px, transparent 50%),
+    radial-gradient(at 0% 0%, rgba(4, 154, 73, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(108, 192, 74, 0.1) 0px, transparent 50%),
     radial-gradient(at 100% 100%, rgba(247, 37, 133, 0.05) 0px, transparent 50%),
-    radial-gradient(at 0% 100%, rgba(0, 119, 182, 0.1) 0px, transparent 50%);
+    radial-gradient(at 0% 100%, rgba(3, 122, 58, 0.1) 0px, transparent 50%);
 }
 
 /* Professional card hover effect */
@@ -261,13 +261,13 @@ header a:hover .relative {
 
 .card-professional:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 30px rgba(4, 159, 217, 0.15);
-  border-color: rgba(4, 159, 217, 0.4);
+  box-shadow: 0 12px 30px rgba(4, 154, 73, 0.15);
+  border-color: rgba(4, 154, 73, 0.4);
 }
 
 /* Gradient text utility */
 .gradient-text {
-  background: linear-gradient(135deg, #049fd9 0%, #00b4d8 50%, #90e0ef 100%);
+  background: linear-gradient(135deg, #049a49 0%, #6cc04a 50%, #8ed06a 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -297,8 +297,8 @@ header a:hover .relative {
 /* Network connection lines decoration */
 .network-lines {
   background-image:
-    linear-gradient(45deg, transparent 48%, rgba(4, 159, 217, 0.1) 48%, rgba(4, 159, 217, 0.1) 52%, transparent 52%),
-    linear-gradient(-45deg, transparent 48%, rgba(0, 180, 216, 0.1) 48%, rgba(0, 180, 216, 0.1) 52%, transparent 52%);
+    linear-gradient(45deg, transparent 48%, rgba(4, 154, 73, 0.1) 48%, rgba(4, 154, 73, 0.1) 52%, transparent 52%),
+    linear-gradient(-45deg, transparent 48%, rgba(108, 192, 74, 0.1) 48%, rgba(108, 192, 74, 0.1) 52%, transparent 52%);
   background-size: 30px 30px;
 }
 
@@ -315,7 +315,7 @@ header a:hover .relative {
   inset: 0;
   border-radius: 1rem;
   padding: 1px;
-  background: linear-gradient(135deg, rgba(4, 159, 217, 0.5), rgba(0, 180, 216, 0.2), transparent);
+  background: linear-gradient(135deg, rgba(4, 154, 73, 0.5), rgba(108, 192, 74, 0.2), transparent);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -329,8 +329,8 @@ header a:hover .relative {
   gap: 0.5rem;
   padding: 0.5rem 1rem;
   border-radius: 9999px;
-  background: linear-gradient(135deg, rgba(4, 159, 217, 0.1), rgba(0, 180, 216, 0.05));
-  border: 1px solid rgba(4, 159, 217, 0.25);
+  background: linear-gradient(135deg, rgba(4, 154, 73, 0.1), rgba(108, 192, 74, 0.05));
+  border: 1px solid rgba(4, 154, 73, 0.25);
   color: var(--color-primary);
   font-size: 0.875rem;
   font-weight: 500;
@@ -338,24 +338,24 @@ header a:hover .relative {
 
 /* Stats card style */
 .stats-card {
-  background: linear-gradient(135deg, rgba(4, 159, 217, 0.05), rgba(0, 180, 216, 0.02));
-  border: 1px solid rgba(4, 159, 217, 0.15);
+  background: linear-gradient(135deg, rgba(4, 154, 73, 0.05), rgba(108, 192, 74, 0.02));
+  border: 1px solid rgba(4, 154, 73, 0.15);
   border-radius: 1rem;
   padding: 1.5rem;
   transition: all 0.3s ease;
 }
 
 .stats-card:hover {
-  background: linear-gradient(135deg, rgba(4, 159, 217, 0.1), rgba(0, 180, 216, 0.05));
-  border-color: rgba(4, 159, 217, 0.3);
+  background: linear-gradient(135deg, rgba(4, 154, 73, 0.1), rgba(108, 192, 74, 0.05));
+  border-color: rgba(4, 154, 73, 0.3);
   transform: translateY(-2px);
 }
 
 /* Glow effect for CTAs */
 .glow-primary {
-  box-shadow: 0 0 20px rgba(4, 159, 217, 0.3);
+  box-shadow: 0 0 20px rgba(4, 154, 73, 0.3);
 }
 
 .glow-primary:hover {
-  box-shadow: 0 0 30px rgba(4, 159, 217, 0.5);
+  box-shadow: 0 0 30px rgba(4, 154, 73, 0.5);
 }
