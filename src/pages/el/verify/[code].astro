@@ -1,0 +1,199 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Header from '../../../components/layout/Header.tsx';
+import Footer from '../../../components/layout/Footer.tsx';
+import el from '../../../i18n/el.json';
+
+export function getStaticPaths() {
+  return [];
+}
+
+const locale = 'el';
+const t = el;
+const { code } = Astro.params;
+---
+
+<BaseLayout title="Επαλήθευση Πιστοποιητικού" description="Επαλήθευση πιστοποιητικού NetworkLearn" lang={locale}>
+  <Header locale={locale} translations={t} client:load />
+
+  <main class="pt-24 pb-16 min-h-screen">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Loading State */}
+      <div id="loading-state" class="text-center py-12">
+        <div class="animate-spin w-12 h-12 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+        <p class="text-text-muted">Επαλήθευση πιστοποιητικού...</p>
+      </div>
+
+      {/* Valid Certificate */}
+      <div id="valid-cert" class="hidden">
+        <div class="bg-surface-card rounded-2xl border border-primary/20 overflow-hidden">
+          {/* Header */}
+          <div class="bg-gradient-to-r from-primary to-accent p-8 text-center">
+            <div class="text-5xl mb-3">✅</div>
+            <h1 class="text-2xl font-bold text-white mb-1">Πιστοποιητικό Επαληθευμένο</h1>
+            <p class="text-white/80 text-sm">Αυτό το πιστοποιητικό είναι γνήσιο και έγκυρο</p>
+          </div>
+
+          {/* Certificate Details */}
+          <div class="p-8 space-y-6">
+            {/* Recipient */}
+            <div class="text-center">
+              <div class="text-sm text-text-muted mb-1">Απονεμήθηκε στον/στην</div>
+              <div id="cert-name" class="text-3xl font-bold gradient-text"></div>
+            </div>
+
+            {/* Program */}
+            <div class="text-center">
+              <div class="text-sm text-text-muted mb-1">Για την ολοκλήρωση</div>
+              <div class="text-xl font-bold text-text">Προγράμματος Εκπαίδευσης Δικτυακής Μηχανικής</div>
+            </div>
+
+            {/* Details Grid */}
+            <div class="grid grid-cols-2 gap-4 pt-4 border-t border-primary/10">
+              <div class="bg-surface-light rounded-xl p-4 text-center">
+                <div class="text-sm text-text-muted mb-1">Εκδόθηκε</div>
+                <div id="cert-date" class="text-lg font-bold text-text"></div>
+              </div>
+              <div class="bg-surface-light rounded-xl p-4 text-center">
+                <div class="text-sm text-text-muted mb-1">Μέσος Όρος</div>
+                <div id="cert-score" class="text-lg font-bold text-primary"></div>
+              </div>
+            </div>
+
+            {/* Verification Code */}
+            <div class="bg-surface-light rounded-xl p-4">
+              <div class="text-sm text-text-muted mb-2">Κωδικός Επαλήθευσης</div>
+              <div id="cert-code" class="text-lg font-mono font-bold text-primary"></div>
+            </div>
+
+            {/* Quiz Scores */}
+            <div id="quiz-scores-section" class="hidden">
+              <div class="text-sm text-text-muted mb-3">Βαθμολογίες Ενοτήτων</div>
+              <div id="quiz-scores" class="space-y-2"></div>
+            </div>
+
+            {/* Share */}
+            <div class="pt-4 border-t border-primary/10">
+              <div class="text-sm text-text-muted mb-3">Κοινοποίηση πιστοποιητικού</div>
+              <div class="flex gap-3">
+                <button onclick="navigator.clipboard.writeText(window.location.href); alert('Σύνδεσμος αντιγράφηκε!')" class="flex-1 px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:opacity-90">
+                  Αντιγραφή Συνδέσμου
+                </button>
+                <a href={`https://twitter.com/intent/tweet?text=Ολοκλήρωσα%20το%20Πρόγραμμα%20Εκπαίδευσης%20Δικτυακής%20Μηχανικής%20στο%20NetworkLearn!&url=${encodeURIComponent(Astro.url.href)}`} target="_blank" class="flex-1 px-4 py-2 border border-primary/30 text-primary rounded-lg text-sm font-medium hover:bg-primary/10 text-center">
+                  Κοινοποίηση στο X
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Back to Platform */}
+        <div class="text-center mt-8">
+          <a href={`/${locale}/`} class="text-primary hover:underline text-sm">
+            ← Επιστροφή στο NetworkLearn
+          </a>
+        </div>
+      </div>
+
+      {/* Invalid Certificate */}
+      <div id="invalid-cert" class="hidden">
+        <div class="bg-surface-card rounded-2xl border border-error/20 overflow-hidden">
+          {/* Header */}
+          <div class="bg-gradient-to-r from-error to-red-600 p-8 text-center">
+            <div class="text-5xl mb-3">❌</div>
+            <h1 class="text-2xl font-bold text-white mb-1">Πιστοποιητικό Δεν Βρέθηκε</h1>
+            <p class="text-white/80 text-sm">Αυτός ο κωδικός επαλήθευσης δεν είναι έγκυρος ή το πιστοποιητικό έχει ανακληθεί</p>
+          </div>
+
+          {/* Details */}
+          <div class="p-8 text-center">
+            <div class="bg-surface-light rounded-xl p-4 mb-6">
+              <div class="text-sm text-text-muted mb-2">Κωδικός Επαλήθευσης</div>
+              <div class="text-lg font-mono font-bold text-error">{code}</div>
+            </div>
+
+            <p class="text-text-muted mb-6">
+              Αυτό μπορεί να σημαίνει:
+            </p>
+            <ul class="text-left text-text-muted text-sm space-y-2 mb-6 max-w-md mx-auto">
+              <li class="flex items-start gap-2">
+                <span class="text-error mt-1">•</span>
+                <span>Ο κωδικός επαλήθευσης είναι λανθασμένος</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-error mt-1">•</span>
+                <span>Το πιστοποιητικό έχει ανακληθεί από διαχειριστή</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-error mt-1">•</span>
+                <span>Ο σύνδεσμος μπορεί να είναι ελλιπής ή κατεστραμμένος</span>
+              </li>
+            </ul>
+
+            <a href={`/${locale}/`} class="inline-flex px-6 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity">
+              Μετάβαση στο NetworkLearn
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <Footer locale={locale} translations={t} />
+
+  <script define:vars={{ verificationCode: code }}>
+    import { supabase } from '../../../lib/supabase';
+
+    async function verifyCertificate() {
+      const loadingState = document.getElementById('loading-state');
+      const validCert = document.getElementById('valid-cert');
+      const invalidCert = document.getElementById('invalid-cert');
+
+      try {
+        const { data, error } = await supabase.rpc('verify_certificate', {
+          p_verification_code: verificationCode
+        });
+
+        if (error || !data || data.is_valid === false) {
+          loadingState.classList.add('hidden');
+          invalidCert.classList.remove('hidden');
+          return;
+        }
+
+        // Populate certificate details
+        document.getElementById('cert-name').textContent = data.user_name || 'Κάτοχος Πιστοποιητικού';
+        document.getElementById('cert-date').textContent = new Date(data.issued_at).toLocaleDateString('el-GR', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+        document.getElementById('cert-score').textContent = `${Math.round(data.total_score || 0)}%`;
+        document.getElementById('cert-code').textContent = data.verification_code;
+
+        // Show quiz scores if available
+        if (data.quiz_scores && data.quiz_scores.length > 0) {
+          const moduleNames = ['Θεμέλια Δικτύων', 'Πρόσβαση Δικτύου', 'Συνδεσιμότητα IP', 'Υπηρεσίες IP', 'Θεμέλια Ασφάλειας', 'Αυτοματοποίηση'];
+          const quizScoresSection = document.getElementById('quiz-scores-section');
+          const quizScoresDiv = document.getElementById('quiz-scores');
+
+          quizScoresSection.classList.remove('hidden');
+          quizScoresDiv.innerHTML = data.quiz_scores.map(score => `
+            <div class="flex items-center justify-between p-2 bg-surface-light rounded-lg">
+              <span class="text-sm text-text">Ενότητα ${score.module_number}: ${moduleNames[score.module_number - 1]}</span>
+              <span class="text-sm font-bold ${score.score >= 80 ? 'text-success' : 'text-warning'}">${Math.round(score.score)}%</span>
+            </div>
+          `).join('');
+        }
+
+        loadingState.classList.add('hidden');
+        validCert.classList.remove('hidden');
+      } catch (err) {
+        console.error('Verification error:', err);
+        loadingState.classList.add('hidden');
+        invalidCert.classList.remove('hidden');
+      }
+    }
+
+    verifyCertificate();
+  </script>
+</BaseLayout>

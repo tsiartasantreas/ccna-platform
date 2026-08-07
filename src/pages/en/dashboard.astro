@@ -230,6 +230,36 @@ const modules = [
     </div>
   </div>
 
+  {/* Certificate Verification Modal */}
+  <div id="cert-verify-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div class="bg-surface-card rounded-2xl border border-primary/10 p-8 max-w-lg mx-4 text-center animate-fade-in">
+      <div class="text-6xl mb-4">✅</div>
+      <h2 class="text-2xl font-bold text-text mb-2">Certificate Generated!</h2>
+      <p class="text-text-muted mb-4">Your certificate has been downloaded with a verification QR code.</p>
+
+      <div class="bg-surface-light rounded-xl p-4 mb-6 text-left">
+        <div class="text-sm text-text-muted mb-1">Verification Code:</div>
+        <div id="cert-verify-code" class="text-lg font-mono font-bold text-primary"></div>
+      </div>
+
+      <div class="bg-surface-light rounded-xl p-4 mb-6 text-left">
+        <div class="text-sm text-text-muted mb-1">Verification URL:</div>
+        <a id="cert-verify-link" href="#" target="_blank" class="text-sm text-primary hover:underline break-all"></a>
+      </div>
+
+      <p class="text-xs text-text-muted mb-4">Share this link to allow anyone to verify your certificate.</p>
+
+      <div class="flex gap-3 justify-center">
+        <button onclick="navigator.clipboard.writeText(document.getElementById('cert-verify-link').textContent); alert('Link copied!')" class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:opacity-90">
+          Copy Link
+        </button>
+        <button onclick="document.getElementById('cert-verify-modal').classList.add('hidden')" class="px-4 py-2 border border-primary/30 text-primary rounded-lg text-sm font-medium hover:bg-primary/10">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
   <Footer locale={locale} translations={t} />
 
   <script>
@@ -458,8 +488,38 @@ const modules = [
         return;
       }
 
-      // Generate certificate
+      // Generate certificate with verification
       const userName = session.user.user_metadata?.display_name || session.user.email?.split('@')[0] || 'User';
+      const userEmail = session.user.email || '';
+
+      // Create verification record in database
+      const { data: certData, error: certError } = await supabase.rpc('create_certificate_verification', {
+        p_user_id: session.user.id,
+        p_user_name: userName,
+        p_user_email: userEmail
+      });
+
+      if (certError) {
+        console.error('Certificate verification error:', certError);
+        alert('Error creating certificate verification. Please try again.');
+        return;
+      }
+
+      const verificationCode = certData?.verification_code;
+      const verificationUrl = `https://networklearn.wasmer.app/en/verify/${verificationCode}`;
+
+      // Generate QR code
+      const QRCode = await import('qrcode');
+      const qrDataUrl = await QRCode.toDataURL(verificationUrl, {
+        width: 150,
+        margin: 1,
+        color: {
+          dark: '#1a1a2e',
+          light: '#ffffff'
+        }
+      });
+
+      // Generate PDF certificate
       const { jsPDF } = await import('jspdf');
       const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
       const w = doc.internal.pageSize.getWidth();
@@ -500,8 +560,35 @@ const modules = [
       doc.setFontSize(11);
       doc.text(`Issued on ${date}`, w / 2, 160, { align: 'center' });
 
+      // Add verification code
+      doc.setFontSize(9);
+      doc.text(`Verification Code: ${verificationCode}`, w / 2, 170, { align: 'center' });
+
+      // Add QR code to bottom right corner
+      const qrSize = 25;
+      const qrX = w - qrSize - 15;
+      const qrY = h - qrSize - 15;
+      doc.addImage(qrDataUrl, 'PNG', qrX, qrY, qrSize, qrSize);
+
+      // Add verification URL text near QR code
+      doc.setFontSize(7);
+      doc.setTextColor(100, 116, 139);
+      doc.text('Scan to verify', qrX + qrSize/2, qrY + qrSize + 3, { align: 'center' });
+
       doc.save(`NetworkLearn-Certificate-${userName.replace(/\s+/g, '-').toLowerCase()}.pdf`);
-      alert('Certificate downloaded!');
+
+      // Show verification link modal
+      const verifyModal = document.getElementById('cert-verify-modal');
+      const verifyLink = document.getElementById('cert-verify-link');
+      const verifyCode = document.getElementById('cert-verify-code');
+      if (verifyModal && verifyLink && verifyCode) {
+        verifyLink.href = verificationUrl;
+        verifyLink.textContent = verificationUrl;
+        verifyCode.textContent = verificationCode;
+        verifyModal.classList.remove('hidden');
+      } else {
+        alert(`Certificate downloaded!\n\nVerification Code: ${verificationCode}\nVerification URL: ${verificationUrl}`);
+      }
     });
 
     // Upgrade button handler

@@ -96,6 +96,7 @@ const t = el;
                   <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Πλάνο</th>
                   <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Μαθήματα</th>
                   <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Βαθμολογία</th>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Πιστοποιητικό</th>
                   <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Ενέργειες</th>
                 </tr>
               </thead>
@@ -350,9 +351,13 @@ const t = el;
         const allProgress = adminData?.lesson_progress || [];
         const allScores = adminData?.quiz_scores || [];
         const adminEmails = adminData?.admin_emails || [];
+        const certificates = adminData?.certificates || [];
 
         const emailMap: Record<string, string> = {};
         adminEmails.forEach((e: any) => { emailMap[e.user_id] = e.email_encrypted; });
+
+        const certMap: Record<string, any> = {};
+        certificates.forEach((c: any) => { if (c.is_valid) certMap[c.user_id] = c; });
 
         const totalUsers = profiles.length;
         const proUsers = profiles.filter((p: any) => p.plan === 'pro').length;
@@ -380,6 +385,8 @@ const t = el;
             const lc = up.filter((lp: any) => lp.status === 'completed').length;
             const as2 = us.length ? Math.round(us.reduce((s: number, q: any) => s + Number(q.score), 0) / us.length) : 0;
             const em = emailMap[p.id] || p.id.substring(0, 8) + '...';
+            const userCert = certMap[p.id];
+            const verifyLink = userCert ? `/el/verify/${userCert.verification_code}` : null;
 
             return `<tr class="border-b border-primary/5 hover:bg-surface-light">
               <td class="px-4 py-3 text-sm text-text font-medium">${sanitize(p.display_name) || 'User'}</td>
@@ -387,6 +394,7 @@ const t = el;
               <td class="px-4 py-3"><select class="plan-select-el px-2 py-1 bg-surface border border-primary/10 rounded text-xs text-text" data-user-id="${p.id}"><option value="free" ${p.plan === 'free' ? 'selected' : ''}>Free</option><option value="pro" ${p.plan === 'pro' ? 'selected' : ''}>Pro</option></select></td>
               <td class="px-4 py-3 text-sm text-text">${lc}/35</td>
               <td class="px-4 py-3 text-sm ${as2 >= 80 ? 'text-success' : as2 > 0 ? 'text-warning' : 'text-text-muted'}">${as2 > 0 ? as2 + '%' : '—'}</td>
+              <td class="px-4 py-3">${verifyLink ? `<a href="${verifyLink}" target="_blank" class="text-xs text-primary hover:underline">🔗 Προβολή</a>` : `<span class="text-xs text-text-muted">—</span>`}</td>
               <td class="px-4 py-3 flex gap-2 flex-wrap">
                 <button class="save-plan-btn-el text-xs text-success hover:underline" data-user-id="${p.id}">Αποθήκευση</button>
                 <button class="cert-btn-el text-xs text-accent hover:underline" data-user-id="${p.id}" data-user-name="${sanitize(p.display_name) || 'User'}" data-lessons="${lc}" data-score="${as2}">🎓 Πιστοπ.</button>

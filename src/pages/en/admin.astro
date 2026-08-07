@@ -129,6 +129,7 @@ const t = en;
                   <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Lessons</th>
                   <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Avg Score</th>
                   <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Last Active</th>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Certificate</th>
                   <th class="px-4 py-3 text-left text-sm font-medium text-text-muted">Actions</th>
                 </tr>
               </thead>
@@ -439,11 +440,18 @@ const t = en;
         const allProgress = adminData?.lesson_progress || [];
         const allScores = adminData?.quiz_scores || [];
         const adminEmails = adminData?.admin_emails || [];
+        const certificates = adminData?.certificates || [];
 
         // Create email lookup map
         const emailMap: Record<string, string> = {};
         adminEmails?.forEach(e => {
           emailMap[e.user_id] = e.email_encrypted;
+        });
+
+        // Create certificate lookup map
+        const certMap: Record<string, any> = {};
+        certificates?.forEach(c => {
+          if (c.is_valid) certMap[c.user_id] = c;
         });
 
         const totalUsers = profiles?.length || 0;
@@ -503,6 +511,9 @@ const t = en;
 
             const userEmail = emailMap[p.id] || p.email || p.id.substring(0, 8) + '...';
 
+            const userCert = certMap[p.id];
+            const verifyLink = userCert ? `/en/verify/${userCert.verification_code}` : null;
+
             return `<tr class="border-b border-primary/5 hover:bg-surface-light" data-user-id="${p.id}">
               <td class="px-4 py-3 text-sm text-text font-medium">${sanitize(p.display_name) || 'User'}</td>
               <td class="px-4 py-3 text-sm text-text-muted font-mono text-xs">${sanitize(userEmail)}</td>
@@ -515,6 +526,12 @@ const t = en;
               <td class="px-4 py-3 text-sm text-text">${lessonsCompleted}/35</td>
               <td class="px-4 py-3 text-sm ${avgScore >= 80 ? 'text-success' : avgScore > 0 ? 'text-warning' : 'text-text-muted'}">${avgScore > 0 ? avgScore + '%' : '—'}</td>
               <td class="px-4 py-3 text-sm text-text-muted">${new Date(p.updated_at).toLocaleDateString()}</td>
+              <td class="px-4 py-3">
+                ${verifyLink
+                  ? `<a href="${verifyLink}" target="_blank" class="text-xs text-primary hover:underline">🔗 View</a>`
+                  : `<span class="text-xs text-text-muted">—</span>`
+                }
+              </td>
               <td class="px-4 py-3 flex gap-2 flex-wrap">
                 <button class="save-plan-btn text-xs text-success hover:underline" data-user-id="${p.id}">Save</button>
                 <button class="reset-pw-btn text-xs text-primary hover:underline" data-user-id="${p.id}" data-user-email="${sanitize(userEmail)}">Reset PW</button>
